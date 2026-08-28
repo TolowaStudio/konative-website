@@ -1,53 +1,25 @@
 name: Konative Weekly Ingest — Canada Queue + IESO
 
-# Replaces the two Vercel cron jobs from web/vercel.json after the migration to
-# Cloudflare (Vercel deprecated 2026-07). Cloudflare Pages does not run Vercel
-# crons, so these weekly ingestion jobs run here instead by hitting the same
-# authenticated API routes on the live site.
+# DISABLED (TOL-322): Schedule removed. This workflow duplicated the live Cloudflare
+# Worker `konative-cron` (same Monday UTC crons, no repo deploy path). Clear the
+# Worker schedules via scripts/cloudflare-clear-konative-cron.mjs before re-enabling
+# any weekly ingest automation.
 #
-# Required repo secrets:
-#   CRON_SECRET  — same value as the site's CRON_SECRET env (Bearer auth on the routes)
-# Optional repo variable:
-#   SITE_URL     — defaults to https://konative.com
+# See docs/konative-leftover-compute.md.
 
 on:
-  schedule:
-    # Mondays 07:00 UTC (was: vercel.json crons at 07:00 and 08:00 UTC Monday)
-    - cron: '0 7 * * 1'
-  workflow_dispatch: # allow manual trigger from the Actions UI
+  workflow_dispatch: # manual trigger only — fails fast below
 
 jobs:
   ingest:
     name: Trigger weekly ingestion endpoints
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      SITE_URL: ${{ vars.SITE_URL || 'https://konative.com' }}
-      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+    timeout-minutes: 5
+
     steps:
-      - name: Guard — CRON_SECRET present
+      - name: Blocked — scheduler consolidation pending (TOL-322)
         run: |
-          if [ -z "$CRON_SECRET" ]; then
-            echo "::error::CRON_SECRET repo secret is not set — the ingest routes will 401."
-            exit 1
-          fi
-
-      - name: Ingest Canada interconnection queue
-        run: |
-          echo "→ POSTing ${SITE_URL}/api/ingest-canada-queue"
-          code=$(curl -sS -o /tmp/canada.json -w '%{http_code}' \
-            -H "Authorization: Bearer ${CRON_SECRET}" \
-            "${SITE_URL}/api/ingest-canada-queue")
-          echo "HTTP ${code}"; cat /tmp/canada.json || true
-          test "$code" = "200"
-
-      - name: Ingest IESO application status
-        # Don't fail the whole run if IESO's upstream feed is briefly down.
-        continue-on-error: true
-        run: |
-          echo "→ POSTing ${SITE_URL}/api/ingest-ieso"
-          code=$(curl -sS -o /tmp/ieso.json -w '%{http_code}' \
-            -H "Authorization: Bearer ${CRON_SECRET}" \
-            "${SITE_URL}/api/ingest-ieso")
-          echo "HTTP ${code}"; cat /tmp/ieso.json || true
-          test "$code" = "200"
+          echo "::error::ingest-weekly.yml schedule removed. konative-cron Worker may still fire."
+          echo "::error::Run: node scripts/cloudflare-clear-konative-cron.mjs (needs CLOUDFLARE_API_TOKEN)"
+          echo "::error::See docs/konative-leftover-compute.md before re-enabling."
+          exit 1

@@ -1,30 +1,15 @@
 name: Refresh static PMTiles
 
-# Scheduled cadence (all times UTC):
-#   CWFIS fire zones        – monthly 04:00 on the 1st, May–Oct (fire season)
-#   NRCAN power/transmission – quarterly 04:00 on the 1st of Jan/Apr/Jul/Oct
-#   CPCAD + CIRNAC/TIGER    – annually 04:00 / 05:00 on 1 Nov (post-summer update)
-#   WRI Aqueduct            – manual only (new versions every 2–3 years)
-#   BCER pipelines          – monthly 06:00 on the 1st (permits change throughout year)
+# DISABLED (TOL-316): Cloudflare R2 is off (403 / NotEntitled). Scheduled runs were
+# failing and burning Actions minutes. Re-enable after GCS bucket + workflow migration.
+# See docs/konative-leftover-compute.md.
 #
-# Manual trigger: Actions → "Refresh static PMTiles" → Run workflow → pick a layer.
+# Legacy cadence (UTC) — do not restore until GCS path exists:
+#   CWFIS – monthly May–Oct · NRCAN – quarterly · CPCAD/CIRNAC – Nov · BCER – monthly
 #
-# Required GitHub Secrets:
-#   CLOUDFLARE_ACCOUNT_ID   – Cloudflare account ID (dash.cloudflare.com → right sidebar)
-#   R2_ACCESS_KEY_ID        – R2 API token client ID  (Cloudflare → R2 → Manage R2 API tokens)
-#   R2_SECRET_ACCESS_KEY    – R2 API token secret
-#   R2_BUCKET_NAME          – bucket name, e.g. "konative-tiles"
-#   R2_PUBLIC_URL           – public bucket URL, e.g. "https://pub-abc123.r2.dev"
-#
-# No GH_PAT needed — uses the built-in GITHUB_TOKEN with contents:write.
+# Archived R2 secrets (retired): R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_URL
 
 on:
-  schedule:
-    - cron: '0 4 1 5-10 *'       # CWFIS – monthly May–Oct
-    - cron: '0 4 1 1,4,7,10 *'   # NRCAN – quarterly
-    - cron: '0 4 1 11 *'         # CPCAD – annually Nov
-    - cron: '0 5 1 11 *'         # CIRNAC + TIGER – annually Nov
-    - cron: '0 6 1 * *'          # BCER – monthly
   workflow_dispatch:
     inputs:
       layer:
@@ -57,9 +42,21 @@ env:
 
 jobs:
 
+  gate:
+    name: Blocked — R2 retired (TOL-316)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail fast
+        run: |
+          echo "::error::refresh-tiles.yml is disabled. R2 konative-tiles/konative-data are off."
+          echo "::error::Provision GCS + migrate workflow per docs/konative-leftover-compute.md."
+          echo "::error::Do not re-enable R2 or restore schedule triggers until GCS is live."
+          exit 1
+
   # ── 1. CWFIS fire weather zones ─────────────────────────────────────────────
   cwfis:
     name: CWFIS fire weather zones
+    needs: gate
     runs-on: ubuntu-latest
     if: |
       (github.event_name == 'schedule' && github.event.schedule == '0 4 1 5-10 *') ||
@@ -139,6 +136,7 @@ jobs:
   # ── 2. NRCAN power + transmission + CER pipelines ───────────────────────────
   nrcan:
     name: NRCAN power, transmission, CER pipelines
+    needs: gate
     runs-on: ubuntu-latest
     if: |
       (github.event_name == 'schedule' && github.event.schedule == '0 4 1 1,4,7,10 *') ||
@@ -289,6 +287,7 @@ jobs:
   # ── 3. CPCAD protected areas ─────────────────────────────────────────────────
   cpcad:
     name: CPCAD protected areas
+    needs: gate
     runs-on: ubuntu-latest
     if: |
       (github.event_name == 'schedule' && github.event.schedule == '0 4 1 11 *') ||
@@ -385,6 +384,7 @@ jobs:
   # ── 4. CIRNAC indigenous lands + US TIGER AIANNH ────────────────────────────
   indigenous:
     name: CIRNAC indigenous lands + US TIGER
+    needs: gate
     runs-on: ubuntu-latest
     if: |
       (github.event_name == 'schedule' && github.event.schedule == '0 5 1 11 *') ||
@@ -509,6 +509,7 @@ jobs:
   # ── 5. WRI Aqueduct water risk (manual-only) ─────────────────────────────────
   wri-aqueduct:
     name: WRI Aqueduct water risk (manual only)
+    needs: gate
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'workflow_dispatch' &&
@@ -605,6 +606,7 @@ jobs:
   # ── 6. BCER pipeline tiles ───────────────────────────────────────────────────
   bcer:
     name: BCER pipeline tiles (BC Energy Regulator)
+    needs: gate
     runs-on: ubuntu-latest
     if: |
       (github.event_name == 'schedule' && github.event.schedule == '0 6 1 * *') ||
