@@ -16,8 +16,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Token unset in production: leave /cms and /studio public until konative-ADMIN_ACCESS_TOKEN exists.
   if (access === "disabled") {
-    return new NextResponse("Admin surfaces are not configured on this deployment", { status: 503 });
+    return NextResponse.next();
   }
 
   return new NextResponse("Authentication required", {

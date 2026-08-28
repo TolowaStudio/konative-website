@@ -75,6 +75,28 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
+          SECRETS="\
+          SANITY_API_TOKEN=konative-SANITY_API_TOKEN:latest,\
+          SUPABASE_SERVICE_ROLE_KEY=konative-SUPABASE_SERVICE_ROLE_KEY:latest,\
+          ANTHROPIC_API_KEY=konative-ANTHROPIC_API_KEY:latest,\
+          CRON_SECRET=konative-CRON_SECRET:latest,\
+          NEWS_INGEST_TOKEN=konative-NEWS_INGEST_TOKEN:latest,\
+          TWENTY_INTAKE_WEBHOOK_URL=konative-TWENTY_INTAKE_WEBHOOK_URL:latest,\
+          TWENTY_INTAKE_WEBHOOK_TOKEN=konative-TWENTY_INTAKE_WEBHOOK_TOKEN:latest,\
+          GHOST_URL=konative-GHOST_URL:latest,\
+          GHOST_ADMIN_API_KEY=konative-GHOST_ADMIN_API_KEY:latest,\
+          GHOST_CONTENT_API_KEY=konative-GHOST_CONTENT_API_KEY:latest,\
+          RESEND_API_KEY=konative-RESEND_API_KEY:latest,\
+          RESEND_FROM=konative-RESEND_FROM:latest,\
+          RESEND_TO=konative-RESEND_TO:latest,\
+          DATABASE_URI=konative-DATABASE_URI:latest"
+          if gcloud secrets describe konative-ADMIN_ACCESS_TOKEN \
+            --project "${{ env.GCP_PROJECT }}" >/dev/null 2>&1; then
+            SECRETS="${SECRETS},ADMIN_ACCESS_TOKEN=konative-ADMIN_ACCESS_TOKEN:latest"
+            echo "konative-ADMIN_ACCESS_TOKEN found — binding admin lock secret"
+          else
+            echo "konative-ADMIN_ACCESS_TOKEN missing — deploy without admin lock until operator adds secret"
+          fi
           gcloud run deploy "${{ env.SERVICE_NAME }}" \
             --project "${{ env.GCP_PROJECT }}" \
             --image "${IMAGE}" \
@@ -87,22 +109,7 @@ jobs:
             --max-instances 3 \
             --memory 1Gi \
             --cpu 1 \
-            --set-secrets="\
-          SANITY_API_TOKEN=konative-SANITY_API_TOKEN:latest,\
-          SUPABASE_SERVICE_ROLE_KEY=konative-SUPABASE_SERVICE_ROLE_KEY:latest,\
-          ANTHROPIC_API_KEY=konative-ANTHROPIC_API_KEY:latest,\
-          CRON_SECRET=konative-CRON_SECRET:latest,\
-          NEWS_INGEST_TOKEN=konative-NEWS_INGEST_TOKEN:latest,\
-          TWENTY_INTAKE_WEBHOOK_URL=konative-TWENTY_INTAKE_WEBHOOK_URL:latest,\
-          TWENTY_INTAKE_WEBHOOK_TOKEN=konative-TWENTY_INTAKE_WEBHOOK_TOKEN:latest,\
-          ADMIN_ACCESS_TOKEN=konative-ADMIN_ACCESS_TOKEN:latest,\
-          GHOST_URL=konative-GHOST_URL:latest,\
-          GHOST_ADMIN_API_KEY=konative-GHOST_ADMIN_API_KEY:latest,\
-          GHOST_CONTENT_API_KEY=konative-GHOST_CONTENT_API_KEY:latest,\
-          RESEND_API_KEY=konative-RESEND_API_KEY:latest,\
-          RESEND_FROM=konative-RESEND_FROM:latest,\
-          RESEND_TO=konative-RESEND_TO:latest,\
-          DATABASE_URI=konative-DATABASE_URI:latest" \
+            --set-secrets="${SECRETS}" \
             --update-env-vars="\
           NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL }},\
           NEXT_PUBLIC_SANITY_PROJECT_ID=${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }},\
