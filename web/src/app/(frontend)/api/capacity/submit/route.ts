@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { submitForm } from "@/lib/forms/submit";
+import { submitFormResponse } from "@/lib/forms/formResponse";
 import { capacitySchema } from "@/lib/forms/schemas/capacity";
 
 export async function POST(request: Request) {
@@ -18,12 +19,5 @@ export async function POST(request: Request) {
     emailSubject: `New capacity RFP: ${b?.company ?? "unknown"} — ${b?.mwRequired ?? "?"}MW`,
   });
 
-  if (!result.ok) {
-    if (result.errors) {
-      return NextResponse.json({ error: "Validation failed", errors: result.errors }, { status: 400 });
-    }
-    return NextResponse.json({ error: result.message ?? "Submission failed" }, { status: 500 });
-  }
-
-  return NextResponse.json({ success: true, id: result.id });
+  return submitFormResponse(result);
 }

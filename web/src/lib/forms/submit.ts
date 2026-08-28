@@ -2,10 +2,12 @@ import { ZodSchema } from "zod";
 import { getSanityWriteClient } from "@/sanity/writeClient";
 import { scoreInquiry, type TriageResult } from "@/lib/forms/triage";
 
+export type SubmitFailureStage = "persist" | "notify" | "crm";
+
 export type SubmitResult =
   | { ok: true; id: string }
-  | { ok: false; errors: { path: string; message: string }[]; message?: undefined }
-  | { ok: false; errors?: undefined; message: string };
+  | { ok: false; errors: { path: string; message: string }[]; message?: undefined; stage?: undefined; id?: undefined }
+  | { ok: false; errors?: undefined; message: string; stage: SubmitFailureStage; id?: string };
 
 export interface SubmitOptions<T> {
   schemaType: string;
@@ -141,6 +143,7 @@ export async function submitForm<T extends Record<string, unknown>>(
     console.error(`[submitForm] Sanity write failed for ${schemaType}:`, err);
     return {
       ok: false,
+      stage: "persist",
       message: "Failed to save submission. Please try again.",
     };
   }
@@ -206,6 +209,8 @@ export async function submitForm<T extends Record<string, unknown>>(
     console.error(`[submitForm] Resend error for ${schemaType} (doc ${docId}):`, err);
     return {
       ok: false,
+      stage: "notify",
+      id: docId,
       message: "Failed to send notification. Please try again.",
     };
   }
@@ -223,6 +228,8 @@ export async function submitForm<T extends Record<string, unknown>>(
     console.error(`[submitForm] CRM webhook error for ${schemaType} (doc ${docId}):`, err);
     return {
       ok: false,
+      stage: "crm",
+      id: docId,
       message: "Failed to route inquiry. Please try again.",
     };
   }

@@ -10,10 +10,11 @@ verified before production activation.
 - `TWENTY_API_TOKEN` (preferred) or `TWENTY_API_KEY`: the existing Twenty workspace API credential
 - `TWENTY_API_URL`: the existing Twenty GraphQL base URL
 
-## Required Vercel environment variables
+## Required Cloud Run environment variables
 
 - `TWENTY_INTAKE_WEBHOOK_URL=https://<n8n-host>/webhook/konative-intake`
 - `TWENTY_INTAKE_WEBHOOK_TOKEN=<same value as KONATIVE_INTAKE_TOKEN>`
+- `CRM_WEBHOOK_REQUIRED=true` (set in deploy workflow once n8n intake is verified)
 
 ## Safe activation sequence
 
@@ -23,7 +24,7 @@ verified before production activation.
 4. Confirm one company, person, opportunity, and follow-up task in Twenty.
 5. Repeat the same payload and confirm the opportunity is not duplicated.
 6. Activate the workflow.
-7. Add the two Vercel variables to Preview and Production, then redeploy.
+7. Add the webhook secrets to Cloud Run (GCP Secret Manager `konative-*`), then redeploy.
 8. Submit one labeled production test inquiry and verify the Sanity and Twenty
    record IDs.
 

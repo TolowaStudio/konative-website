@@ -8,6 +8,22 @@ const nextConfig: NextConfig = {
   output: "standalone",
   /** Cloud Run only — keep Node pg out of the OpenNext Worker bundle (TOL-321). */
   serverExternalPackages: ["pg", "pg-cloudflare"],
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains",
+          },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       { source: "/powered-land", destination: "/data-center-connectivity", permanent: true },

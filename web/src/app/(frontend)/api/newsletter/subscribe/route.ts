@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse, after } from "next/server";
 import { submitForm } from "@/lib/forms/submit";
+import { submitFormResponse } from "@/lib/forms/formResponse";
 import { newsletterSchema } from "@/lib/forms/schemas/newsletter";
 import {
   ghostAdminFetch,
@@ -34,10 +35,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (!result.ok) {
-    if (result.errors) {
-      return NextResponse.json({ error: "Validation failed", errors: result.errors }, { status: 400 });
-    }
-    return NextResponse.json({ error: result.message ?? "Subscription failed" }, { status: 500 });
+    return submitFormResponse(result, "Subscription failed");
   }
 
   // Ghost member upsert (non-blocking — never fail the user signup on Ghost

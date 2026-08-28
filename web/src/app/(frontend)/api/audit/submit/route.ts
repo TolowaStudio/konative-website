@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { submitForm } from "@/lib/forms/submit";
+import { submitFormResponse } from "@/lib/forms/formResponse";
 import { auditInquirySchema } from "@/lib/forms/schemas/audit";
 
 // R4 Readiness Audit inquiries land in Sanity as `auditInquiry` docs and
@@ -20,17 +21,5 @@ export async function POST(request: Request) {
     emailSubject: `[Konative] Readiness Audit inquiry — ${b?.organization ?? "?"} (${b?.audience ?? "?"})`,
   });
 
-  if (!result.ok) {
-    if (result.errors) {
-      return NextResponse.json(
-        { error: "Validation failed", errors: result.errors },
-        { status: 400 },
-      );
-    }
-    return NextResponse.json(
-      { error: result.message ?? "Submission failed" },
-      { status: 500 },
-    );
-  }
-  return NextResponse.json({ success: true, id: result.id });
+  return submitFormResponse(result);
 }
