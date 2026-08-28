@@ -95,6 +95,7 @@ jobs:
           NEWS_INGEST_TOKEN=konative-NEWS_INGEST_TOKEN:latest,\
           TWENTY_INTAKE_WEBHOOK_URL=konative-TWENTY_INTAKE_WEBHOOK_URL:latest,\
           TWENTY_INTAKE_WEBHOOK_TOKEN=konative-TWENTY_INTAKE_WEBHOOK_TOKEN:latest,\
+          ADMIN_ACCESS_TOKEN=konative-ADMIN_ACCESS_TOKEN:latest,\
           GHOST_URL=konative-GHOST_URL:latest,\
           GHOST_ADMIN_API_KEY=konative-GHOST_ADMIN_API_KEY:latest,\
           GHOST_CONTENT_API_KEY=konative-GHOST_CONTENT_API_KEY:latest,\
@@ -111,7 +112,8 @@ jobs:
           NEXT_PUBLIC_GHOST_URL=${{ secrets.NEXT_PUBLIC_GHOST_URL }},\
           NEXT_PUBLIC_GHOST_CONTENT_API_KEY=${{ secrets.NEXT_PUBLIC_GHOST_CONTENT_API_KEY }},\
           NEXT_PUBLIC_GTM_ID=${{ secrets.NEXT_PUBLIC_GTM_ID }},\
-          NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}"
+          NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }},\
+          CRM_WEBHOOK_REQUIRED=true"
 
       - name: Smoke /api/v1/health
         run: |

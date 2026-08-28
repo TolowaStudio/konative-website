@@ -43,7 +43,21 @@ export default function ContactPage() {
       });
 
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
+        const body = (await res.json().catch(() => ({}))) as {
+          error?: string;
+          stage?: string;
+          id?: string;
+        };
+        if (body.stage === "crm" && body.id) {
+          throw new Error(
+            "We received your inquiry but could not complete team routing. Please email deals@konative.com and we will follow up.",
+          );
+        }
+        if (body.stage === "notify" && body.id) {
+          throw new Error(
+            "We saved your inquiry but could not send an email notification. Please email deals@konative.com to ensure we receive it.",
+          );
+        }
         throw new Error(body.error || "Something went wrong. Please try again.");
       }
 

@@ -81,8 +81,10 @@ describe("submitForm", () => {
       emailSubject: "Test Contact",
     });
     expect(result.ok).toBe(false);
-    if (!result.ok) {
+    if (!result.ok && !result.errors) {
       expect(result.message).toBe("Failed to send notification. Please try again.");
+      expect(result.stage).toBe("notify");
+      expect(result.id).toBe("mock-id-123");
     }
     expect(mockCreate).toHaveBeenCalledOnce();
   });
@@ -96,8 +98,10 @@ describe("submitForm", () => {
       emailSubject: "Test Contact",
     });
     expect(result.ok).toBe(false);
-    if (!result.ok) {
+    if (!result.ok && !result.errors) {
       expect(result.message).toBe("Failed to send notification. Please try again.");
+      expect(result.stage).toBe("notify");
+      expect(result.id).toBe("mock-id-123");
     }
     expect(mockCreate).toHaveBeenCalledOnce();
     expect(mockFetch).toHaveBeenCalledWith(
@@ -153,8 +157,10 @@ describe("submitForm", () => {
     });
 
     expect(result.ok).toBe(false);
-    if (!result.ok) {
+    if (!result.ok && !result.errors) {
       expect(result.message).toBe("Failed to route inquiry. Please try again.");
+      expect(result.stage).toBe("crm");
+      expect(result.id).toBe("mock-id-123");
     }
     expect(mockCreate).toHaveBeenCalledOnce();
   });
@@ -170,8 +176,10 @@ describe("submitForm", () => {
     });
 
     expect(result.ok).toBe(false);
-    if (!result.ok) {
+    if (!result.ok && !result.errors) {
       expect(result.message).toBe("Failed to route inquiry. Please try again.");
+      expect(result.stage).toBe("crm");
+      expect(result.id).toBe("mock-id-123");
     }
     expect(mockCreate).toHaveBeenCalledOnce();
   });

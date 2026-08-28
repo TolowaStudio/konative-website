@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { submitForm } from "@/lib/forms/submit";
+import { submitFormResponse } from "@/lib/forms/formResponse";
 import { contactSchema } from "@/lib/forms/schemas/contact";
 import { summarizeVoiceIntake, buildVoiceIntakeMarkdown, type VoiceAnswer } from "@/lib/forms/voiceIntakeSummary";
 
@@ -60,10 +61,7 @@ export async function POST(request: Request) {
   });
 
   if (!result.ok) {
-    if (result.errors) {
-      return NextResponse.json({ error: "Validation failed", errors: result.errors }, { status: 400 });
-    }
-    return NextResponse.json({ error: result.message ?? "Submission failed" }, { status: 500 });
+    return submitFormResponse(result);
   }
 
   return NextResponse.json({ success: true, id: result.id, summary });

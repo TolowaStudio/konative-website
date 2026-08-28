@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { submitForm } from "@/lib/forms/submit";
+import { submitFormResponse } from "@/lib/forms/formResponse";
 import { landFullSchema } from "@/lib/forms/schemas/land";
 
 export async function POST(request: Request) {
@@ -18,12 +19,5 @@ export async function POST(request: Request) {
     emailSubject: `New Land Inquiry: ${b?.name ?? "Unknown"} in ${b?.county ?? "Unknown"}, ${b?.state ?? "Unknown"}`,
   });
 
-  if (!result.ok) {
-    if (result.errors) {
-      return NextResponse.json({ error: "Validation failed", errors: result.errors }, { status: 400 });
-    }
-    return NextResponse.json({ error: result.message ?? "Submission failed" }, { status: 500 });
-  }
-
-  return NextResponse.json({ success: true, id: result.id });
+  return submitFormResponse(result);
 }
