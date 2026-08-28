@@ -22,7 +22,6 @@ env:
   AR_REPO: konative-website
   IMAGE_NAME: konative
   SERVICE_NAME: konative-website-staging
-  CLOUDSQL_INSTANCE: tolowa-studio:us-west1:konative-intel
 
 jobs:
   deploy:
@@ -76,21 +75,12 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          CLOUDSQL_FLAG=()
-          if gcloud sql instances describe konative-intel \
-            --project "${{ env.GCP_PROJECT }}" >/dev/null 2>&1; then
-            CLOUDSQL_FLAG=(--add-cloudsql-instances "${{ env.CLOUDSQL_INSTANCE }}")
-            echo "Cloud SQL instance found — attaching socket"
-          else
-            echo "Cloud SQL instance not found — deploy without socket (run provision-cloud-sql.yml)"
-          fi
           gcloud run deploy "${{ env.SERVICE_NAME }}" \
             --project "${{ env.GCP_PROJECT }}" \
             --image "${IMAGE}" \
             --region "${{ env.GCP_REGION }}" \
             --platform managed \
             --service-account konative-runtime@${{ env.GCP_PROJECT }}.iam.gserviceaccount.com \
-            "${CLOUDSQL_FLAG[@]}" \
             --port 8080 \
             --allow-unauthenticated \
             --min-instances 0 \
@@ -140,5 +130,5 @@ jobs:
           if gcloud secrets versions access latest --secret=konative-DATABASE_URI --project="${{ env.GCP_PROJECT }}" >/dev/null 2>&1; then
             test "${code}" = "200"
           else
-            echo "DATABASE_URI secret not set — health 503 acceptable until provision-cloud-sql.yml runs"
+            echo "DATABASE_URI secret not set — health 503 acceptable until Supabase DATABASE_URI is configured"
           fi

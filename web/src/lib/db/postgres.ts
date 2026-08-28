@@ -12,6 +12,30 @@ export { PostgresDatabaseUnavailableError };
 
 let pool: Pool | null = null;
 
+/**
+ * Supabase transaction pooler (and similar managed Postgres) presents a cert chain
+ * that fails Node's default TLS verification when sslmode=require is parsed by pg.
+ * Explicitly relax verification for SSL-required DSNs (Supabase serverless guidance).
+ */
+export function resolvePgSslFromConnectionString(
+  connectionString: string,
+): { rejectUnauthorized: false } | undefined {
+  try {
+    const normalized = connectionString.replace(/^postgres:\/\//, "postgresql://");
+    const url = new URL(normalized);
+    const sslmode = url.searchParams.get("sslmode")?.toLowerCase();
+    if (sslmode === "require" || sslmode === "verify-ca" || sslmode === "verify-full") {
+      return { rejectUnauthorized: false };
+    }
+    if (url.searchParams.get("ssl") === "true") {
+      return { rejectUnauthorized: false };
+    }
+    return undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function getConnectionString(): string {
   const uri = process.env.DATABASE_URI?.trim();
   if (!uri) {
@@ -24,8 +48,11 @@ function getConnectionString(): string {
 
 export function getPostgresPool(): Pool {
   if (!pool) {
+    const connectionString = getConnectionString();
+    const ssl = resolvePgSslFromConnectionString(connectionString);
     pool = new Pool({
-      connectionString: getConnectionString(),
+      connectionString,
+      ...(ssl ? { ssl } : {}),
       max: 10,
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 10_000,
