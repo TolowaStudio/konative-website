@@ -2,7 +2,7 @@
 
 **Canonical clone:** `~/repos/konative-website` — must match the GitHub repo name. Origin: `tolowa-studio/konative-website` (not the old `jerameyjames` redirect). OneDrive `_AI_projects/konative/konative-site` must be a **symlink** here, not a second checkout.
 
-App code lives in **`web/`** (Next.js 16 + Sanity + Builder.io). Site agent rules: `web/AGENTS.md`.
+App code lives in **`web/`** (Next.js 16 + Sanity). Site agent rules: `web/AGENTS.md`.
 
 ## Platform truth (2026-08-19)
 
@@ -27,7 +27,7 @@ Legacy OpenNext / `wrangler.jsonc` / `.github/workflows/deploy.yml` may still ex
 
 From `web/`: `npm ci` then **`npm run dev`** → **http://localhost:3005** (default port avoids collisions with 3000/3010/3011). Override: `npx next dev -p <port>`.
 
-**Node 22** everywhere (`web/.nvmrc` + `web/package.json` `engines.node`). Node 24+ has broken `isolated-vm` (Builder.io) installs.
+**Node 22** everywhere (`web/.nvmrc` + `web/package.json` `engines.node`).
 
 Copy env from `web/.env.local.example`.
 

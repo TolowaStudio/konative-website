@@ -8,7 +8,7 @@ Next.js site for connectivity intelligence, carrier-neutral brokerage, datacente
 
 - **Runtime:** Cloud Run (`konative-website-staging`) — public **konative.com** / **www**
 - **Data:** Supabase `tcbworxmlmxoyzcvdjhh` for intelligence tables and `/api/v1/*`
-- **CMS:** Sanity (+ Builder.io where already wired)
+- **CMS:** Sanity
 - **Newsletter:** Ghost on Railway
 - **Intake automation:** Twenty + n8n on Railway
 - **DNS:** Bunny (`kiki` / `coco`); Porkbun registrar only — never flip NS to Porkbun
@@ -27,7 +27,6 @@ Do **not** recommend Cloudflare Workers/OpenNext, D1, R2, KV, or Workers AI as t
 ## CMS rules
 
 - **Sanity** is curated CMS: pages, tribal/news editorial, form submissions, map/editorial records. Prefer block-based `layout` fields and stable slugs; avoid one-off hardcoded page fields when a reusable block works.
-- **Builder.io** only where already integrated — do not expand scope without approval.
 - Globals/settings: navigation, SEO defaults, site-wide config in Sanity globals where the schema supports it.
 - Content imports: follow `web/content/seed/import-ready-checklist.md` for positioning alignment before bulk publish.
 

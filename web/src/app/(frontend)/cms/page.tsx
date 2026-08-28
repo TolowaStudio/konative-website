@@ -62,15 +62,25 @@ export default async function CmsSystemPage() {
           {!allConfigured && (
             <div className="cms-hub__alert">
               <strong>Setup required</strong> — one or more integrations are
-              missing API keys. Add the environment variables below in the{" "}
+              missing API keys. Add the secrets below in{" "}
               <a
-                href="https://dash.cloudflare.com/e2b6ede12b96c7be2fe252c4b1e74bcf/workers/services/view/konative/production/settings/variables"
+                href="https://console.cloud.google.com/security/secret-manager?project=tolowa-studio"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Cloudflare Worker settings
+                GCP Secret Manager
               </a>{" "}
-              then redeploy.
+              (bound into Cloud Run at deploy) or in{" "}
+              <code className="cms-hub__code">web/.env.local</code> for local
+              dev, then redeploy via{" "}
+              <a
+                href="https://github.com/tolowa-studio/konative-website/actions/workflows/deploy-cloud-run.yml"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                deploy-cloud-run
+              </a>
+              .
             </div>
           )}
         </header>
@@ -204,11 +214,20 @@ export default async function CmsSystemPage() {
             </li>
             <li>
               <a
-                href="https://dash.cloudflare.com/e2b6ede12b96c7be2fe252c4b1e74bcf/workers/services/view/konative/production"
+                href="https://console.cloud.google.com/run/detail/us-west1/konative-website-staging?project=tolowa-studio"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Cloudflare Worker ↗
+                Cloud Run (staging) ↗
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://console.cloud.google.com/security/secret-manager?project=tolowa-studio"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GCP Secret Manager ↗
               </a>
             </li>
             <li>

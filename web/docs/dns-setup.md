@@ -1,26 +1,29 @@
-# DNS setup for konative.com on Cloudflare
+# DNS setup for konative.com
 
-**Superseded 2026-07-03.** This repo's platform is Cloudflare Workers (via OpenNext), not Vercel —
-see `CLAUDE.md` → Deploy Configuration. The Vercel nameserver/A-record instructions previously in
-this file are actively wrong: following them would point DNS away from the working Cloudflare setup.
+**Updated 2026-08-27.** Public traffic for **konative.com** and **www** is served by **Google Cloud Run** (`konative-website-staging`, GCP project `tolowa-studio`, region `us-west1`). DNS is managed at **Bunny**; **Porkbun** is the registrar only — do not move nameservers to Porkbun.
 
-## Current status (verified against the live Cloudflare API, 2026-07-03)
+## Current stack
 
-- `konative.com` and `www.konative.com` are both bound as Cloudflare Workers **Custom Domains** on
-  the `konative` Worker (account **Tolowa Studio**, `e2b6ede12b96c7be2fe252c4b1e74bcf`), production
-  environment, both `enabled: true`.
-- DNS for the `konative.com` zone (`zone_id 328a243ea23865d1113a519464970c89`) and TLS certificates
-  for both hostnames are fully managed by Cloudflare as part of the Custom Domain binding — there
-  are no manual A/CNAME records to create or maintain at an external registrar.
-- No action is needed here. If `konative.com` ever stops resolving, check (in order): the zone's
-  nameservers are still pointed at Cloudflare at the registrar, the Custom Domain bindings still show
-  `enabled: true` (Cloudflare dashboard → Workers & Pages → `konative` → Settings → Domains &
-  Routes, or `GET /accounts/{account_id}/workers/domains?service=konative` via the API), and the
-  Worker itself is deploying successfully (see Deploy Configuration in `CLAUDE.md`).
+| Layer | Provider | Notes |
+|-------|----------|-------|
+| **Registrar** | Porkbun | Domain registration only |
+| **DNS** | Bunny | Nameservers: `kiki.bunny.net`, `coco.bunny.net` |
+| **Public runtime** | Cloud Run | Service `konative-website-staging` serves production hostnames |
+
+## Operator notes
+
+- Record changes (A/CNAME, TLS, redirects) happen in the **Bunny DNS** panel for the `konative.com` zone — not in Vercel, Builder.io, or Cloudflare Workers.
+- Deploy path and runtime health: see root **`CLAUDE.md`** → Deploy.
+- If `konative.com` stops resolving, check (in order): Bunny nameservers still delegated at Porkbun, Bunny records still point at the live Cloud Run front door, Cloud Run service is healthy (`curl -sf https://konative.com -o /dev/null -w "%{http_code}\n"` expects `200`).
 
 ## Verification
 
 ```bash
-curl -sI https://konative.com | grep -i "^server:"   # expect: server: cloudflare
-curl -sL https://konative.com/ | head -c 400          # expect real app HTML, not a parked page
+curl -sf https://konative.com -o /dev/null -w "homepage: %{http_code}\n"
+curl -sf https://www.konative.com -o /dev/null -w "www: %{http_code}\n"
+curl -sf https://konative.com/api/v1/health
 ```
+
+## Historical note
+
+Earlier docs described **Cloudflare Workers** custom domains and **Vercel** A-record cutovers. Those platforms are **retired for application hosting** on Konative. Leftover Cloudflare account assets may still exist elsewhere in the org, but they are not the operator path for this site.

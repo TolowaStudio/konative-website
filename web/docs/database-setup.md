@@ -1,44 +1,53 @@
 # Data layer for Konative
 
-**Updated 2026-07-09.** Cloudflare-native intelligence data plane — Supabase is deprecated.
+**Updated 2026-08-27.**
 
 ## Current data layer
 
 | Layer | Store | What |
 |-------|-------|------|
-| **CMS / curated content** | [Sanity](https://sanity.io) | tribalProject, newsItem, pages, forms |
-| **Tabular intelligence** | **Cloudflare D1** (`konative-intel`) | TBCP, queue, PeeringDB, sponsors, signals |
-| **Geo / large files** | **Cloudflare R2** (`konative-tiles`, `konative-data`) | PMTiles, dataset snapshots |
-| **Hot cache** | **Cloudflare KV** | Layer manifests, sponsor-of-day |
-| **Metrics** | **Cloudflare Analytics Engine** | Page/sponsor/API events |
-| **Newsletter / blog** | Ghost (Railway) | Tribal Infrastructure Brief |
+| **CMS / curated content** | [Sanity](https://sanity.io) | Pages, tribal/news editorial, form submissions, site settings |
+| **Tabular intelligence** | **Supabase** (`tcbworxmlmxoyzcvdjhh`) | Intelligence tables and `/api/v1/*` read paths |
+| **Newsletter / blog** | Ghost (Railway) | Konative Dispatch and `/blog` |
 
-## Setup
+## Local setup
 
 ```bash
 cd web
-npm run d1:provision              # create D1 + KV, apply schema
-npm run d1:migrate-from-supabase  # one-time data copy (requires .env.local)
+cp .env.local.example .env.local
+# Fill in Sanity + Supabase + site URL vars (see below)
+npm ci
+npm run dev
 ```
 
-Schema: `web/d1/migrations/0001_konative_intel.sql`  
-Bindings: `web/wrangler.jsonc`
+Dev server: **http://localhost:3005**
 
-## Legacy (deprecated — remove after migration)
+## Environment variables
 
-- **Supabase** project `tcbworxmlmxoyzcvdjhh` — read paths fall back until D1 populated
-- See `docs/supabase-decommission-checklist.md`
+**Sanity (CMS):**
 
-## Env vars (production — Cloudflare Worker secrets)
+- `NEXT_PUBLIC_SANITY_PROJECT_ID`
+- `NEXT_PUBLIC_SANITY_DATASET` (usually `production`)
+- `SANITY_API_TOKEN` (Editor token with write access)
 
-**Sanity:** `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`, `SANITY_API_TOKEN`
+**Supabase (intelligence / `/api/v1/*`):**
 
-**Supabase (transitional):** `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` (server-only; required for privileged API routes)
 
-**Other:** See `CLAUDE.md` → Deploy Configuration
+**Site:**
 
-Local dev: copy from `web/.env.local.example`
+- `NEXT_PUBLIC_SITE_URL` (e.g. `https://konative.com`)
 
-## Architecture reference
+See `web/.env.local.example` for Ghost, Resend, CRM webhook, and other optional vars.
 
-`.context/konative-api-platform-architecture.md` (rev 3)
+## Production secrets
+
+Runtime secrets are stored in **GCP Secret Manager** (`konative-*` prefix) and bound into Cloud Run at deploy via `.github/workflows/deploy-cloud-run.yml`. Do not configure production credentials in Vercel, Builder.io, or Cloudflare Worker bindings.
+
+Build-time `NEXT_PUBLIC_*` values are passed from **GitHub Actions secrets** during the Docker build step in the same workflow.
+
+## Historical note
+
+An intermediate migration doc described **Cloudflare D1 / R2 / KV** as the intelligence data plane with Supabase as deprecated. That direction was not kept. **Supabase remains the active tabular datastore** per the current Cloud Run deploy workflow and platform guidance in root `CLAUDE.md`.
