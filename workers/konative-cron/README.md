@@ -13,7 +13,7 @@ committed **for visibility only** — this is not a build target, there is no
 deploy pipeline wired to this directory, and no `wrangler.toml` is included
 on purpose. Do not add one without first resolving TOL-322 (four competing
 scheduler surfaces for the same jobs — this Worker fires the same two
-Monday crons `.github/workflows/ingest-weekly.yml` also fires).
+Monday crons `.github/workflows/ingest-weekly.yml` also fired).
 
 ## What it does
 
@@ -29,9 +29,16 @@ Objects, no other bindings referenced — this closed the DO question in
 TOL-319 (no Durable Object exists anywhere in Konative's infrastructure;
 the exit audit's claim was stale).
 
-## Status
+## Status (2026-08-28)
 
-Confirmed still live and deployed as of 2026-08-18 (`workers_list` / `workers_get_worker`
-both return it). Whether it fires in parallel with `ingest-weekly.yml` for
-the same schedule — and whether that's safe — is exactly TOL-322's open
-question and is **not** resolved by this commit.
+**GitHub Actions:** `ingest-weekly.yml` schedule removed (TOL-322). Manual dispatch fails fast.
+
+**Cloudflare Worker:** Still deployed with Monday cron triggers until an operator runs
+`scripts/cloudflare-clear-konative-cron.mjs`. See `docs/konative-leftover-compute.md`.
+
+Pick **one** scheduler surface before re-enabling weekly ingest — not GHA + Worker in parallel.
+
+## Railway note
+
+`workers/index.js` (sibling directory) defines a `node-cron` Railway worker that was
+**never deployed** for Konative. No Railway service to stop for TOL-322.

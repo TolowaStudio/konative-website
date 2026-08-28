@@ -1,5 +1,8 @@
 import cron from 'node-cron';
 
+// Legacy Railway cron worker — NEVER DEPLOYED for Konative (TOL-322).
+// Schedules below are stale; see docs/konative-leftover-compute.md.
+
 const SITE_URL = process.env.SITE_URL?.replace(/\/$/, '');
 const CRON_SECRET = process.env.CRON_SECRET;
 

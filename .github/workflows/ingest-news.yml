@@ -1,15 +1,9 @@
 name: Konative Daily Ingest — News
 
-# Replaces the Railway cron from workers/index.js (`0 6 * * *` → /api/ingest-news).
-# Hits the live site (konative.com) authenticated API route from GitHub Actions.
+# DISABLED (frozen): News ingest stays off per web/AGENTS.md. Scheduled runs removed.
+# Re-enable only with explicit operator approval.
 #
-# Auth: NOT from GitHub repo secrets — tolowa-studio/konative-website has no
-# CRON_SECRET or NEWS_INGEST_TOKEN in gh secret list. Tokens live in GCP Secret
-# Manager (project tolowa-studio) and are fetched at runtime via the same WIF /
-# service-account pair as deploy-cloud-run.yml.
-#
-# Optional repo variable:
-#   SITE_URL — defaults to https://konative.com
+# Legacy: daily 06:00 UTC → GET /api/ingest-news on konative.com (was Railway cron).
 
 permissions:
   contents: read
@@ -20,58 +14,17 @@ env:
   SITE_URL: ${{ vars.SITE_URL || 'https://konative.com' }}
 
 on:
-  schedule:
-    # Daily 06:00 UTC (was: Railway workers/index.js cron)
-    - cron: '0 6 * * *'
-  workflow_dispatch: # allow manual trigger from the Actions UI
+  workflow_dispatch: # manual trigger only — fails fast below
 
 jobs:
   ingest:
     name: Trigger news ingestion endpoint
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
 
     steps:
-      - name: Guard — GCP WIF configured
+      - name: Blocked — news ingest frozen
         run: |
-          if [ -z "${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ] || [ -z "${{ vars.GCP_SERVICE_ACCOUNT }}" ]; then
-            echo "::error::GCP_WORKLOAD_IDENTITY_PROVIDER and GCP_SERVICE_ACCOUNT repo variables are not set."
-            echo "::error::Configure WIF via scripts/gcp-provision-konative.sh (same as deploy-cloud-run.yml)."
-            echo "::error::GitHub repo secrets do NOT hold CRON_SECRET or NEWS_INGEST_TOKEN — ingest-weekly.yml fails for the same reason."
-            exit 1
-          fi
-
-      - uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
-
-      - uses: google-github-actions/setup-gcloud@v2
-
-      - name: Fetch ingest token from Secret Manager
-        run: |
-          TOKEN=$(gcloud secrets versions access latest \
-            --secret=konative-NEWS_INGEST_TOKEN \
-            --project="${GCP_PROJECT}" 2>/dev/null | tr -d '\n' || true)
-          if [ -z "$TOKEN" ]; then
-            echo "konative-NEWS_INGEST_TOKEN not available — trying konative-CRON_SECRET"
-            TOKEN=$(gcloud secrets versions access latest \
-              --secret=konative-CRON_SECRET \
-              --project="${GCP_PROJECT}" | tr -d '\n')
-          fi
-          if [ -z "$TOKEN" ]; then
-            echo "::error::Neither konative-NEWS_INGEST_TOKEN nor konative-CRON_SECRET accessible in ${GCP_PROJECT}"
-            exit 1
-          fi
-          echo "::add-mask::${TOKEN}"
-          printf '%s' "$TOKEN" > /tmp/ingest-token
-
-      - name: Ingest news feeds
-        run: |
-          echo "→ GET ${SITE_URL}/api/ingest-news"
-          code=$(curl -sS -o /tmp/news.json -w '%{http_code}' \
-            -H "Authorization: Bearer $(cat /tmp/ingest-token)" \
-            "${SITE_URL}/api/ingest-news")
-          echo "HTTP ${code}"
-          cat /tmp/news.json || true
-          test "$code" = "200"
+          echo "::error::ingest-news.yml schedule removed. News ingest is frozen (web/AGENTS.md)."
+          echo "::error::Do not re-enable cron or workflow_dispatch without explicit approval."
+          exit 1
