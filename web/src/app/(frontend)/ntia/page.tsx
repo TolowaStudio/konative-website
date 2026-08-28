@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "NTIA TBCP Round 3 Connectivity Partner | Konative",
   description:
-    "TBCP Round 3 & NEGP close Sept 17, 2026. Konative brokers the operational connectivity grants don't fund — vendor-neutral, sovereignty-aware, $0 to the Tribe.",
+    "TBCP Round 3 closes Sept 17, 2026; NEGP closes Nov 17, 2026. Konative brokers the operational connectivity grants don't fund — vendor-neutral, sovereignty-aware, $0 to the Tribe.",
   keywords: [
     "NTIA TBCP Round 3",
     "Tribal Broadband Connectivity Program",
@@ -42,9 +42,9 @@ const facts: { value: string; label: string; note: string }[] = [
     note: "$540M in Tribal Broadband Connectivity Program Round 3 plus $250M in the Native Entities Grant Program (NTIA, June 2026 NOFO).",
   },
   {
-    value: "Sept 17, 2026",
-    label: "Application window closes",
-    note: "The window is open now. Applications are due by September 17, 2026 — no partial extensions assumed.",
+    value: "Sept 17 / Nov 17",
+    label: "Application deadlines",
+    note: "TBCP Round 3 (2026-NTIA-TBCP) closes September 17, 2026. NEGP (2026-NTIA-NEGP) was amended July 30, 2026 and closes November 17, 2026 — both at 11:59 p.m. ET via the NTIA grants portal.",
   },
   {
     value: "Spring 2027",
@@ -84,8 +84,8 @@ const brings: { num: string; title: string; body: string }[] = [
 const timeline: { phase: string; window: string; body: string }[] = [
   {
     phase: "Pre-Award",
-    window: "Now → Sept 17, 2026",
-    body: "Engage early. We review the connectivity requirements and help specify carrier-grade operational connectivity into the proposal before the deadline closes.",
+    window: "Now → Sept 17 / Nov 17, 2026",
+    body: "Engage early. TBCP Round 3 closes September 17, 2026; NEGP closes November 17, 2026. We review connectivity requirements and help specify carrier-grade operational connectivity into the proposal before the relevant deadline.",
   },
   {
     phase: "Award",
@@ -111,7 +111,7 @@ const faqs: { question: string; answer: string }[] = [
   {
     question: "What is NTIA TBCP Round 3 and how much funding is available?",
     answer:
-      "The NTIA Tribal Broadband Connectivity Program (TBCP) Round 3, combined with the Native Entities Grant Program (NEGP), makes approximately $790 million available for Tribal broadband. The application window is open now and closes September 17, 2026, with awards expected on a rolling basis beginning Spring 2027.",
+      "The NTIA Tribal Broadband Connectivity Program (TBCP) Round 3, together with the Native Entities Grant Program (NEGP), makes approximately $790 million available for Tribal broadband. TBCP Round 3 closes September 17, 2026; NEGP closes November 17, 2026 (amended July 30, 2026), with awards expected on a rolling basis beginning Spring 2027.",
   },
   {
     question: "Who is eligible to apply?",
@@ -131,7 +131,7 @@ const faqs: { question: string; answer: string }[] = [
   {
     question: "We haven't been awarded yet. Is it too early to engage Konative?",
     answer:
-      "No — pre-award is the right time. Engaging before the September 17, 2026 deadline lets us specify carrier-grade operational connectivity into your proposal and pre-negotiate carrier terms, so the connectivity is ready to execute the moment funding lands in Spring 2027 rather than restarted from scratch.",
+      "No — pre-award is the right time. Engaging before the TBCP Round 3 deadline (September 17, 2026) or the NEGP deadline (November 17, 2026) lets us specify carrier-grade operational connectivity into your proposal and pre-negotiate carrier terms, so the connectivity is ready to execute the moment funding lands in Spring 2027 rather than restarted from scratch.",
   },
   {
     question: "Is Konative really vendor-neutral?",
@@ -162,7 +162,7 @@ export default async function NtiaPage() {
     name: "NTIA Tribal Broadband Connectivity Program (TBCP) Round 3 & Native Entities Grant Program (NEGP)",
     serviceType: "Federal broadband grant program",
     description:
-      "Federal grant program administered by the NTIA making approximately $790 million available for Tribal broadband infrastructure. Application window closes September 17, 2026; awards begin on a rolling basis in Spring 2027.",
+      "Federal grant programs administered by the NTIA making approximately $790 million available for Tribal broadband infrastructure. TBCP Round 3 closes September 17, 2026; NEGP closes November 17, 2026; awards begin on a rolling basis in Spring 2027.",
     provider: {
       "@type": "GovernmentOrganization",
       name: "National Telecommunications and Information Administration (NTIA)",
@@ -192,14 +192,14 @@ export default async function NtiaPage() {
         ]}
       />
       <PitchLayout
-        eyebrow="NTIA TBCP Round 3 · Deadline Sept 17, 2026"
+        eyebrow="NTIA TBCP Round 3 · TBCP closes Sept 17 · NEGP Nov 17, 2026"
         titleLines={[
           { text: "GRANTS FUND", tone: "white" },
           { text: "THE FIBER.", tone: "white" },
           { text: "WE BROKER", tone: "dim" },
           { text: "THE CONNECTIVITY.", tone: "rust" },
         ]}
-        subhead="The NTIA Tribal Broadband Connectivity Program Round 3 ($540M) and the Native Entities Grant Program ($250M) put $790M toward Tribal broadband — and the window closes September 17, 2026. But grants fund the build, not the operational connectivity that runs on it. Konative is the vendor-neutral, sovereignty-aware partner that designs and sources that layer, at no cost to the Tribe."
+        subhead="The NTIA Tribal Broadband Connectivity Program Round 3 ($540M) and the Native Entities Grant Program ($250M) put $790M toward Tribal broadband — TBCP Round 3 closes September 17, 2026 and NEGP closes November 17, 2026. Grants fund the build, not the operational connectivity that runs on it. Konative is the vendor-neutral, sovereignty-aware partner that designs and sources that layer, at no cost to the Tribe."
         primaryCta={{ label: "Request a Round 3 connectivity consult →", href: "/contact#request" }}
         secondaryCta={{ label: "Tribal Enterprise →", href: "/tribal" }}
         heroImage={{
@@ -207,9 +207,9 @@ export default async function NtiaPage() {
           alt: "Excavator digging a trench for rural broadband cable installation",
           credit: { name: "Chandler Cruttenden", url: "https://unsplash.com/@chanphoto" },
         }}
-        ctaHeadlineTop="THE WINDOW CLOSES"
-        ctaHeadlineBottom="SEPTEMBER 17, 2026."
-        ctaSub="Engage before the deadline so carrier-grade connectivity is specified into your Round 3 proposal — ready to execute the moment funding lands in Spring 2027."
+        ctaHeadlineTop="TBCP CLOSES SEPT 17"
+        ctaHeadlineBottom="NEGP CLOSES NOV 17, 2026."
+        ctaSub="Engage before your program deadline so carrier-grade connectivity is specified into your proposal — ready to execute the moment funding lands in Spring 2027."
       >
         {/* The gap grants don't fund */}
         <PitchSection eyebrow="The Gap" heading="The layer grants don't fund">
@@ -492,7 +492,7 @@ export default async function NtiaPage() {
             }}
           >
             TBCP Round 3 and the NEGP are directed to Native entities. If you fall into one of the categories below,
-            you are eligible to apply before the September 17, 2026 deadline.
+            you are eligible to apply — TBCP Round 3 by September 17, 2026 and NEGP by November 17, 2026.
           </p>
           <ul
             style={{

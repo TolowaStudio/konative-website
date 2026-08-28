@@ -38,7 +38,7 @@ const FAQ_ITEMS = [
   {
     question: "What are TBCP 3 and NEGP?",
     answer:
-      "TBCP 3 is the 2026 round of NTIA's Tribal Broadband Connectivity Program. NEGP is the Native Entities Grant Program, the Native entity set-aside under the Digital Equity Act. Together, the 2026 funding lane is intended to support broadband connectivity, infrastructure availability, adoption, and related activities for Tribal and Native communities. Konative is not NTIA and does not administer grant awards.",
+      "TBCP 3 is the 2026 round of NTIA's Tribal Broadband Connectivity Program (2026-NTIA-TBCP), closing September 17, 2026. NEGP is the Native Entities Grant Program (2026-NTIA-NEGP), the Native entity set-aside under the Digital Equity Act, closing November 17, 2026 (amended July 30, 2026). Together, the 2026 funding lane is intended to support broadband connectivity, infrastructure availability, adoption, and related activities for Tribal and Native communities. Konative is not NTIA and does not administer grant awards.",
   },
   {
     question: "How can Konative help with TBCP 3 or NEGP?",

@@ -27,7 +27,8 @@
 
 - /data-center-connectivity — Primary cash lane: mid-build deliverability, laterals, waves, DCI
 - /tribal — Tribal gaming & enterprise connectivity (sovereignty-aware brokerage)
-- /tribal/funding-navigator — Free $790M TBCP Round 3 + NEGP navigator (due Sept 17, 2026) —
+- /tribal/funding-navigator — Free $790M TBCP Round 3 + NEGP navigator (TBCP due Sept 17;
+  NEGP due Nov 17, 2026) —
   trust resource; not a brokerage funnel
 - /tribal/sovereignty — Written sovereignty commitment
 - /tribal/carrier-check — Free 48-hour carrier availability report for Tribal lands

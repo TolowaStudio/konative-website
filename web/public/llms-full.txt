@@ -22,12 +22,14 @@ brokerage sales motion.
 
 Free resource, no signup. Verified against NTIA primary sources.
 
-On June 17, 2026, NTIA opened two funding opportunities for Tribal Nations. Applications for
-both are due September 17, 2026 at 11:59 p.m. ET via the NTIA grants portal. Awards roll out
-on a rolling basis beginning Spring 2027.
+On June 17, 2026, NTIA opened two funding opportunities for Tribal Nations. TBCP Round 3
+(2026-NTIA-TBCP) closes September 17, 2026 at 11:59 p.m. ET; NEGP (2026-NTIA-NEGP) was
+amended July 30, 2026 and closes November 17, 2026 at 11:59 p.m. ET via the NTIA grants
+portal. Awards roll out on a rolling basis beginning Spring 2027.
 
 ### TBCP Round 3 (Tribal Broadband Connectivity Program)
 - Total: $540 million. Run by NTIA BroadbandUSA.
+- Application deadline: September 17, 2026 at 11:59 p.m. ET (2026-NTIA-TBCP).
 - Eligible entities: Tribal governments, Tribal organizations, Tribal colleges and
   universities, the Department of Hawaiian Home Lands, and Alaska Native entities.
 - Eligible uses: broadband infrastructure deployment AND broadband use/adoption projects,
@@ -37,6 +39,7 @@ on a rolling basis beginning Spring 2027.
 
 ### NEGP (Native Entities Grant Program)
 - Total: $250 million, under the Digital Equity Act.
+- Application deadline: November 17, 2026 at 11:59 p.m. ET (2026-NTIA-NEGP; amended July 30, 2026).
 - Awards: $500,000 to $2.5 million each.
 - Match: 10%, waivable.
 - Purpose: Native entities' digital equity and inclusion activities.

@@ -16,12 +16,12 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "$790M Tribal Broadband Funding Navigator — TBCP Round 3 & NEGP Deadlines",
   description:
-    "TBCP Round 3 ($540M) and the Native Entities Grant Program ($250M) are open now. Applications close September 17, 2026. Free navigator: eligibility, eligible uses, and an application checklist.",
+    "TBCP Round 3 ($540M) closes Sept 17, 2026; NEGP ($250M) closes Nov 17, 2026. Free navigator: eligibility, eligible uses, and an application checklist.",
   alternates: { canonical: "/tribal/funding-navigator" },
   openGraph: {
     title: "$790M Tribal Broadband Funding Navigator — TBCP Round 3 & NEGP Deadlines",
     description:
-      "TBCP Round 3 ($540M) and the Native Entities Grant Program ($250M) are open now. Applications close September 17, 2026. Free navigator: eligibility, eligible uses, and an application checklist.",
+      "TBCP Round 3 ($540M) closes Sept 17, 2026; NEGP ($250M) closes Nov 17, 2026. Free navigator: eligibility, eligible uses, and an application checklist.",
     url: `${SITE_URL}/tribal/funding-navigator`,
   },
 };
@@ -59,9 +59,9 @@ const speakableJsonLd = {
 
 const FAQ_ITEMS = [
   {
-    question: "What is due September 17, 2026?",
+    question: "What are the application deadlines for TBCP Round 3 and NEGP?",
     answer:
-      "Applications for both NTIA funding opportunities opened June 17, 2026: Tribal Broadband Connectivity Program (TBCP) Round 3 ($540 million) and the Native Entities Grant Program (NEGP, $250 million). Both close September 17, 2026 at 11:59 p.m. ET, submitted through the NTIA grants portal. Awards are expected on a rolling basis beginning Spring 2027.",
+      "Both NTIA funding opportunities opened June 17, 2026. TBCP Round 3 (2026-NTIA-TBCP, $540 million) closes September 17, 2026 at 11:59 p.m. ET. The Native Entities Grant Program (2026-NTIA-NEGP, $250 million) was amended July 30, 2026 and closes November 17, 2026 at 11:59 p.m. ET. Applications for each program are submitted through the NTIA grants portal. Awards are expected on a rolling basis beginning Spring 2027.",
   },
   {
     question: "What is the difference between TBCP Round 3 and the NEGP?",
@@ -71,12 +71,12 @@ const FAQ_ITEMS = [
   {
     question: "Can we apply to both programs?",
     answer:
-      "Both opportunities are open simultaneously with the same September 17, 2026 deadline, and many Tribal Nations have needs that map to each — infrastructure under TBCP Round 3 and digital-equity programming under NEGP. Read both NOFOs carefully for scope and duplication-of-funding rules, and confirm your application strategy with your NTIA program officer. Splitting a coherent story across two sharp applications is usually stronger than stretching one application to cover everything.",
+      "Both opportunities are open simultaneously, but on different deadlines — TBCP Round 3 closes September 17, 2026 and NEGP closes November 17, 2026. Many Tribal Nations have needs that map to each: infrastructure under TBCP Round 3 and digital-equity programming under NEGP. Read both NOFOs carefully for scope and duplication-of-funding rules, and confirm your application strategy with your NTIA program officer. Splitting a coherent story across two sharp applications is usually stronger than stretching one application to cover everything.",
   },
   {
-    question: "What if we miss the September 17 deadline?",
+    question: "What if we miss a deadline?",
     answer:
-      "There is no announced extension, so treat September 17, 2026 at 11:59 p.m. ET as hard. If the window closes without an application, the practical next moves are: pursue FY2026 E-Rate for eligible anchor institutions (the Tribal library Category Two floor is now $66,385 with a 90% maximum discount, and the FCC's T-LEAP program offers free application help), watch for future federal windows, and get procurement-ready now so the next opportunity is not a scramble. Konative can help you scope requirements either way.",
+      "Treat each program deadline as hard unless NTIA announces otherwise: TBCP Round 3 closes September 17, 2026 at 11:59 p.m. ET; NEGP closes November 17, 2026 at 11:59 p.m. ET. If a window closes without an application, the practical next moves are: pursue FY2026 E-Rate for eligible anchor institutions (the Tribal library Category Two floor is now $66,385 with a 90% maximum discount, and the FCC's T-LEAP program offers free application help), watch for future federal windows, and get procurement-ready now so the next opportunity is not a scramble. Konative can help you scope requirements either way.",
   },
   {
     question: "Does Konative charge for this navigator or for application-window help?",
@@ -235,8 +235,8 @@ const COMPARISON_ROWS: Array<{ label: string; tbcp: string; negp: string }> = [
   },
   {
     label: "Deadline",
-    tbcp: "September 17, 2026 · 11:59 p.m. ET, via the NTIA grants portal",
-    negp: "September 17, 2026 · 11:59 p.m. ET, via the NTIA grants portal",
+    tbcp: "September 17, 2026 · 11:59 p.m. ET, via the NTIA grants portal (2026-NTIA-TBCP)",
+    negp: "November 17, 2026 · 11:59 p.m. ET, via the NTIA grants portal (2026-NTIA-NEGP; amended July 30, 2026)",
   },
   {
     label: "Awards",
@@ -264,7 +264,7 @@ const DECISION_SCENARIOS = [
   {
     num: "04",
     title: "Not sure which — or whether — to pursue",
-    body: "Ninety days is a short window and oversubscription is the norm. Book a free working session: we will map your situation to the right program, sanity-check scope, and point you to the right partners for the pieces we don't do.",
+    body: "Application windows are finite and oversubscription is the norm. Book a free working session: we will map your situation to the right program, sanity-check scope, and point you to the right partners for the pieces we don't do.",
   },
 ];
 
@@ -416,7 +416,8 @@ export default function FundingNavigatorPage() {
           >
             On June 17, 2026, NTIA opened two funding opportunities for Tribal Nations — TBCP
             Round 3 ($540 million) and the Native Entities Grant Program ($250 million).
-            Applications for both are due September 17, 2026 at 11:59 p.m. ET. This navigator
+            TBCP Round 3 closes September 17, 2026; NEGP closes November 17, 2026 (amended
+            July 30, 2026) — both at 11:59 p.m. ET via the NTIA grants portal. This navigator
             explains eligibility, eligible uses, and how to get an application in on time.
           </p>
           <DeadlineCountdown />
@@ -449,7 +450,7 @@ export default function FundingNavigatorPage() {
       {/* Program comparison */}
       <PitchSection eyebrow="The Two Programs" heading="TBCP Round 3 vs. the Native Entities Grant Program">
         <p style={{ fontFamily: BODY, fontSize: 16, lineHeight: 1.75, color: MUTED, maxWidth: 720, marginBottom: 36 }}>
-          Two programs, one deadline. The facts below are drawn from NTIA program materials —
+          Two programs, two deadlines. The facts below are drawn from NTIA program materials —
           the Notices of Funding Opportunity linked in the sources section are the binding
           documents, so confirm every detail there before you build a budget around it.
         </p>

@@ -1,13 +1,14 @@
 "use client";
 
-// Live countdown to the TBCP Round 3 / NEGP application deadline.
-// Renders a static fallback before hydration; renders a "closed" message
-// once the deadline passes so the page never shows a stale clock.
+// Live countdown to the next open NTIA application deadline (TBCP Round 3, then NEGP).
+// Renders a static fallback before hydration; renders a "closed" message once both
+// deadlines pass so the page never shows a stale clock.
 
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
-const DEADLINE_MS = new Date("2026-09-17T23:59:00-04:00").getTime();
+const TBCP_DEADLINE_MS = new Date("2026-09-17T23:59:00-04:00").getTime();
+const NEGP_DEADLINE_MS = new Date("2026-11-17T23:59:00-05:00").getTime();
 
 const DISPLAY = '"Barlow Condensed", sans-serif';
 const BODY = "Inter, sans-serif";
@@ -25,6 +26,14 @@ const labelStyle: CSSProperties = {
   textTransform: "uppercase",
   color: "#FF526B",
   marginBottom: 14,
+};
+const deadlineListStyle: CSSProperties = {
+  fontFamily: BODY,
+  fontSize: 14,
+  lineHeight: 1.7,
+  color: "rgba(255,255,255,0.72)",
+  marginBottom: 18,
+  maxWidth: 560,
 };
 const boxRowStyle: CSSProperties = {
   display: "flex",
@@ -56,14 +65,6 @@ const unitStyle: CSSProperties = {
   color: "rgba(255,255,255,0.5)",
   marginTop: 8,
 };
-const fallbackStyle: CSSProperties = {
-  fontFamily: DISPLAY,
-  fontWeight: 700,
-  fontSize: 24,
-  textTransform: "uppercase",
-  letterSpacing: "0.04em",
-  color: "#fff",
-};
 const closedStyle: CSSProperties = {
   fontFamily: BODY,
   fontSize: 16,
@@ -71,6 +72,25 @@ const closedStyle: CSSProperties = {
   color: "rgba(255,255,255,0.85)",
   maxWidth: 560,
 };
+
+function nextOpenDeadline(now: number): { ms: number; label: string } | null {
+  if (now < TBCP_DEADLINE_MS) {
+    return {
+      ms: TBCP_DEADLINE_MS,
+      label: "TBCP Round 3 closes Sept 17, 2026 · 11:59 p.m. ET",
+    };
+  }
+  if (now < NEGP_DEADLINE_MS) {
+    return {
+      ms: NEGP_DEADLINE_MS,
+      label: "NEGP closes Nov 17, 2026 · 11:59 p.m. ET",
+    };
+  }
+  return null;
+}
+
+const SPLIT_DEADLINE_COPY =
+  "TBCP Round 3 (2026-NTIA-TBCP): September 17, 2026 · 11:59 p.m. ET. NEGP (2026-NTIA-NEGP): November 17, 2026 · 11:59 p.m. ET — amended July 30, 2026.";
 
 export default function DeadlineCountdown() {
   const [now, setNow] = useState<number | null>(null);
@@ -81,30 +101,38 @@ export default function DeadlineCountdown() {
     return () => clearInterval(id);
   }, []);
 
+  const deadlineList = (
+    <p style={deadlineListStyle}>
+      <strong style={{ color: "rgba(255,255,255,0.9)" }}>Application deadlines:</strong>{" "}
+      {SPLIT_DEADLINE_COPY}
+    </p>
+  );
+
   // Static fallback before hydration (also what crawlers without JS see).
   if (now === null) {
     return (
       <div style={wrapStyle}>
-        <div style={labelStyle}>Application Window Closes</div>
-        <div style={fallbackStyle}>Deadline: September 17, 2026 · 11:59 p.m. ET</div>
+        <div style={labelStyle}>Application Deadlines</div>
+        {deadlineList}
       </div>
     );
   }
 
-  const remaining = DEADLINE_MS - now;
+  const active = nextOpenDeadline(now);
 
-  if (remaining <= 0) {
+  if (!active) {
     return (
       <div style={wrapStyle}>
-        <div style={labelStyle}>Application Window</div>
+        <div style={labelStyle}>Application Windows</div>
         <p style={closedStyle}>
-          Applications closed — awards roll out from Spring 2027. Talk to us about
-          what&apos;s next.
+          TBCP Round 3 and NEGP application windows are closed — awards roll out from Spring
+          2027. Talk to us about what&apos;s next.
         </p>
       </div>
     );
   }
 
+  const remaining = active.ms - now;
   const totalMinutes = Math.floor(remaining / 60_000);
   const days = Math.floor(totalMinutes / (60 * 24));
   const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
@@ -118,7 +146,9 @@ export default function DeadlineCountdown() {
 
   return (
     <div style={wrapStyle}>
-      <div style={labelStyle}>Application Window Closes Sept 17, 2026 · 11:59 p.m. ET</div>
+      <div style={labelStyle}>Next Application Deadline</div>
+      {deadlineList}
+      <div style={{ ...labelStyle, marginTop: 4, marginBottom: 10 }}>{active.label}</div>
       <div style={boxRowStyle}>
         {units.map((u) => (
           <div key={u.unit} style={boxStyle}>
