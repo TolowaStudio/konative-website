@@ -8,7 +8,7 @@
       "items": [
         {
           "title": "Deterministic read-only Twenty cohort and unsafe-queue baseline gate",
-          "state": "verified",
+          "state": "adopted",
           "paths": [
             "scripts/konative-crm-campaign-audit.mjs",
             "scripts/test-konative-crm-campaign-audit.mjs",
@@ -28,9 +28,20 @@
               "state": "verified",
               "at": "2026-08-31T00:46:44.229Z",
               "evidence": "node --test scripts/test-konative-crm-campaign-audit.mjs scripts/test-konative-enrichment-cost-report.mjs scripts/test-konative-twenty-evidence-writer.mjs (33/33); live Twenty asserted receipt /private/tmp/konative-audit-20260830-corrected-asserted.fNxO6O/baseline-summary.json"
+            },
+            {
+              "state": "landed",
+              "at": "2026-08-31T00:50:14.663Z",
+              "evidence": "commit c433966 pushed to origin/codex/tol-462-membership-drift"
+            },
+            {
+              "state": "adopted",
+              "at": "2026-08-31T00:50:14.741Z",
+              "evidence": "live asserted Twenty receipt /private/tmp/konative-audit-20260830-corrected-asserted.fNxO6O/baseline-summary.json reproduced 605/164/21 and all three membership hashes"
             }
           ],
-          "evidence": "node --test scripts/test-konative-crm-campaign-audit.mjs scripts/test-konative-enrichment-cost-report.mjs scripts/test-konative-twenty-evidence-writer.mjs (33/33); live Twenty asserted receipt /private/tmp/konative-audit-20260830-corrected-asserted.fNxO6O/baseline-summary.json"
+          "evidence": "live asserted Twenty receipt /private/tmp/konative-audit-20260830-corrected-asserted.fNxO6O/baseline-summary.json reproduced 605/164/21 and all three membership hashes",
+          "landed_sha": "c43396647afeafb8345115648cc7a66c6b7f7d77"
         }
       ]
     }
