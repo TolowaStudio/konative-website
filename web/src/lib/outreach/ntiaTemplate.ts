@@ -5,7 +5,7 @@
  * unit-testable without touching Supabase or Mailgun. Renders a personalized
  * first-touch email for a TBCP awardee: Konative brokers the operational
  * connectivity layer TBCP grants don't fund — vendor-neutral, sovereignty-aware,
- * $0 to the Tribe. NTIA Round 3 NOFO deadline: September 17, 2026.
+ * $0 to the Tribe. NTIA Round 3 NOFO deadline: November 17, 2026.
  */
 
 /** Minimal shape of a `tbcp_awards` row needed to personalize the email. */
@@ -23,7 +23,7 @@ export interface RenderedOutreachEmail {
   text: string;
 }
 
-const ROUND3_DEADLINE = "September 17, 2026";
+const ROUND3_DEADLINE = "November 17, 2026";
 
 function formatUsd(amount: number | null): string | null {
   if (typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0) return null;

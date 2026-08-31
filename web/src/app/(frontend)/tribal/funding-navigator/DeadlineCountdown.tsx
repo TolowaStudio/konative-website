@@ -1,14 +1,13 @@
 "use client";
 
-// Live countdown to the next open NTIA application deadline (TBCP Round 3, then NEGP).
+// Live countdown to the shared TBCP Round 3 and NEGP application deadline.
 // Renders a static fallback before hydration; renders a "closed" message once both
 // deadlines pass so the page never shows a stale clock.
 
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
-const TBCP_DEADLINE_MS = new Date("2026-09-17T23:59:00-04:00").getTime();
-const NEGP_DEADLINE_MS = new Date("2026-11-17T23:59:00-05:00").getTime();
+const APPLICATION_DEADLINE_MS = new Date("2026-11-17T23:59:00-05:00").getTime();
 
 const DISPLAY = '"Barlow Condensed", sans-serif';
 const BODY = "Inter, sans-serif";
@@ -74,23 +73,17 @@ const closedStyle: CSSProperties = {
 };
 
 function nextOpenDeadline(now: number): { ms: number; label: string } | null {
-  if (now < TBCP_DEADLINE_MS) {
+  if (now < APPLICATION_DEADLINE_MS) {
     return {
-      ms: TBCP_DEADLINE_MS,
-      label: "TBCP Round 3 closes Sept 17, 2026 · 11:59 p.m. ET",
-    };
-  }
-  if (now < NEGP_DEADLINE_MS) {
-    return {
-      ms: NEGP_DEADLINE_MS,
-      label: "NEGP closes Nov 17, 2026 · 11:59 p.m. ET",
+      ms: APPLICATION_DEADLINE_MS,
+      label: "TBCP Round 3 and NEGP close Nov 17, 2026 · 11:59 p.m. ET",
     };
   }
   return null;
 }
 
-const SPLIT_DEADLINE_COPY =
-  "TBCP Round 3 (2026-NTIA-TBCP): September 17, 2026 · 11:59 p.m. ET. NEGP (2026-NTIA-NEGP): November 17, 2026 · 11:59 p.m. ET — amended July 30, 2026.";
+const DEADLINE_COPY =
+  "TBCP Round 3 (2026-NTIA-TBCP) and NEGP (2026-NTIA-NEGP): November 17, 2026 · 11:59 p.m. ET.";
 
 export default function DeadlineCountdown() {
   const [now, setNow] = useState<number | null>(null);
@@ -104,7 +97,7 @@ export default function DeadlineCountdown() {
   const deadlineList = (
     <p style={deadlineListStyle}>
       <strong style={{ color: "rgba(255,255,255,0.9)" }}>Application deadlines:</strong>{" "}
-      {SPLIT_DEADLINE_COPY}
+      {DEADLINE_COPY}
     </p>
   );
 

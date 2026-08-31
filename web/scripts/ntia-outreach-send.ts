@@ -6,7 +6,7 @@
  * been contacted yet, renders a personalized first-touch email (Konative
  * brokers the operational connectivity layer TBCP grants don't fund —
  * vendor-neutral, sovereignty-aware, $0 to the Tribe; NTIA Round 3 NOFO
- * deadline September 17, 2026), sends via Mailgun (`sendOutreachEmail`), and
+ * deadline November 17, 2026), sends via Mailgun (`sendOutreachEmail`), and
  * — only on a successful send — marks that row's `outreach_status` as
  * 'outreach_sent'.
  *

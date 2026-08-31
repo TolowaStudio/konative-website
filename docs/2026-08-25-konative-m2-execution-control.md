@@ -10,7 +10,7 @@
 2. Never reuse the rejected 164-contact cohort or the 21 `QUEUED` records as-is.
 3. Treat the 164 contacts as proposed, not reviewed or campaign-ready. `0` campaign-ready is the current validated baseline.
 4. Preserve immutable audience snapshots, suppression checks, and sender-event sync before any future send readiness decision.
-5. TBCP R3/NEGP deadline is 2026-09-17.
+5. TBCP R3 and NEGP both close 2026-11-17 at 11:59 p.m. ET under the current NTIA notices.
 
 ## Verified baseline — 2026-08-25
 
@@ -23,14 +23,21 @@
 - The tooling was safely replayed onto current `origin/main` on the M2 as `d9e28c4` and is now under review in GitHub PR #69. Do not force-push, duplicate the PR, or merge it without the normal review path.
 - A host-side, credential-in-memory read-only audit on the M2 reverified the baseline and hash above. Private artifacts are in `/tmp/konative-audit-20260825-m2-host` (mode 0700); no CRM write occurred.
 - BrowserOS Neo and its OpenMaus bridge were live-tested on the M2. The Mailgun console is reachable but stuck at “Loading session...”; this is an interactive re-login requirement, not a missing browser integration. Do not retry it automatically until the session is restored.
-- Official-source work resolved three additional pilot roles. One claim remains genuinely unresolved and must not be upgraded without a new primary source. The exact stale public claim is “164 — reviewed tribal contacts in the first campaign base”; the proposed correction is “164 proposed tribal contacts — pending review, 0 approved for campaign.” It is a proposal only.
+- Official-source work resolved three additional pilot roles. One claim remains genuinely unresolved and must not be upgraded without a new primary source. The stale public claim “164 — reviewed tribal contacts in the first campaign base” was approved for correction on 2026-08-30; the validated replacement is “164 proposed tribal contacts — pending review, 0 approved for campaign.”
+
+## Factual correction scope — 2026-08-30
+
+- Current deadline authority: [TBCP Round 3](https://broadbandusa.ntia.gov/funding-programs/tribal-broadband-connectivity/round-three-notice-of-funding-opportunity) and [NEGP](https://broadbandusa.ntia.gov/funding-programs/native-entities-grant-program). Each current NTIA page states November 17, 2026 at 11:59 p.m. ET.
+- Active public pages, LLM feeds, campaign templates, tests, generators, seed descriptions, and current operating documents must use the current deadline.
+- `docs/strategy/2026-06-23-gtm-business-plan.md` and `docs/strategy/2026-07-06-market-storm-briefing.md` remain unchanged as dated historical snapshots. Their former-deadline statements are archival evidence, not current operating authority.
+- This correction does not approve outreach, CRM changes, deployment, spending, or campaign execution.
 
 ## Ordered M2 work queue
 
 1. Monitor PR #69; do not duplicate its rebase, force-push, or merge it automatically.
 2. Wait for the interactive BrowserOS Neo Mailgun re-login, then record a sender/suppression verification receipt. No campaign action follows automatically.
 3. Keep the one unresolved pilot claim unresolved unless a new official source appears; store evidence packets and candidate diffs only.
-4. Obtain an explicit decision before changing the inaccurate public “164 reviewed” copy; the proposed correction is above.
+4. Verify the approved public “164 reviewed” correction in the factual-corrections PR; do not reinterpret that approval as campaign-send authorization.
 5. Obtain an explicit IAM decision before expanding the M2 runtime service account beyond `get_secret`; do not rely on Jeramey’s personal gcloud identity as a durable service credential.
 
 ## Completion gates for this control cycle

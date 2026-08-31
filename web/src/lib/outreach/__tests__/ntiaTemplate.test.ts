@@ -80,8 +80,10 @@ describe("renderNtiaRound3Email", () => {
     const rendered = renderNtiaRound3Email(makeRow());
     expect(rendered.text).toContain("Konative");
     expect(rendered.text).toContain("$0 cost to the Tribe");
-    expect(rendered.text).toContain("September 17, 2026");
-    expect(rendered.html).toContain("September 17, 2026");
+    expect(rendered.text).toContain("November 17, 2026");
+    expect(rendered.html).toContain("November 17, 2026");
+    expect(rendered.text).not.toContain("September 17, 2026");
+    expect(rendered.html).not.toContain("September 17, 2026");
   });
 
   it("never leaves an unresolved template placeholder in subject, html, or text", () => {
