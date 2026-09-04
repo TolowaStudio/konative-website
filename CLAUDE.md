@@ -1,45 +1,32 @@
 # Konative (repo)
 
-**Canonical clone:** `~/repos/konative-website` — must match the GitHub repo name. Origin: `tolowa-studio/konative-website` (not the old `jerameyjames` redirect). OneDrive `_AI_projects/konative/konative-site` must be a **symlink** here, not a second checkout.
+**What:** Recurring-revenue connectivity brokerage — not a grant-writer. App in **`web/`** (Next.js + Sanity). Site rules: `web/AGENTS.md`.
 
-App code lives in **`web/`** (Next.js 16 + Sanity). Site agent rules: `web/AGENTS.md`.
+**Origin:** `tolowa-studio/konative-website` · canonical clone `~/repos/konative-website`.
 
-## Platform truth (2026-08-19)
+## Harness lanes (locked 2026-09-04)
 
-| Layer | Choice |
-|-------|--------|
-| **Public runtime** | **Google Cloud Run** — service `konative-website-staging` (GCP project `tolowa-studio`, region `us-west1`) serves **konative.com** and **www** |
-| **Intelligence / tabular data** | **Supabase** project `tcbworxmlmxoyzcvdjhh` (free tier) — not D1, not Cloud SQL |
-| **CMS** | Sanity |
-| **Newsletter** | Ghost on **Railway** |
-| **Stateful ops** | Railway only where already deployed: **Twenty**, **Ghost**, **n8n** |
-| **DNS** | **Bunny** nameservers (`kiki.bunny.net`, `coco.bunny.net`). **Porkbun** registrar only — **never** move NS to Porkbun |
-| **Cloudflare** | Leftover account assets only. **No R2. No Workers AI.** Worker **public hostnames are retired** |
-| **Agent secrets** | **GCP Secret Manager** (bound into Cloud Run at deploy) |
+Desk decides → Cursor ships → Hermes@Mini long jobs → Claude designs → DeepInfra cheap inference.
 
-**Cutover rule:** Plan first. Do not remove a live public hostname until Cloud Run is verified serving (health `200`, Supabase-backed counts sane).
+| Lane | Role |
+|------|------|
+| **Tolowa CTO desk** | Order, no-go, dispatch, gates |
+| **Cursor** | This repo — PRs, CI, Cloud Run |
+| **Hermes@Mini + DeepInfra** | Long ops; no phone interrupt |
+| **Claude** | Design/strategy only — no execute, deploy, DNS, send, pay, or spawn. Campaigns = plan-first; no send until Jeramey says |
 
-**Frozen (operator):** News ingest **off**. Outreach **campaign** waits for Claude. **No Kit** (ConvertKit) on Konative.
+**Memory:** Linear = issues · Notion = library · Stash = agent locks. **Human gates:** pay · send · sign · delete · ship.
 
-Legacy OpenNext / `wrangler.jsonc` / `.github/workflows/deploy.yml` may still exist in the repo — treat as **migration residue**, not current platform guidance.
+## Stack
 
-## Local development
+Cloud Run (`konative-website-staging`) → **konative.com** · Supabase (intel tables) · Sanity · Twenty + Ghost (Railway) · Mailgun + Resend · GCP Secret Manager · Bunny DNS (Porkbun registrar only). **No Kit.** News ingest off; outreach waits for Claude. Legacy OpenNext/wrangler = migration residue.
 
-From `web/`: `npm ci` then **`npm run dev`** → **http://localhost:3005** (default port avoids collisions with 3000/3010/3011). Override: `npx next dev -p <port>`.
+## Local & deploy
 
-**Node 22** everywhere (`web/.nvmrc` + `web/package.json` `engines.node`).
+`web/`: `npm ci` → `npm run dev` (port **3005**, Node **22**). Push `main` → `deploy-cloud-run.yml`. Health: `curl -sf https://konative.com -o /dev/null -w "%{http_code}\n"`.
 
-Copy env from `web/.env.local.example`.
+## Done contract
 
-## Deploy
+Acceptance + durable handoff (Notion/Stash). **Open PR; leave merge/deploy for ship gate.**
 
-- **Live path:** push to `main` → `.github/workflows/deploy-cloud-run.yml` builds `web/Dockerfile`, pushes to Artifact Registry, deploys Cloud Run.
-- **Production URL:** https://konative.com
-- **Status:** `gh run list --workflow=deploy-cloud-run.yml --branch main`
-- **Health:** `curl -sf https://konative.com -o /dev/null -w "%{http_code}\n"` (expect `200`)
-
-Runtime secrets and server env vars come from **GCP Secret Manager** (`konative-*` secrets), not Cloudflare Worker bindings or Vercel env.
-
-## Notion
-
-Project hub: [Konative.com — Project Hub](https://www.notion.so/34232e0a547481b39bc1e081765d6df6). See `docs/notion-setup.md`.
+Notion: [Konative.com — Project Hub](https://www.notion.so/34232e0a547481b39bc1e081765d6df6).
