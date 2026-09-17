@@ -44,8 +44,7 @@ function makeQuery(table: string) {
       if (current !== expected) {
         return resolve({ data: [], error: null }); // CAS miss — simulates concurrent writer
       }
-      const [updateField, updateVal] = Object.entries(state.updatePayload)[0];
-      (row as Record<string, number>)[updateField] = updateVal as number;
+      Object.assign(row, state.updatePayload);
       return resolve({ data: [{ id }], error: null });
     },
   };
