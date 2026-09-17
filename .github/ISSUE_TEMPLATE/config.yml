@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: File in Linear first
+    url: https://linear.app/tolowastudio
+    about: No work starts without a Linear issue that includes acceptance criteria.

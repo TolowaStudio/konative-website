@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "typecheck": "tsc --noEmit",
     "start": "next start",
     "etl:canada:p0": "tsx scripts/etl/canada/run.ts",
     "etl:canada:p0:dry": "tsx scripts/etl/canada/run.ts --dry-run",
