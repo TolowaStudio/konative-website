@@ -5,8 +5,11 @@ truth. Do not treat hand-edited local copies as authority.
 
 **Signed frame (TOL-638, 2026-09-17):** one loop only —
 decide → build → verify → activate commercial → measure → weekly continue / change / stop.
-No three-OS top architecture. Factory map: [`docs/FACTORY.md`](docs/FACTORY.md). Current
-focus: [`now.md`](now.md). Site rules: [`web/AGENTS.md`](web/AGENTS.md).
+No three-OS top architecture. Factory map: [`docs/FACTORY.md`](docs/FACTORY.md).
+Prove recipe: [`docs/FACTORY-E2E.md`](docs/FACTORY-E2E.md). Current focus:
+[`now.md`](now.md). Site rules: [`web/AGENTS.md`](web/AGENTS.md).
+The Factory Spec is still a draft — do not claim Jeramey SIGN or reference-tape
+status.
 
 ## Who may act
 
@@ -23,11 +26,12 @@ Astra = Codex. Fable = Claude. Never reverse.
 ## Authority
 
 - Agents work on branches and open PRs to the default branch (`main` today).
-- Automated gates (Factory CI) must pass before review. Speed is granted; bypass is not.
+- Automated gates (Factory CI — required check `lint · typecheck · smoke`) must pass
+  before review. Speed is granted; bypass is not.
 - No work starts without a Linear issue that names owner, constraint, success metric, and
   **acceptance criteria**. Reject issues that omit acceptance criteria rather than guessing.
-- Staging / Cloud Run deploy remains the existing `deploy-cloud-run.yml` path. Treat that
-  as verify evidence, not a ship.
+- Staging Cloud Run deploy (`deploy-cloud-run.yml`) **needs** Factory CI. Treat a green
+  deploy as verify evidence, not a ship.
 
 ## Forbidden
 
@@ -57,8 +61,8 @@ Astra = Codex. Fable = Claude. Never reverse.
 
 Before marking work ready for review:
 
-1. Run Factory CI locally (`node scripts/factory-smoke.mjs`, `npm run typecheck`, targeted
-   `npm test` in `web/`) or explain why they could not run.
+1. Run Factory CI locally (`node scripts/factory-smoke.mjs`, `npm run typecheck`, the
+   `web/src/lib/__tests__` smoke set) or explain why they could not run.
 2. Summarize changed files and behavioral impact.
 3. Leave acceptance results and a durable handoff in the PR (and Linear when possible).
 4. Remember durable decisions in Stash when the tool is available.

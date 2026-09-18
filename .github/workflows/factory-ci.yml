@@ -1,13 +1,16 @@
 name: Factory CI
 
-# Konative factory first slice (TOL-639 steps 3–5).
-# Lint + typecheck + fail-closed smoke on every push/PR.
-# GitHub-hosted runners only — M1 self-hosted is a later step.
+# Konative factory verify gate (TOL-639).
+# Lint (instruction files — no ESLint in web/) + typecheck + fail-closed smoke.
+# GitHub-hosted runners only. M1 self-hosted is a later step (not this PR).
+# Reusable so Cloud Run deploy cannot start without these gates.
 
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_call:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -40,9 +43,12 @@ jobs:
         working-directory: web
         run: npm run typecheck
 
-      - name: Smoke (factory docs)
+      # Production `next build` stays in deploy-cloud-run.yml (needs NEXT_PUBLIC_*).
+      # That job `needs` this workflow — deploy cannot skip these gates.
+
+      - name: Smoke (factory docs + deploy gate)
         run: node scripts/factory-smoke.mjs
 
       - name: Smoke (unit)
         working-directory: web
-        run: npm test -- src/lib/__tests__/feasibility-score.test.ts
+        run: npm test -- src/lib/__tests__/feasibility-score.test.ts src/lib/__tests__/adminAccess.test.ts src/lib/__tests__/canadaDataset.test.ts src/lib/__tests__/newsPageQuery.test.ts

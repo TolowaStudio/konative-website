@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Factory fail-closed smoke (TOL-639 steps 3–5).
- * Exits 1 if instruction files or the loop map are missing, empty, or off-frame.
+ * Factory fail-closed smoke (TOL-639).
+ * Exits 1 if instruction files, loop map, prove recipe, or deploy gate are off-frame.
  */
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -14,6 +14,7 @@ const requiredFiles = [
   "CLAUDE.md",
   "now.md",
   "docs/FACTORY.md",
+  "docs/FACTORY-E2E.md",
 ];
 
 /** @type {Array<{ file: string, needles: string[] }>} */
@@ -40,6 +41,22 @@ const requiredPhrases = [
       "measure",
       "continue",
       "acceptance",
+      "lint · typecheck · smoke",
+    ],
+  },
+  {
+    file: "docs/FACTORY-E2E.md",
+    needles: [
+      "Linear",
+      "acceptance",
+      "branch",
+      "Factory CI",
+      "deploy",
+      "eval harness",
+      "M1",
+      "GTM send",
+      "one loop",
+      "not done",
     ],
   },
 ];
@@ -76,11 +93,38 @@ for (const { file, needles } of requiredPhrases) {
   }
 }
 
-const factoryPath = resolve(root, "docs/FACTORY.md");
-if (existsSync(factoryPath)) {
-  const factory = readFileSync(factoryPath, "utf8");
-  if (/three[- ]os top architecture/i.test(factory) && !/no three[- ]os/i.test(factory)) {
-    fail("docs/FACTORY.md must lock to the signed one-loop frame (no three-OS architecture)");
+for (const rel of ["docs/FACTORY.md", "docs/FACTORY-E2E.md"]) {
+  const path = resolve(root, rel);
+  if (!existsSync(path)) {
+    continue;
+  }
+  const text = readFileSync(path, "utf8");
+  if (/three[- ]os top architecture/i.test(text) && !/no three[- ]os/i.test(text)) {
+    fail(`${rel} must lock to the signed one-loop frame (no three-OS architecture)`);
+  }
+}
+
+const deployRel = ".github/workflows/deploy-cloud-run.yml";
+const deployPath = resolve(root, deployRel);
+if (!existsSync(deployPath)) {
+  fail(`missing ${deployRel}`);
+} else {
+  const deploy = readFileSync(deployPath, "utf8");
+  const callsFactory = /uses:\s*\.\/\.github\/workflows\/factory-ci\.yml/.test(
+    deploy,
+  );
+  const needsFactory =
+    /needs:\s*factory-gates/.test(deploy) ||
+    /needs:\s*\n[ \t]*-[ \t]*factory-gates/.test(deploy);
+  if (!callsFactory) {
+    fail(
+      `${deployRel} must call ./.github/workflows/factory-ci.yml (deploy cannot skip Factory CI)`,
+    );
+  }
+  if (!needsFactory) {
+    fail(
+      `${deployRel} must set needs: factory-gates (deploy cannot skip Factory CI)`,
+    );
   }
 }
 

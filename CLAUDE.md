@@ -2,7 +2,8 @@
 
 **What:** Recurring-revenue connectivity brokerage — not a grant-writer. App in
 **`web/`** (Next.js + Sanity). Site rules: `web/AGENTS.md`. Current focus: `now.md`.
-Factory loop map: `docs/FACTORY.md`. Authority and forbidden: `AGENTS.md`.
+Factory loop map: `docs/FACTORY.md`. Prove recipe: `docs/FACTORY-E2E.md`.
+Authority and forbidden: `AGENTS.md`.
 
 **Origin:** `tolowa-studio/konative-website` · canonical clone `~/repos/konative-website`.
 
@@ -40,7 +41,9 @@ Sanity · Twenty + Ghost (Railway) · Mailgun + Resend · GCP Secret Manager · 
 
 - Typecheck: `npm run typecheck`
 - Unit tests: `npm test`
-- Production image: push `main` → `deploy-cloud-run.yml` (ship gate, not an agent action)
+- Factory smoke: `node scripts/factory-smoke.mjs`
+- Production image: push `main` → `deploy-cloud-run.yml` **after** Factory CI
+  (`needs: factory-gates`). Ship gate, not an agent action.
 - Health: `curl -sf https://konative.com -o /dev/null -w "%{http_code}\n"`
 
 Prefer these scripts. Do not add a second package manager or lint stack.
