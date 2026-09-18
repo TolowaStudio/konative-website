@@ -44,8 +44,10 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { createCanaryBatch, transitionCanaryToSending } from "../src/lib/outreach/campaign/batchLifecycle";
 import { sendOutreachEmail } from "../src/lib/outreach/mailgun";
 import { renderNtiaRound3Email, type TbcpAwardRow } from "../src/lib/outreach/ntiaTemplate";
+import { resolveOutreachScriptSendGateMode } from "../src/lib/jev/sendGateMode";
 
 interface CampaignRow extends TbcpAwardRow {
   id: string;
@@ -127,6 +129,34 @@ async function main() {
 
   console.log(`Selected ${rows.length} row(s) for this batch.`);
 
+  const sampleRow = rows[0] as CampaignRow;
+  const sampleRendered = renderNtiaRound3Email(sampleRow);
+  const gateMode = resolveOutreachScriptSendGateMode(args.dryRun);
+  const canaryBatch = await createCanaryBatch({
+    audience: `ntia-round3-tbcp-${args.round}`,
+    touch: {
+      subject: sampleRendered.subject,
+      html: sampleRendered.html,
+      text: sampleRendered.text,
+    },
+    suppression_checked: true,
+    canary_recipient_count: Math.min(args.limit, rows.length),
+    gate: { getMode: () => gateMode },
+  });
+
+  if (!canaryBatch.ok) {
+    console.error(
+      `Send safety gate blocked canary batch creation (${canaryBatch.reason}). ` +
+        `Batch remains planned; receipts=${canaryBatch.batch.receipts.length}.`,
+    );
+    process.exit(1);
+  }
+
+  console.log(
+    `Canary batch ${canaryBatch.batch.run_id} status=${canaryBatch.batch.status} ` +
+      `(KONATIVE_JEV_SEND_GATE=${gateMode})`,
+  );
+
   let sent = 0;
   let skippedNoEmail = 0;
   let failed = 0;
@@ -141,6 +171,19 @@ async function main() {
     }
 
     const rendered = renderNtiaRound3Email(row);
+
+    if (!args.dryRun && canaryBatch.batch.status === "canary") {
+      const transition = await transitionCanaryToSending({
+        batch: canaryBatch.batch,
+        gate: { getMode: () => gateMode },
+      });
+      if (!transition.ok) {
+        console.error(
+          `Send safety gate blocked canary→sending (${transition.reason}). No Mailgun calls made.`,
+        );
+        process.exit(1);
+      }
+    }
 
     const result = await sendOutreachEmail({
       to,
