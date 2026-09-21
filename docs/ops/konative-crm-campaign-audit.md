@@ -32,12 +32,26 @@ node scripts/konative-crm-campaign-audit.mjs \
   --output-dir /absolute/private/output/path \
   --expected-eligible 605 \
   --expected-queued 21 \
+  --expected-candidate-membership-sha256 <approved-605-member-hash> \
+  --expected-working-cohort-membership-sha256 <approved-164-member-hash> \
+  --expected-queued-membership-sha256 <approved-21-member-hash> \
   --cohort-size 164 \
   --pilot-size 10 \
   --fail-on-baseline-drift
 
 unset TWENTY_API_TOKEN
 ```
+
+The three membership hashes contain only sorted Twenty person IDs: the 605
+currently eligible candidates, the score-selected 164-person working cohort,
+and the 21 unsafe queued records. Mutable CRM fields can still change who is
+eligible or selected, so a resulting membership change intentionally produces
+drift. The full-content hashes separately prove snapshot integrity. If an
+expected membership hash is omitted, its check is `NOT_ASSERTED`; the overall
+baseline is never presented as reproduced. With `--fail-on-baseline-drift`, all
+three expected hashes are required and a mismatch exits 3. A first baseline-
+establishment run must omit that flag, record the emitted hashes, and then
+immediately rerun with all three expectations plus the flag.
 
 The GraphQL reader requests 100 people per page and pauses 700 milliseconds
 between pages to stay below the current Twenty API request ceiling. It retries
