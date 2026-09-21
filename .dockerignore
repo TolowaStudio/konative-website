@@ -12,7 +12,6 @@
 !web/.env.example
 
 # Large tile binaries (manifest JSON is bundled at build time via imports)
-tiles/
 **/*.pmtiles
 web/data/
 web/content/

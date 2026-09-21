@@ -8,7 +8,6 @@
 **/.turbo
 **/.vercel
 **/.env*
-tiles/
 **/*.pmtiles
 web/data/
 web/content/
