@@ -32,8 +32,8 @@ describe("verifyAdminAccess", () => {
 
   it("returns disabled when token is unset outside development", () => {
     const prev = process.env.NODE_ENV;
-    process.env.NODE_ENV = "production";
+    Object.assign(process.env, { NODE_ENV: "production" });
     expect(verifyAdminAccess(null, undefined)).toBe("disabled");
-    process.env.NODE_ENV = prev;
+    Object.assign(process.env, { NODE_ENV: prev });
   });
 });

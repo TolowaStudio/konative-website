@@ -1,7 +1,8 @@
 name: Deploy to Cloud Run (staging)
 
-# Parallel to the Cloudflare Worker deploy — does NOT cut over DNS.
-# Requires GCP landing zone: scripts/gcp-provision-konative.sh
+# Staging service (konative-website-staging). Does not invent a second prod env.
+# Factory CI must pass before this job starts — deploy cannot skip verify.
+# Merge/deploy remain the ship gate (Jeramey). See docs/FACTORY-E2E.md.
 
 on:
   push:
@@ -9,6 +10,7 @@ on:
     paths:
       - 'web/**'
       - '.github/workflows/deploy-cloud-run.yml'
+      - '.github/workflows/factory-ci.yml'
       - '.dockerignore'
   workflow_dispatch:
 
@@ -24,7 +26,14 @@ env:
   SERVICE_NAME: konative-website-staging
 
 jobs:
+  factory-gates:
+    name: Factory CI (required)
+    uses: ./.github/workflows/factory-ci.yml
+    permissions:
+      contents: read
+
   deploy:
+    needs: factory-gates
     runs-on: ubuntu-latest
     # Skip until WIF vars are configured (see scripts/gcp-provision-konative.sh).
     if: vars.GCP_WORKLOAD_IDENTITY_PROVIDER != '' && vars.GCP_SERVICE_ACCOUNT != ''
