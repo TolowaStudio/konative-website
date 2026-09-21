@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "efforts": {
+    "tol-462-factual-corrections": {
+      "title": "Konative factual deadline and outreach-status corrections",
+      "created_at": "2026-08-31T01:31:58.519Z",
+      "owner": "jerameyjames",
+      "items": [
+        {
+          "title": "Correct live/public TBCP and NEGP deadline copy from official NTIA sources web/src,web/public",
+          "state": "landed",
+          "paths": [
+            "web/src",
+            "web/public"
+          ],
+          "history": [
+            {
+              "state": "planned",
+              "at": "2026-08-31T01:31:58.608Z"
+            },
+            {
+              "state": "built",
+              "at": "2026-08-31T01:41:11.508Z",
+              "evidence": "git diff -- web/src web/public confirms current deadline copy is implemented"
+            },
+            {
+              "state": "verified",
+              "at": "2026-08-31T01:41:11.620Z",
+              "evidence": "npm test -- src/lib/outreach/__tests__/ntiaTemplate.test.ts src/lib/outreach/__tests__/ntiaCurrentFacts.test.ts (27/27 passed); official NTIA URLs verified 2026-08-30"
+            },
+            {
+              "state": "landed",
+              "at": "2026-08-31T01:42:53.876Z",
+              "evidence": "commit 69adc8d pushed to origin/codex/tol-462-factual-corrections"
+            }
+          ],
+          "evidence": "commit 69adc8d pushed to origin/codex/tol-462-factual-corrections",
+          "landed_sha": "69adc8d2308b8b2319e95f4e297ac51096b70caf"
+        },
+        {
+          "title": "Correct homepage contact cohort status to pending review with zero campaign approvals web/src/app/(frontend)/HomePage.tsx",
+          "state": "landed",
+          "paths": [
+            "web/src/app/(frontend)/HomePage.tsx"
+          ],
+          "history": [
+            {
+              "state": "planned",
+              "at": "2026-08-31T01:31:58.698Z"
+            },
+            {
+              "state": "built",
+              "at": "2026-08-31T01:41:11.711Z",
+              "evidence": "git diff -- web/src/app/(frontend)/HomePage.tsx confirms approved cohort copy"
+            },
+            {
+              "state": "verified",
+              "at": "2026-08-31T01:41:11.804Z",
+              "evidence": "npm test -- src/lib/outreach/__tests__/ntiaCurrentFacts.test.ts (16/16 passed)"
+            },
+            {
+              "state": "landed",
+              "at": "2026-08-31T01:42:54.096Z",
+              "evidence": "commit 69adc8d pushed to origin/codex/tol-462-factual-corrections"
+            }
+          ],
+          "evidence": "commit 69adc8d pushed to origin/codex/tol-462-factual-corrections",
+          "landed_sha": "69adc8d2308b8b2319e95f4e297ac51096b70caf"
+        },
+        {
+          "title": "Keep source templates, tests, and current operating docs factually aligned web/src/lib/outreach,docs",
+          "state": "landed",
+          "paths": [
+            "web/src/lib/outreach",
+            "docs"
+          ],
+          "history": [
+            {
+              "state": "planned",
+              "at": "2026-08-31T01:31:58.809Z"
+            },
+            {
+              "state": "built",
+              "at": "2026-08-31T01:41:11.896Z",
+              "evidence": "git diff -- web/src/lib/outreach web/scripts web/docs docs confirms aligned sources and tests"
+            },
+            {
+              "state": "verified",
+              "at": "2026-08-31T01:41:11.991Z",
+              "evidence": "npm test -- src/lib/outreach/__tests__/ntiaTemplate.test.ts src/lib/outreach/__tests__/ntiaCurrentFacts.test.ts (27/27 passed)"
+            },
+            {
+              "state": "landed",
+              "at": "2026-08-31T01:42:54.249Z",
+              "evidence": "commit 69adc8d pushed to origin/codex/tol-462-factual-corrections"
+            }
+          ],
+          "evidence": "commit 69adc8d pushed to origin/codex/tol-462-factual-corrections",
+          "landed_sha": "69adc8d2308b8b2319e95f4e297ac51096b70caf"
+        }
+      ]
+    }
+  }
+}

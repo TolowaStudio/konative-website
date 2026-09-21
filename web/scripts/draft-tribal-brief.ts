@@ -49,14 +49,14 @@ const GRANT_RADAR = [
   {
     program: "TBCP Round 3 — Tribal Broadband Connectivity",
     amount: "$540M",
-    due: "2026-09-17",
-    url: "https://www.ntia.gov/funding-programs/internet-all/tribal-broadband-connectivity-program",
+    due: "2026-11-17",
+    url: "https://broadbandusa.ntia.gov/funding-programs/tribal-broadband-connectivity/round-three-notice-of-funding-opportunity",
   },
   {
     program: "Native Entities Grant Program (NEGP)",
     amount: "$250M",
-    due: "2026-09-17",
-    url: "https://www.ntia.gov/funding-programs/internet-all/native-entities-grant-program",
+    due: "2026-11-17",
+    url: "https://broadbandusa.ntia.gov/funding-programs/native-entities-grant-program",
   },
 ] as const;
 

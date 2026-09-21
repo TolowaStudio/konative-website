@@ -3,7 +3,7 @@
 **Status:** Active · time-sensitive
 **Owner:** Konative (subagent under Avant Communications)
 **Landing asset:** `/ntia` (`web/src/app/(frontend)/ntia/page.tsx`)
-**Hard deadline:** Application window closes **September 17, 2026**
+**Hard deadline:** Application window closes **November 17, 2026 at 11:59 p.m. ET**
 **Award horizon:** Rolling awards begin **Spring 2027**
 
 ---
@@ -13,7 +13,7 @@
 Position Konative as the **connectivity design partner** for Tribal entities
 applying to the NTIA Tribal Broadband Connectivity Program (TBCP) Round 3 and the
 Native Entities Grant Program (NEGP), so that carrier-grade operational
-connectivity is specified into their proposals **before the Sept 17, 2026
+connectivity is specified into their proposals **before the Nov 17, 2026
 deadline** — and Konative is the pre-negotiated, vendor-neutral broker that
 executes and manages that connectivity when awards land in Spring 2027.
 
@@ -75,20 +75,20 @@ ready to run."
 
 ## 4. The three-phase motion (against the calendar)
 
-### Phase 1 — Pre-award · NOW → Sept 17, 2026
+### Phase 1 — Pre-award · NOW → Nov 17, 2026
 **Goal:** get specified into as many R3 proposals as possible; build the pipeline.
 
 Concrete actions:
 - Build/refresh the target list from the `tbcp_awards` table (see §6) — prioritize
   entities flagged `nofo_round = 'R3'` (or prospective R3) with `outreach_status`
   of `not_started`.
-- First-touch outreach (see §5) framed entirely around the **Sept 17 deadline**
+- First-touch outreach (see §5) framed entirely around the **Nov 17 deadline**
   and the infrastructure-vs-operational gap.
 - Offer a free **connectivity architecture review** as the meeting hook.
 - For engaged applicants: produce a connectivity design brief they can reference
   or attach in their proposal; begin pre-negotiating carrier terms.
-- Cadence urgency ramps as the deadline approaches: heaviest push **June–early
-  Sept 2026**; final-call sequence in the **two weeks before Sept 17**.
+- Cadence urgency ramps as the deadline approaches; final-call sequence belongs
+  in the **two weeks before Nov 17** and remains subject to the campaign approval gate.
 
 **Exit criterion for a prospect:** connectivity specified into their proposal, or
 a signed intent to work together post-award.
@@ -125,10 +125,10 @@ cold every time — prioritize them.
 
 First-touch email (skeleton — personalize per entity):
 
-> **Subject:** The connectivity TBCP Round 3 won't fund — before Sept 17
+> **Subject:** The connectivity TBCP Round 3 won't fund — before Nov 17
 >
 > [Name] — TBCP Round 3 and the Native Entities Grant Program put ~$790M toward
-> Tribal infrastructure, and the window closes September 17, 2026. The grant funds
+> Tribal infrastructure, and the window closes November 17, 2026 at 11:59 p.m. ET. The grant funds
 > the fiber and the build. It does **not** fund the operational connectivity that
 > runs on it — the enterprise internet, SD-WAN, voice, security, redundancy, and
 > cloud on-ramps that keep a gaming floor, clinic, or government office running.
@@ -148,9 +148,9 @@ Follow-up cadence (pre-award):
    floor / tribal clinic) + the $0-cost reframe.
 3. **Day 9** — vendor-neutral proof: "we're not a carrier; we quote the whole
    market including fixed wireless/satellite where fiber doesn't reach."
-4. **Day 16** — deadline urgency: days remaining until Sept 17; offer to review
+4. **Day 16** — deadline urgency: days remaining until Nov 17; offer to review
    before submission.
-5. **Final-call (T-14 to T-2 before Sept 17)** — last chance to specify
+5. **Final-call (T-14 to T-2 before Nov 17)** — last chance to specify
    connectivity into the proposal.
 
 All links point to `/ntia`; the on-page CTA routes to `/contact#request` and
@@ -208,7 +208,7 @@ Lagging indicators (award → ops):
 Hypotheses to test:
 - **H1** — Applicants engaged **pre-award** convert to executed connectivity at a
   materially higher rate than winners reached only post-award. (If true, front-load
-  spend before Sept 17.)
+  spend before Nov 17.)
 - **H2** — `casino_present` entities convert fastest and expand most (gaming floors
   have the sharpest need for redundancy/security). (If true, weight the queue on it.)
 - **H3** — Vendor-neutral + $0-cost framing out-performs any capability-led message
@@ -222,7 +222,7 @@ Hypotheses to test:
 
 - **Deadline is fixed.** The pre-award window is the whole game; miss it on a given
   entity and the next real entry point is post-award fast-follow (weaker position).
-- **Program details evolve.** The ~$790M figure and the Sept 17, 2026 / Spring 2027
+- **Program details evolve.** The ~$790M figure and the Nov 17, 2026 / Spring 2027
   dates are the current program facts used across the site — verify against the
   latest NTIA guidance before external claims; keep the landing page and this doc in
   sync.
