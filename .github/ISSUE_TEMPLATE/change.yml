@@ -1,0 +1,30 @@
+name: Change (acceptance required)
+description: Mirror a Linear issue. Agents reject work without acceptance criteria.
+title: "[TOL-xxx] "
+labels: []
+body:
+  - type: input
+    id: linear
+    attributes:
+      label: Linear issue
+      description: Identifier such as TOL-639
+      placeholder: TOL-639
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Mandatory. Agents must reject this issue if this section is empty.
+      placeholder: |
+        - [ ] …
+        - [ ] …
+    validations:
+      required: true
+  - type: textarea
+    id: no_go
+    attributes:
+      label: No-go / out of scope
+      placeholder: What this change must not do
+    validations:
+      required: true
