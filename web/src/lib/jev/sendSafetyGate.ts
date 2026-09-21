@@ -107,7 +107,10 @@ async function invokeBatonSendSafety(args: {
   }
 
   const record = body && typeof body === "object" ? (body as Record<string, unknown>) : {};
-  const decisionRaw = record.decision ?? record.composed?.allow;
+  const composed = record.composed && typeof record.composed === "object"
+    ? (record.composed as Record<string, unknown>)
+    : {};
+  const decisionRaw = record.decision ?? composed.allow;
   let decision: "allow" | "deny" | "escalate";
   if (decisionRaw === true || decisionRaw === "allow") decision = "allow";
   else if (decisionRaw === false || decisionRaw === "deny") decision = "deny";
@@ -301,7 +304,10 @@ export async function runSendSafetyGate(args: {
     work_type: "gate.send_safety",
     transport_ok: gateResult.transport_ok,
     decision: gateResult.transport_ok ? gateResult.decision : undefined,
-    baton_receipt_id: gateResult.transport_ok ? gateResult.baton_receipt_id : undefined,
+    baton_receipt_id: gateResult.transport_ok && "baton_receipt_id" in gateResult
+      && typeof gateResult.baton_receipt_id === "string"
+      ? gateResult.baton_receipt_id
+      : undefined,
     noul: gateResult.transport_ok ? gateResult.noul : undefined,
     confidence: gateResult.transport_ok ? gateResult.confidence : undefined,
     error_code: gateResult.transport_ok ? undefined : gateResult.error_code,
