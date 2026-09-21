@@ -44,6 +44,7 @@ export function AudienceCTAForm({
         return;
       }
       setStatus("success");
+      window.dispatchEvent(new CustomEvent("tolowa:analytics", { detail: { event: "contact_submitted", properties: { audience: audienceSlug } } }));
     } catch {
       setStatus("error");
       setErrorMsg("Network error. Please try again.");

@@ -3,6 +3,7 @@ import type { Viewport } from "next";
 
 import ConditionalFooter from "../../components/ConditionalFooter";
 import Header from "../../components/Header";
+import PostHogAnalytics from "../../components/PostHogAnalytics";
 import {
   JsonLd,
   organizationSchema,
@@ -55,6 +56,7 @@ export default function FrontendLayout({ children }: { children: React.ReactNode
         <JsonLd data={[organizationSchema, websiteSchema]} />
       </head>
       <body>
+        <PostHogAnalytics />
         <Header />
         <main className="site-main">{children}</main>
         <ConditionalFooter />
