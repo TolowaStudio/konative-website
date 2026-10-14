@@ -254,7 +254,7 @@ const items: CuratedItem[] = [
     title: "NTIA Announces $790 Million in New Tribal Broadband Funding",
     url: "https://www.ntia.gov/press-release/2026/ntia-announces-two-new-funding-opportunities-expand-broadband-connectivity-tribal-lands",
     summary:
-      "TBCP Round 3 ($540M) and Native Entities Grant Program ($250M) open June 17, 2026. Applications due September 17, 2026; awards expected Spring 2027.",
+      "TBCP Round 3 ($540M) and Native Entities Grant Program ($250M) opened June 17, 2026. Both current application windows close November 17, 2026 at 11:59 p.m. ET; awards are expected beginning Spring 2027.",
     sourceId: "newsSource-ntia-press",
     sourceName: "NTIA",
     publishedAt: "2026-06-17T12:00:00.000Z",
@@ -306,7 +306,7 @@ const items: CuratedItem[] = [
     title: "NTIA Opens Native Entities Grant Program Competition",
     url: "https://www.benton.org/blog/ntia-opens-native-entities-grant-program-competition",
     summary:
-      "Analysis of the $250M NEGP set-aside under the Digital Equity Act — streamlined requirements, BEAD alignment, and September 17, 2026 deadline.",
+      "Analysis of the $250M NEGP set-aside under the Digital Equity Act — streamlined requirements, BEAD alignment, and November 17, 2026 deadline.",
     sourceId: "newsSource-benton-institute",
     sourceName: "Benton Institute",
     publishedAt: "2026-06-18T12:00:00.000Z",

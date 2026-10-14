@@ -24,7 +24,7 @@ const gtmMotions = [
 ];
 
 const signalRows = [
-  ["164", "reviewed tribal contacts in the first campaign base"],
+  ["164", "proposed tribal contacts — pending review, 0 approved for campaign"],
   ["17", "TBCP award-matched organizations ready for approval review"],
   ["60", "gaming and casino contacts for uptime and resilience outreach"],
   ["US + Canada", "operating focus for tribal, Indigenous, rural, and data-center connectivity"],
