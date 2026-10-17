@@ -14,13 +14,13 @@ export function ContactHoneypot() {
         overflow: "hidden",
       }}
     >
-      <label htmlFor="contact-company-website">Company website</label>
+      <label htmlFor="contact-mesh-ledger-slot">Mesh ledger slot</label>
       <input
         type="text"
-        id="contact-company-website"
+        id="contact-mesh-ledger-slot"
         name={CONTACT_HONEYPOT_FIELD}
         tabIndex={-1}
-        autoComplete="off"
+        autoComplete="new-password"
       />
     </div>
   );
