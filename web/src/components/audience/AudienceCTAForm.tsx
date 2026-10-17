@@ -23,10 +23,11 @@ export function AudienceCTAForm({
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  async function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("submitting");
     setErrorMsg("");
+    const honeypot = String(new FormData(e.currentTarget).get(CONTACT_HONEYPOT_FIELD) ?? "");
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -37,7 +38,7 @@ export function AudienceCTAForm({
           organization,
           message: message || undefined,
           audience: audienceSlug,
-          [CONTACT_HONEYPOT_FIELD]: "",
+          [CONTACT_HONEYPOT_FIELD]: honeypot,
         }),
       });
       const data = await res.json().catch(() => ({}));
