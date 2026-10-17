@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import { ContactHoneypot } from "@/components/forms/ContactHoneypot";
+import { CONTACT_HONEYPOT_FIELD } from "@/lib/forms/contactAntiSpam";
 
 const ORANGE = "#C8001F";
 const BODY_FONT = "Inter, sans-serif";
@@ -35,6 +37,7 @@ export function AudienceCTAForm({
           organization,
           message: message || undefined,
           audience: audienceSlug,
+          [CONTACT_HONEYPOT_FIELD]: "",
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -60,7 +63,8 @@ export function AudienceCTAForm({
   }
 
   return (
-    <form onSubmit={onSubmit} data-audience={audienceSlug} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+    <form onSubmit={onSubmit} data-audience={audienceSlug} style={{ display: "flex", flexDirection: "column", gap: 14, position: "relative" }}>
+      <ContactHoneypot />
       <Field label="Name" id="cta-name" value={name} onChange={setName} required />
       <Field label="Email" id="cta-email" type="email" value={email} onChange={setEmail} required />
       <Field label="Organization" id="cta-org" value={organization} onChange={setOrganization} required />
