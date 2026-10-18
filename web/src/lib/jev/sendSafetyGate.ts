@@ -169,7 +169,7 @@ async function invokeTypesafeSendSafety(args: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: trimEnv(process.env.TYPESAFE_JEV_MODEL) || "jev-1.13.0" // pinned (TOL-1294),
+        model: trimEnv(process.env.TYPESAFE_JEV_MODEL) || "jev-1.13.0", // pinned (TOL-1294)
         state: args.state,
         questions: {
           send_safe: {
