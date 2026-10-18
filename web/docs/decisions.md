@@ -23,3 +23,10 @@ Capture architecture decisions that affect the future WebOS starter.
 - Why: Single source of truth for Git, CI, and deploy; fewer path mistakes (`web/.env.local` vs nested folder).
 - Tradeoffs: Anyone with links to the old `konative-website` Vercel project must migrate env vars, domains, and Postgres/Blob links to **`konative-site`** (or rename the project in Vercel to match).
 - Affected files: `web/**`, root `README.md`, `CLAUDE.md`, `scripts/vercel-bootstrap.sh`, `web/docs/database-setup.md`, `web/docs/deploy-readiness-checklist.md`, `web/docs/dns-setup.md`, `web/docs/analytics-setup.md`, `web/next.config.ts`, `docs/ai-os/*`
+
+### 2026-09-18 — K-0 shadow `gate.send_safety` before Mailgun
+- Context: Desk GO to wire TypeSafe Jev send safety at Konative canary batch creation and canary→sending without merging campaign send automation.
+- Decision: Add `@/lib/jev/*` gate client + `@/lib/outreach/campaign/batchLifecycle` call sites; env `KONATIVE_JEV_SEND_GATE=shadow|steer|off`; auth via `TYPESAFE_API_KEY` (GSM `typesafe-jev-api-key`); optional Baton invoke URL; JSONL receipts `konative.jev-send-safety-receipt.v1`.
+- Why: Fail-closed judgment layer in front of deterministic suppression/policy; matches signed TypeSafe decision map first fork.
+- Tradeoffs: Live NTIA script requires TypeSafe key when gate is shadow; dry-run defaults gate off unless env explicitly set.
+- Affected files: `web/src/lib/jev/**`, `web/src/lib/outreach/campaign/**`, `web/scripts/ntia-outreach-send.ts`, `web/docs/outreach/send-safety-gate-k0.md`

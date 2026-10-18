@@ -30,7 +30,7 @@ Use official NTIA/BroadbandUSA pages as the source of truth during campaign copy
 
 - TBCP is a $3 billion program for Tribal broadband infrastructure deployment, broadband use and adoption, distance learning, and telehealth.
 - The official BroadbandUSA award-recipient page currently lists 271 TBCP awardees and notes the data can change when awards are modified or terminated.
-- NTIA announced TBCP 3 and NEGP on June 17, 2026. Applications opened June 17, 2026 and close September 17, 2026, with rolling awards expected beginning Spring 2027.
+- NTIA announced TBCP 3 and NEGP on June 17, 2026. Applications opened June 17, 2026; both current application windows close November 17, 2026 at 11:59 p.m. ET, with rolling awards expected beginning Spring 2027.
 - TBCP 3 is opportunity `2026-NTIA-TBCP`, with up to $540 million available. Official NOFO guidance says no required match, with approximate single-applicant ranges of $500,000-$2.5 million for use/adoption and $1 million-$25 million for infrastructure.
 - NEGP is opportunity `2026-NTIA-NEGP`, with at least $250 million set aside for Native Entities under the Digital Equity Act. Official NOFO guidance includes a 10% match requirement with a waiver petition path and an expected award range of $500,000-$2.5 million.
 - Campaign messaging should distinguish already-awarded Tribes from TBCP 3 / NEGP applicants and pre-award planning prospects.

@@ -60,6 +60,7 @@
     "pg": "^8.21.0",
     "playwright": "^1.60.0",
     "pmtiles": "^4.4.1",
+    "posthog-js": "^1.434.5",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-map-gl": "^8.1.1",
