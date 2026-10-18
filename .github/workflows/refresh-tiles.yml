@@ -59,8 +59,8 @@ jobs:
     needs: gate
     runs-on: ubuntu-latest
     if: |
-      (github.event_name == 'schedule' && github.event.schedule == '0 4 1 5-10 *') ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.layer == 'cwfis' || github.event.inputs.layer == 'all'))
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.layer == 'cwfis' || github.event.inputs.layer == 'all')
     steps:
       - uses: actions/checkout@v4
         with:
@@ -139,8 +139,8 @@ jobs:
     needs: gate
     runs-on: ubuntu-latest
     if: |
-      (github.event_name == 'schedule' && github.event.schedule == '0 4 1 1,4,7,10 *') ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.layer == 'nrcan' || github.event.inputs.layer == 'all'))
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.layer == 'nrcan' || github.event.inputs.layer == 'all')
     steps:
       - uses: actions/checkout@v4
         with:
@@ -290,8 +290,8 @@ jobs:
     needs: gate
     runs-on: ubuntu-latest
     if: |
-      (github.event_name == 'schedule' && github.event.schedule == '0 4 1 11 *') ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.layer == 'cpcad' || github.event.inputs.layer == 'all'))
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.layer == 'cpcad' || github.event.inputs.layer == 'all')
     steps:
       - uses: actions/checkout@v4
         with:
@@ -387,8 +387,8 @@ jobs:
     needs: gate
     runs-on: ubuntu-latest
     if: |
-      (github.event_name == 'schedule' && github.event.schedule == '0 5 1 11 *') ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.layer == 'indigenous' || github.event.inputs.layer == 'all'))
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.layer == 'indigenous' || github.event.inputs.layer == 'all')
     steps:
       - uses: actions/checkout@v4
         with:
@@ -609,8 +609,8 @@ jobs:
     needs: gate
     runs-on: ubuntu-latest
     if: |
-      (github.event_name == 'schedule' && github.event.schedule == '0 6 1 * *') ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.layer == 'bcer' || github.event.inputs.layer == 'all'))
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.layer == 'bcer' || github.event.inputs.layer == 'all')
     steps:
       - uses: actions/checkout@v4
         with:

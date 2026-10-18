@@ -2,6 +2,7 @@
 
 import type { CSSProperties, FormEvent, ReactNode } from "react";
 import { useState } from "react";
+import { ContactHoneypot } from "@/components/forms/ContactHoneypot";
 import HeroBackdrop from "@/components/marketing/HeroBackdrop";
 
 type FormState = "idle" | "submitting" | "success" | "error";
@@ -111,7 +112,8 @@ export default function ContactPage() {
       </section>
 
       <section id="request" style={{ maxWidth: 1180, margin: "0 auto", padding: "72px 48px 110px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 360px), 1fr))", gap: 56 }}>
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 18, position: "relative" }}>
+          <ContactHoneypot />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))", gap: 16 }}>
             <Field label="Full name" required>
               <input type="text" name="name" required style={inputStyle} />
