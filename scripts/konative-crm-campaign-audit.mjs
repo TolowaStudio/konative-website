@@ -4,11 +4,21 @@ import { createHash } from 'node:crypto';
 import {
   chmodSync,
   existsSync,
+  lstatSync,
   mkdirSync,
   readFileSync,
+  realpathSync,
   writeFileSync,
 } from 'node:fs';
-import { dirname, isAbsolute, relative, resolve } from 'node:path';
+import {
+  basename,
+  dirname,
+  isAbsolute,
+  parse,
+  relative,
+  resolve,
+  sep,
+} from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const POLICY_VERSION = 'konative-campaign-readiness-v0.1.0';
@@ -225,7 +235,7 @@ export function campaignReadinessBlockers(person, score) {
 }
 
 function compareCandidates(a, b) {
-  return b.score - a.score
+  return b.fit_score - a.fit_score
     || a.company_name.localeCompare(b.company_name)
     || a.person_name.localeCompare(b.person_name)
     || a.person_id.localeCompare(b.person_id);
@@ -322,6 +332,53 @@ function canonicalJson(value) {
   return JSON.stringify(value);
 }
 
+function membershipSha256(rows) {
+  const ids = rows.map((row) => normalize(row.person_id || row.id));
+  if (ids.some((id) => !id)) {
+    throw new Error('Cannot compute membership hash: one or more person IDs are missing');
+  }
+  if (new Set(ids).size !== ids.length) {
+    throw new Error('Cannot compute membership hash: duplicate person IDs detected');
+  }
+  ids.sort();
+  return sha256(canonicalJson(ids));
+}
+
+function assertGlobalPersonIdentities(people) {
+  const ids = people.map((person) => normalize(person.id));
+  if (ids.some((id) => !id)) {
+    throw new Error('Cannot audit people: one or more person IDs are missing');
+  }
+  if (new Set(ids).size !== ids.length) {
+    throw new Error('Cannot audit people: duplicate person IDs detected across the fetched dataset');
+  }
+}
+
+function normalizeExpectedHash(value, label, allowMissing = true) {
+  if (value === undefined || value === null) {
+    if (allowMissing) return null;
+    throw new Error(`${label} is required`);
+  }
+  const normalized = normalize(value).toLowerCase();
+  if (!/^[a-f0-9]{64}$/.test(normalized)) {
+    throw new Error(`${label} must be exactly 64 hexadecimal characters`);
+  }
+  return normalized;
+}
+
+function baselineCheck(actual, expected) {
+  const normalizedExpected = normalizeExpectedHash(expected, 'Expected membership SHA-256');
+  return {
+    actual,
+    expected: normalizedExpected || null,
+    status: !normalizedExpected
+      ? 'NOT_ASSERTED'
+      : actual === normalizedExpected
+        ? 'PASS'
+        : 'DRIFT',
+  };
+}
+
 function csvCell(value) {
   const scalar = Array.isArray(value) ? value.join('|') : String(value ?? '');
   return `"${scalar.replaceAll('"', '""')}"`;
@@ -345,15 +402,39 @@ function findRepoRoot(start) {
 
 export function assertOutputOutsideRepo(outputDir, repoRoot) {
   const output = resolve(outputDir);
-  const repo = resolve(repoRoot);
-  const rel = relative(repo, output);
-  if (rel === '' || (!rel.startsWith('..') && !isAbsolute(rel))) {
-    throw new Error(`Refusing to write private CRM artifacts inside Git repository: ${output}`);
+  const parsed = parse(output);
+  let cursor = parsed.root;
+  for (const [index, part] of output.slice(parsed.root.length).split(sep).filter(Boolean).entries()) {
+    cursor = resolve(cursor, part);
+    if (!existsSync(cursor)) continue;
+    if (lstatSync(cursor).isSymbolicLink()) {
+      if (index === 0) {
+        cursor = realpathSync(cursor);
+        continue;
+      }
+      throw new Error(`Refusing symlinked private CRM output path component: ${cursor}`);
+    }
   }
-  return output;
+  let existingAncestor = output;
+  const missingParts = [];
+  while (!existsSync(existingAncestor)) {
+    missingParts.unshift(basename(existingAncestor));
+    existingAncestor = dirname(existingAncestor);
+  }
+  const canonicalOutput = resolve(realpathSync(existingAncestor), ...missingParts);
+  const repo = existsSync(repoRoot) ? realpathSync(repoRoot) : resolve(repoRoot);
+  const rel = relative(repo, canonicalOutput);
+  const isOutside = rel === '..' || rel.startsWith(`..${sep}`) || isAbsolute(rel);
+  if (!isOutside) {
+    throw new Error(`Refusing to write private CRM artifacts inside Git repository: ${canonicalOutput}`);
+  }
+  return canonicalOutput;
 }
 
-function writePrivate(path, content) {
+export function writePrivate(path, content) {
+  if (existsSync(path) && lstatSync(path).isSymbolicLink()) {
+    throw new Error(`Refusing to overwrite symlinked private CRM artifact: ${path}`);
+  }
   writeFileSync(path, content, { encoding: 'utf8', mode: 0o600 });
   chmodSync(path, 0o600);
 }
@@ -414,7 +495,11 @@ function reportMarkdown(summary, files) {
     + `Generated: ${summary.generated_at}\n\n`
     + `Policy: \`${summary.policy_version}\`  \nSelection: \`${summary.selection_version}\`\n\n`
     + `## Gate status\n\n`
-    + `- Read-only baseline reproduced: **${summary.baseline_reproduced ? 'PASS' : 'DRIFT'}**\n`
+    + `- Read-only baseline reproduced: **${summary.baseline_status}**\n`
+    + `- Count baseline: **${summary.baseline_checks.counts.status}**\n`
+    + `- Eligible membership: **${summary.baseline_checks.candidate_membership.status}** (\`${summary.candidate_membership_sha256}\`)\n`
+    + `- Working-cohort membership: **${summary.baseline_checks.working_cohort_membership.status}** (\`${summary.working_cohort_membership_sha256}\`)\n`
+    + `- Unsafe-queue membership: **${summary.baseline_checks.queued_membership.status}** (\`${summary.queued_membership_sha256}\`)\n`
     + `- Verified, mailable, tribal, not suppressed: **${summary.counts.baseline_eligible}**\n`
     + `- Unsafe legacy \`QUEUED\` records: **${summary.counts.queued}**\n`
     + `- Proposed working cohort: **${summary.counts.working_cohort}**\n`
@@ -481,6 +566,7 @@ export function buildAuditArtifacts(people, options = {}) {
   const pilotSize = Number(options.pilotSize ?? 10);
   const generatedAt = options.generatedAt ?? new Date().toISOString();
 
+  assertGlobalPersonIdentities(people);
   const candidates = selectWorkingCohort(people, cohortSize);
   const workingCohort = candidates.filter((row) => row.working_cohort_selected);
   const queuedPeople = people.filter((person) => upper(person.outreachStatus) === 'QUEUED');
@@ -490,14 +576,60 @@ export function buildAuditArtifacts(people, options = {}) {
   }));
   const pilot = selectPilot(candidates, pilotSize);
   const campaignReady = candidates.filter((row) => row.campaign_ready);
-  const baselineReproduced = candidates.length === expectedEligible && queued.length === expectedQueued;
+  const countBaselineReproduced = candidates.length === expectedEligible && queued.length === expectedQueued;
+  const candidateMembershipSha256 = membershipSha256(candidates);
+  const workingCohortMembershipSha256 = membershipSha256(workingCohort);
+  const queuedMembershipSha256 = membershipSha256(queued);
+  const candidateMembershipCheck = baselineCheck(
+    candidateMembershipSha256,
+    options.expectedCandidateMembershipSha256,
+  );
+  const workingCohortMembershipCheck = baselineCheck(
+    workingCohortMembershipSha256,
+    options.expectedWorkingCohortMembershipSha256,
+  );
+  const queuedMembershipCheck = baselineCheck(
+    queuedMembershipSha256,
+    options.expectedQueuedMembershipSha256,
+  );
+  const baselineReproduced = countBaselineReproduced
+    && candidateMembershipCheck.status === 'PASS'
+    && workingCohortMembershipCheck.status === 'PASS'
+    && queuedMembershipCheck.status === 'PASS';
+  const membershipStatuses = [
+    candidateMembershipCheck.status,
+    workingCohortMembershipCheck.status,
+    queuedMembershipCheck.status,
+  ];
+  const baselineStatus = !countBaselineReproduced || membershipStatuses.includes('DRIFT')
+    ? 'DRIFT'
+    : membershipStatuses.includes('NOT_ASSERTED')
+      ? 'NOT_ASSERTED'
+      : 'PASS';
   const summary = {
     generated_at: generatedAt,
     source: 'Twenty CRM GraphQL read-only',
     policy_version: POLICY_VERSION,
     selection_version: SELECTION_VERSION,
-    expected: { baseline_eligible: expectedEligible, queued: expectedQueued },
+    expected: {
+      baseline_eligible: expectedEligible,
+      queued: expectedQueued,
+      candidate_membership_sha256: candidateMembershipCheck.expected,
+      working_cohort_membership_sha256: workingCohortMembershipCheck.expected,
+      queued_membership_sha256: queuedMembershipCheck.expected,
+    },
     baseline_reproduced: baselineReproduced,
+    baseline_status: baselineStatus,
+    baseline_checks: {
+      counts: {
+        expected: { baseline_eligible: expectedEligible, queued: expectedQueued },
+        actual: { baseline_eligible: candidates.length, queued: queued.length },
+        status: countBaselineReproduced ? 'PASS' : 'DRIFT',
+      },
+      candidate_membership: candidateMembershipCheck,
+      working_cohort_membership: workingCohortMembershipCheck,
+      queued_membership: queuedMembershipCheck,
+    },
     counts: {
       people: people.length,
       baseline_eligible: candidates.length,
@@ -514,6 +646,9 @@ export function buildAuditArtifacts(people, options = {}) {
       company_org_type: safeCount(workingCohort, 'company_org_type'),
       pilot_stratum: safeCount(pilot, 'pilot_stratum'),
     },
+    candidate_membership_sha256: candidateMembershipSha256,
+    working_cohort_membership_sha256: workingCohortMembershipSha256,
+    queued_membership_sha256: queuedMembershipSha256,
     record_set_sha256: sha256(canonicalJson(people)),
     working_cohort_sha256: sha256(canonicalJson(workingCohort)),
     score_weights: SCORE_WEIGHTS,
@@ -521,7 +656,7 @@ export function buildAuditArtifacts(people, options = {}) {
   return { summary, candidates, workingCohort, queued, pilot };
 }
 
-function parseArgs(argv) {
+export function parseArgs(argv) {
   const args = {
     baseUrl: 'https://crm.tolowastudio.com',
     expectedEligible: 605,
@@ -543,12 +678,38 @@ function parseArgs(argv) {
     else if (arg === '--expected-queued') args.expectedQueued = Number(next());
     else if (arg === '--cohort-size') args.cohortSize = Number(next());
     else if (arg === '--pilot-size') args.pilotSize = Number(next());
+    else if (arg === '--expected-candidate-membership-sha256') args.expectedCandidateMembershipSha256 = next();
+    else if (arg === '--expected-working-cohort-membership-sha256') args.expectedWorkingCohortMembershipSha256 = next();
+    else if (arg === '--expected-queued-membership-sha256') args.expectedQueuedMembershipSha256 = next();
     else if (arg === '--page-delay-ms') args.pageDelayMs = Number(next());
     else if (arg === '--fail-on-baseline-drift') args.failOnBaselineDrift = true;
     else throw new Error(`Unknown argument: ${arg}`);
   }
   if (!args.outputDir) throw new Error('--output-dir is required');
+  for (const [key, label] of [
+    ['expectedCandidateMembershipSha256', '--expected-candidate-membership-sha256'],
+    ['expectedWorkingCohortMembershipSha256', '--expected-working-cohort-membership-sha256'],
+    ['expectedQueuedMembershipSha256', '--expected-queued-membership-sha256'],
+  ]) {
+    if (args[key] !== undefined) args[key] = normalizeExpectedHash(args[key], label, false);
+  }
+  if (
+    args.failOnBaselineDrift
+    && (
+      !args.expectedCandidateMembershipSha256
+      || !args.expectedWorkingCohortMembershipSha256
+      || !args.expectedQueuedMembershipSha256
+    )
+  ) {
+    throw new Error(
+      '--fail-on-baseline-drift requires all three expected membership SHA-256 arguments',
+    );
+  }
   return args;
+}
+
+export function baselineExitCode(failOnBaselineDrift, summary) {
+  return failOnBaselineDrift && !summary.baseline_reproduced ? 3 : 0;
 }
 
 export async function main(argv = process.argv.slice(2)) {
@@ -599,11 +760,15 @@ export async function main(argv = process.argv.slice(2)) {
   process.stdout.write(`${JSON.stringify({
     output_dir: outputDir,
     baseline_reproduced: artifacts.summary.baseline_reproduced,
+    baseline_checks: artifacts.summary.baseline_checks,
     counts: artifacts.summary.counts,
+    candidate_membership_sha256: artifacts.summary.candidate_membership_sha256,
+    working_cohort_membership_sha256: artifacts.summary.working_cohort_membership_sha256,
+    queued_membership_sha256: artifacts.summary.queued_membership_sha256,
     working_cohort_sha256: artifacts.summary.working_cohort_sha256,
   }, null, 2)}\n`);
 
-  if (args.failOnBaselineDrift && !artifacts.summary.baseline_reproduced) process.exitCode = 3;
+  process.exitCode = baselineExitCode(args.failOnBaselineDrift, artifacts.summary);
 }
 
 const invokedPath = process.argv[1] ? pathToFileURL(resolve(process.argv[1])).href : '';
