@@ -59,8 +59,8 @@ jobs:
     needs: gate
     runs-on: ubuntu-latest
     if: |
-      (github.event_name == 'schedule' && github.event.schedule == '0 4 1 5-10 *') ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.layer == 'cwfis' || github.event.inputs.layer == 'all'))
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.layer == 'cwfis' || github.event.inputs.layer == 'all')
     steps:
       - uses: actions/checkout@v4
         with:
@@ -77,11 +77,7 @@ jobs:
           mkdir -p .tiles-raw
           # CWFIS GeoServer WFS – fire weather zone polygons (national)
           curl -sf \
-            "https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wfs\
-?service=WFS&version=2.0.0&request=GetFeature\
-&typeName=public:fwf\
-&outputFormat=application/json\
-&srsName=EPSG:4326" \
+            "https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wfs?service=WFS&version=2.0.0&request=GetFeature&typeName=public:fwf&outputFormat=application/json&srsName=EPSG:4326" \
             -o .tiles-raw/cwfis_raw.geojson \
             -H "User-Agent: konative-site/1.0 (deals@konative.com)"
           echo "Features: $(jq '.features | length' .tiles-raw/cwfis_raw.geojson)"
@@ -139,8 +135,8 @@ jobs:
     needs: gate
     runs-on: ubuntu-latest
     if: |
-      (github.event_name == 'schedule' && github.event.schedule == '0 4 1 1,4,7,10 *') ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.layer == 'nrcan' || github.event.inputs.layer == 'all'))
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.layer == 'nrcan' || github.event.inputs.layer == 'all')
     steps:
       - uses: actions/checkout@v4
         with:
@@ -290,8 +286,8 @@ jobs:
     needs: gate
     runs-on: ubuntu-latest
     if: |
-      (github.event_name == 'schedule' && github.event.schedule == '0 4 1 11 *') ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.layer == 'cpcad' || github.event.inputs.layer == 'all'))
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.layer == 'cpcad' || github.event.inputs.layer == 'all')
     steps:
       - uses: actions/checkout@v4
         with:
@@ -387,8 +383,8 @@ jobs:
     needs: gate
     runs-on: ubuntu-latest
     if: |
-      (github.event_name == 'schedule' && github.event.schedule == '0 5 1 11 *') ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.layer == 'indigenous' || github.event.inputs.layer == 'all'))
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.layer == 'indigenous' || github.event.inputs.layer == 'all')
     steps:
       - uses: actions/checkout@v4
         with:
@@ -609,8 +605,8 @@ jobs:
     needs: gate
     runs-on: ubuntu-latest
     if: |
-      (github.event_name == 'schedule' && github.event.schedule == '0 6 1 * *') ||
-      (github.event_name == 'workflow_dispatch' && (github.event.inputs.layer == 'bcer' || github.event.inputs.layer == 'all'))
+      github.event_name == 'workflow_dispatch' &&
+      (github.event.inputs.layer == 'bcer' || github.event.inputs.layer == 'all')
     steps:
       - uses: actions/checkout@v4
         with:
