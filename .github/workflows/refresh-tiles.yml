@@ -77,11 +77,7 @@ jobs:
           mkdir -p .tiles-raw
           # CWFIS GeoServer WFS – fire weather zone polygons (national)
           curl -sf \
-            "https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wfs\
-?service=WFS&version=2.0.0&request=GetFeature\
-&typeName=public:fwf\
-&outputFormat=application/json\
-&srsName=EPSG:4326" \
+            "https://cwfis.cfs.nrcan.gc.ca/geoserver/public/wfs?service=WFS&version=2.0.0&request=GetFeature&typeName=public:fwf&outputFormat=application/json&srsName=EPSG:4326" \
             -o .tiles-raw/cwfis_raw.geojson \
             -H "User-Agent: konative-site/1.0 (deals@konative.com)"
           echo "Features: $(jq '.features | length' .tiles-raw/cwfis_raw.geojson)"
