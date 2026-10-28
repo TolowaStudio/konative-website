@@ -35,6 +35,8 @@ export default function PostHogAnalytics() {
         return event;
       },
     });
+    // Super properties (TOL-1738 taxonomy): site is the hostname, venture the slug.
+    posthog.register({ site: 'konative.com', venture: 'konative' });
     const capture = (event: Event) => {
       const detail = (event as CustomEvent<{ event?: string; properties?: Record<string, string> }>).detail;
       if (detail?.event) posthog.capture(detail.event, detail.properties);
