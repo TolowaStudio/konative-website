@@ -22,6 +22,9 @@ export default function PostHogAnalytics() {
       capture_pageview: 'history_change', capture_pageleave: false, disable_session_recording: true,
       disable_surveys: true, mask_all_element_attributes: true, mask_all_text: true, person_profiles: 'never',
       rageclick: false, respect_dnt: true,
+      // Super properties (TOL-1738 taxonomy): site is the production hostname, venture the slug.
+      // Registered in `loaded` so the initial $pageview carries them.
+      loaded: (ph) => ph.register({ site: 'konative.com', venture: 'konative' }),
       before_send: (event) => {
         if (!event) return event;
         for (const key of ['$current_url', '$referrer']) {

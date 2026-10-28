@@ -43,9 +43,20 @@ jobs:
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
 
+      # Public PostHog project token (tolowa-web; safe to embed client-side by design).
+      # Next.js inlines NEXT_PUBLIC_* at build time, so it must be a build arg.
+      # Empty if secretAccessor isn't granted, which leaves analytics off, not a failed deploy.
+      - id: posthog
+        uses: google-github-actions/get-secretmanager-secrets@v2
+        continue-on-error: true
+        with:
+          secrets: |-
+            token:tolowa-studio/posthog-public-project-token
+
       - name: Build and push image
         env:
           IMAGE_TAG: ${{ github.sha }}
+          NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN: ${{ steps.posthog.outputs.token }}
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
           NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
           NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
@@ -68,6 +79,8 @@ jobs:
             --build-arg NEXT_PUBLIC_GHOST_CONTENT_API_KEY="${NEXT_PUBLIC_GHOST_CONTENT_API_KEY}" \
             --build-arg NEXT_PUBLIC_GTM_ID="${NEXT_PUBLIC_GTM_ID}" \
             --build-arg NEXT_PUBLIC_SENTRY_DSN="${NEXT_PUBLIC_SENTRY_DSN}" \
+            --build-arg NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN="${NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN}" \
+            --build-arg NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com \
             -t "${IMAGE}" \
             .
           docker push "${IMAGE}"
