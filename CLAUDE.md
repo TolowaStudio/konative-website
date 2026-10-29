@@ -23,6 +23,8 @@ Cloud Run (`konative-website-staging`) → **konative.com** · Supabase (intel t
 
 ## Local & deploy
 
+From repo root, use the Node version in `.nvmrc` (`nvm use`).
+
 `web/`: `npm ci` → `npm run dev` (port **3005**, Node **22**). Push `main` → `deploy-cloud-run.yml`. Health: `curl -sf https://konative.com -o /dev/null -w "%{http_code}\n"`.
 
 ## Done contract
