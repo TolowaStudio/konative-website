@@ -11,7 +11,12 @@ Founder OS structure and PRD live in **`docs/`**. Notion hub (live): [konative.c
 
 The live site lives in **`web/`** (Next.js 16 + Sanity CMS + Supabase). Editor workflow, blocks, and collections are defined there.
 
+## Run locally
+
+Use **Node 22** (see [`.nvmrc`](.nvmrc) at the repo root).
+
 ```bash
+nvm use   # or otherwise install/use Node 22
 cd web
 npm ci
 npm run dev
@@ -19,7 +24,13 @@ npm run dev
 
 Dev server: **http://localhost:3005** (see root `CLAUDE.md`).
 
-- Production build: `npm run build` then `npm run start`
+Production build:
+
+```bash
+cd web
+npm run build
+npm run start
+```
 - **Deploy:** push to `main` → [`.github/workflows/deploy-cloud-run.yml`](.github/workflows/deploy-cloud-run.yml) builds `web/Dockerfile` and deploys Cloud Run service `konative-website-staging` (GCP project `tolowa-studio`, region `us-west1`). Runtime secrets come from **GCP Secret Manager** (`konative-*` secrets). See root **`CLAUDE.md`** for status and health checks.
 - **Local env:** copy `web/.env.local.example` to `web/.env.local` and set Sanity, Supabase, and site URL vars (see `web/docs/database-setup.md`).
 
