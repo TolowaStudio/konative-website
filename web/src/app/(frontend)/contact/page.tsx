@@ -64,6 +64,11 @@ export default function ContactPage() {
 
       setFormState("success");
       form.reset();
+      window.dispatchEvent(
+        new CustomEvent("tolowa:analytics", {
+          detail: { event: "demo_request", properties: { form: "contact", page: "contact" } },
+        }),
+      );
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : "Something went wrong.");
       setFormState("error");
