@@ -1,7 +1,7 @@
 # Warm-intro asks — DRAFT
 
-**Run these before any tier sequence.** Sent 1:1 by Jeramey from his own
-mailbox (not Mailgun / Resend). Partner names and emails live in Twenty, not in
+**Warm intros only (Jeramey, 2026-11-15).** Sent 1:1 by Jeramey from his own
+mailbox. No campaign tool, no Mailgun or Resend, no cold follow-on. Partner names and emails live in Twenty, not in
 this repo.
 
 Context: warm asks went to Avant and T4DevCo contacts on 2026-07-15 (Pathfinder
@@ -95,9 +95,9 @@ Jeramey
 ## After an intro lands
 
 - Log the intro in Twenty (person, source = warm intro + who made it).
-- First message to the introduced person: one paragraph, thank the introducer,
-  then the One-Site Snapshot offer from the matching tier's Touch 1 (drop the
-  cold opener).
+- First message to the introduced person: thank the introducer, then use the
+  matching message in `follow-ups.md`. LinkedIn: message them only after the
+  intro, never cold InMail.
 - Thank the introducer within a day, whatever happens.
 
 ## Signature (all warm asks)
