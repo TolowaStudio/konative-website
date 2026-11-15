@@ -46,7 +46,7 @@ export default function HomePage() {
             </p>
             <div className="home-hero-actions" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <Link href="/call" style={primary}>Book a connectivity review</Link>
-              <Link href="/tribal/grants" style={secondary}>TBCP 3 / NEGP help</Link>
+              <Link href="/tribal/grants" style={secondary}>TBCP 3 / NEGP awardees</Link>
             </div>
             <div className="home-signal-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", maxWidth: 800, marginTop: 48, border: "1px solid rgba(255,255,255,.15)" }}>
               {["Tribal + rural", "Data-center connectivity", "US + Canada", "Map-backed outreach"].map(x => <div key={x} style={{ padding: "16px 18px", color: "#fff", fontSize: 11, fontWeight: 700, letterSpacing: ".11em", textTransform: "uppercase", borderRight: "1px solid rgba(255,255,255,.12)" }}>{x}</div>)}
@@ -67,7 +67,7 @@ export default function HomePage() {
         <p style={{ ...eyebrow, color: RED }}>Start with your situation</p>
         <h2 style={sectionTitle}>Two go-to-market lanes. One sourcing desk.</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,430px),1fr))", gap: 18, marginTop: 42 }}>
-          <Door href="/tribal/grants" number="01" title="TBCP 3 & Tribal grants" body="Turn TBCP 3, NEGP, award records, renewals, gaming uptime, healthcare, education, and rural enterprise needs into carrier-neutral sourcing and installed service." cta="Plan funded connectivity" />
+          <Door href="/tribal/grants" number="01" title="TBCP 3 awardees & Tribal enterprise" body="Turn TBCP 3 and NEGP awards (rolling from Spring 2027), award records, renewals, gaming uptime, healthcare, education, and rural enterprise needs into carrier-neutral sourcing and installed service." cta="Plan funded connectivity" />
           <Door href="/data-center-connectivity" number="02" title="Data-center connectivity" body="Determine whether a site can obtain the internet, transport, dark fiber, wavelengths, cloud access, DCI, and physical diversity its operating plan requires." cta="Evaluate site connectivity" />
         </div>
         <p style={{ color: MUTED, marginTop: 22, lineHeight: 1.7 }}>Also sourcing multi-site enterprise, gaming and hospitality, healthcare, public safety, UCaaS/CCaaS, managed networks, cloud, mobility, cybersecurity, and Canada partnership opportunities.</p>

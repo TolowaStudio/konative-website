@@ -42,7 +42,7 @@ export default function Footer() {
               ["News Feed", "/news"],
               ["Tribal DC Tracker", "/tribal/projects"],
               ["Market Coverage", "/markets"],
-              ["TBCP 3 / NEGP Help", "/tribal/grants"],
+              ["TBCP 3 / NEGP Awardees", "/tribal/grants"],
               ["Voice-to-Scope", "/tribal/scope"],
               ["TBCP Awards", "/tribal/awards"],
               ["Connectivity Map", "/map"],
