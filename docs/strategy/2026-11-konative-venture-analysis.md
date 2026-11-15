@@ -24,12 +24,12 @@ How to read the confidence tags:
 | Closed revenue | None recorded. No installed circuit, no residual. | Stash, Linear |
 | Live opportunity | One inbound carrier/CLEC partner opportunity: multi-site, redundant 100G (TOL-1695). Deliverables were sent 2026-10-26. A reply to the partner's diligence questions is drafted but not sent. Waiting on Jeramey. Deal details are in the private Notion version of this page. | TOL-1695 |
 | Warm asks | Sent 2026-07-15 to Avant (Pathfinder name-check, 10 sites) and T4DevCo (Sabey Decatur). No replies are recorded in the repo, Stash or Linear. | Stash |
-| Cold email record | 225 delivered → 0 human replies (July). The 102-send tribal test got 0 replies, meetings or opportunities. | 2026-07-15 brief; Stash 2026-07-14 |
+| Cold email history | 225 delivered → 0 human replies (July). The 102-send tribal test got 0 replies, meetings or opportunities. This is history only; cold is now out of scope. | 2026-07-15 brief; Stash 2026-07-14 |
 | CRM | Twenty has 7,650 people and 3,878 companies. 605 eligible tribal contacts, 164 proposed, **0 campaign-ready**. | TOL-462 |
-| Sending path | Mailgun console session is blocked (needs a human re-login). Cold sending through Mailgun or Resend is prohibited by both providers' terms. | TOL-462, TOL-659 |
-| Site vs strategy | `llms.txt` matches the lock: DC primary, tribal secondary. The **homepage does not**. Lane 01 is "TBCP 3 & Tribal grants → Plan funded connectivity", and the hero CTA pair includes "TBCP 3 / NEGP help". The homepage also publishes internal pipeline counts ("164 proposed tribal contacts…", "17 TBCP award-matched organizations…"). This is W2 work. | live homepage fetched 2026-11-15 |
+| Outreach path | **Warm intros only, at $0** (Jeramey, 2026-11-15, TOL-3559). No cold-email domain or tool, no paid lead data. Cold outbound is out of scope. Nothing is sent without approval of the exact batch. | TOL-3559 |
+| Site vs strategy | `llms.txt` matches the lock: DC primary, tribal secondary. The homepage pipeline-metrics block is being removed (TOL-3549). The remaining gap: homepage lane 01 still leads with "TBCP 3 & Tribal grants → Plan funded connectivity" rather than the DC hero and snapshot CTA (W2). | live homepage fetched 2026-11-15; TOL-3549 |
 
-**One-line read:** the model is sound and the wedge is defensible. But four months after the July lock, Konative has one inbound opportunity, no warm-path conversions on record and no compliant cold path. The binding constraint is **origination volume through warm channels**, not strategy.
+**One-line read:** the model is sound and the wedge is defensible. But four months after the July lock, Konative has one inbound opportunity and no warm-path conversions on record. With cold outbound out of scope by decision, everything rests on **warm-path origination and inbound**. Jeramey's time is the budget.
 
 ---
 
@@ -49,7 +49,7 @@ The buyer signs the carrier order. The carrier pays Avant a residual on monthly 
 | SPIFFs / upfront bonuses | Commonly 1–3× MRC on promoted products (examples: 2× MRC managed network, 1× MRR SASE) | Confirmed (promos) | [Telarus promos](https://promos.telarus.com) |
 | **Konative's effective take** (after the Avant split) | **8–14% of customer MRC** if the pass-through is 50–70% | **Assumption: unconfirmed for four months** | market STORM F6 |
 
-**The most important unknown in the model:** whether the Pathfinder gross % is what Konative itself receives as a Trusted Advisor, or what Avant receives before a sub-agent split. If Konative keeps the gross rate, every residual below roughly **doubles**. Both columns are modelled. Resolving this takes reading one agreement (Decision D1).
+**The most important unknown in the model:** whether the Pathfinder gross % is what Konative itself receives as a Trusted Advisor, or what Avant receives before a sub-agent split. If Konative keeps the gross rate, every residual below roughly **doubles**. Both columns are modelled. Resolving this takes reading one agreement (target 2026-11-30, §6).
 
 ### Per-deal residual estimates
 
@@ -102,7 +102,7 @@ Per the 2026-07-15 reshape and the 2026-08-20 lock: the target is anyone buying 
 | Pain | Uptime (gaming floor, payments, surveillance), single-carrier risk, renewal leverage, sovereignty and data control. |
 | Deal shape | $5–10k MRC anchor (DIA + diverse path + SD-WAN + UCaaS). |
 | Rules | Tribal contracting checklist applies to every deal (authority resolution, limited waiver + arbitration, TERO / licensing check) [legal brief]. Contract with the enterprise / Section 17 entity where possible. |
-| Sequencing tension | July lock: 90% DC / 10% tribal nurture. The 2026-08-30 Jeramey direction: *intensify* the tribal campaign. **These conflict; see Decision D4.** |
+| Effort mix | Working assumption: ~70% DC / ~30% tribal. The July lock said 90/10; the 2026-08-30 direction stepped up the tribal campaign. |
 
 ### P1b: Prior TBCP awardees (Rounds 1–2) moving into operations
 
@@ -125,7 +125,8 @@ Per the 2026-07-15 reshape and the 2026-08-20 lock: the target is anyone buying 
 - Grant-only contacts with no operating connectivity need.
 - Hyperscalers buying IRUs or dark fiber direct.
 - Residential and single-site SMB broadband below ~$500 MRC (not worth the cycle).
-- Unverified or scraped personas; any bulk-list cold send.
+- **Cold outbound of any kind:** cold email, cold-email domains or sequencers, automated LinkedIn, and calls to scraped lists. Also paid lead data or enrichment, and messaging Twenty records with no prior relationship. (Jeramey, 2026-11-15, TOL-3559.)
+- Unverified or scraped personas.
 - The May 2026 powered-land / three-sided land brokerage / media-flywheel model (stale since the 2026-06-18 pivot). `docs/phase-one-offer.md` ($300k Development Readiness Engagement) belongs to that era and should not be revived without a decision.
 
 ---
@@ -147,7 +148,7 @@ Already the locked offer (`llms.txt`: "one-page Market Connectivity Brief / One-
 | Conversion step | Snapshot → "want firm quotes?" → Pathfinder deal registration → quotes → proposal. |
 | Rules | No firm pricing or carrier names to a counterparty who has not signed a mutual NDA with non-circumvention (TOL-1695 rule). Internal Avant rates are never shown. |
 
-### Paid tier: options only (Jeramey decides; D2)
+### Paid tier: options only (open decision; see §8)
 
 The public promise is "suppliers pay; buyers pay nothing" (`llms.txt`, `/answers`). Any paid tier changes that promise and the site copy. These are the choices; prices are deliberately not chosen here.
 
@@ -162,77 +163,109 @@ Public reference points for sizing (not recommendations): Lightyear prices procu
 
 ---
 
-## 5. Channels and economics
+## 5. Channels and economics (warm intros only, $0)
 
-Ranked by expected meetings per Jeramey-hour. Every cost below is **[Assumption]** except where noted.
+**Decided by Jeramey, 2026-11-15 (TOL-3559):** outreach is warm intros only, at $0. There is no cold-email domain or tool and no paid lead data. Cold outbound is **out of scope**. It is not a later option and is not costed here.
 
-| # | Channel | Mechanism | Cash cost | Time cost | Expected yield (90 days) | Status |
+| # | Warm channel | What qualifies as warm | Mechanism | Time cost | Expected yield (90 days) [Assumption] | Status |
 |---|---|---|---|---|---|---|
-| 1 | **Avant** (channel managers; SE bench; Pathfinder) | Name-checks on target sites; SE joint calls; partner-to-partner referrals; Avant events | $0 | Low | 2–4 qualified intros if Avant engages | Asked 2026-07-15; **no reply recorded**. Chase first. |
-| 2 | **T4DevCo / WestPorch** (SiteIQ) | DC developer adjacency; Sabey Decatur; co-sell on sites they already touch | $0 | Low | 1–3 P0 site intros | Asked 2026-07-15; **no reply recorded**. Partner-conflict check needed for Offer D. |
-| 3 | **Tribal relationships** (Synergy, CTUIR, Tolowa networks, TribalNet contacts, Native-owned IT teaming partners) | One named casino-IT intro per ask, not a campaign; teaming with a Native-owned prime for preference RFPs | $0 | Medium | 2–4 tribal meetings | The July plan asked for one Synergy / CTUIR intro; outcome not recorded. |
-| 4 | **Inbound** (konative.com forms, Cal.com, LinkedIn) | Snapshot CTA; carrier check; lateral estimator; LinkedIn presence | $0 | Low | 1–3 inbound per quarter (the TOL-1695 lead came from LinkedIn) | The form → Twenty path is tracked in TOL-489 / W7. The homepage CTA does not lead with the snapshot (W2). |
-| 5 | **Partners** (AMERIND, Tribal Ready, grant consultants, DC land brokers) | Konative as their multi-carrier quoting layer; ask for endorsement, not leads | $0 | Medium | 0–2 referrals | Not started. |
-| 6 | **Cold (residual only)** | Plain-text, one sourced trigger, snapshot offer, opt-out; only after a warm-path search fails | Needs a dedicated sending domain + sequencer: **money, so needs:jeramey** | High | Low. July cold: 225 → 0 human replies. | **Blocked:** no compliant path. Mailgun and Resend prohibit cold sending, and a violation risks the transactional mail. CAN-SPAM (sender and advertiser both liable) and WA CEMA ($100/email, private right of action) apply [TOL-659]. Mailgun console login is also blocked (TOL-462). |
+| 1 | **Avant** (channel managers, SE bench, Pathfinder) | An existing Avant relationship | Name-checks on target sites; SE joint calls; partner-to-partner referrals; Avant events | Low | 2–4 qualified intros if Avant engages | Asked 2026-07-15; **no reply recorded**. Chase first. |
+| 2 | **T4DevCo / WestPorch** (SiteIQ) | An existing partner relationship | DC developer adjacency (Sabey Decatur first); co-sell on sites they already touch | Low | 1–3 P0 site intros | Asked 2026-07-15; **no reply recorded**. |
+| 3 | **Tribal relationships** (Synergy, CTUIR, Tolowa networks, TribalNet contacts, Native-owned IT partners) | Someone Jeramey or Tolowa already knows | One named casino-IT or tribal-IT intro per ask, not a campaign; teaming with a Native-owned prime for preference RFPs | Medium | 2–4 tribal meetings | The July plan asked for one Synergy / CTUIR intro; the outcome isn't recorded. |
+| 4 | **Existing Twenty contacts with a real prior relationship** | A past two-way conversation, an in-person meeting, a prior inbound, or a current partner or customer. **The rest of Twenty's 7,650 records are not warm and are not contacted.** | A personal 1:1 note from Jeramey that names the prior contact and offers a One-Site Snapshot | Low | Depends on how many qualify (unknown until audited) | Needs a read-only Twenty audit that tags relationship evidence (W3). No writes without approval. |
+| 5 | **Referrals** | An introduction from someone in channels 1–4, a snapshot recipient or a customer; DC land / site brokers; AMERIND, Tribal Ready and similar partners asked for an endorsement, not a list | After every snapshot or meeting: "who else is building or renewing?" | Low | 1–3 intros | Not started. |
+| 6 | **Inbound** (konative.com, Cal.com, LinkedIn, Ghost newsletter) | Someone came to Konative first, or opted in to the newsletter | Snapshot CTA, carrier check, lateral estimator. Ghost goes only to opted-in subscribers, as nurture. | Low | 1–3 inbound requests per quarter (the TOL-1695 lead came from LinkedIn) | The form → Twenty path is tracked in TOL-489 / W7. The homepage pipeline block is being removed (TOL-3549). |
 
-**Economics of cold, honestly** [Assumption]: at July's 0/225 human-reply rate, cold produces no meetings. Even at a 1–2% reply rate on trigger-verified contacts, 100 verified sends gives 1–2 conversations. Each verified contact costs ~$0.02–0.03 to find plus $0.004 to verify (TOL-659) and ~10 minutes of human verification. Cold is not worth reopening until warm channels 1–3 have been worked and either produced or failed (the July rule: cold only after the warm-path search fails).
+**Economics.** Cash cost is **$0** on every channel. The only cost is Jeramey's time, so the plan is sized to that.
 
-**CRM discipline:** every touch is logged in Twenty against the stage model in `docs/operations/twenty-connectivity-model.md` (Target → … → Residual active). Bulk writes only on deduped, sourced records with an undo log and Jeramey's batch approval (TOL-462 rules).
+Time per step [Assumption]:
+
+| Step | Time each |
+|---|---|
+| Warm intro ask or follow-up | ~15 min |
+| One-Site Snapshot | 1–2 h |
+| First meeting, including prep | ~1 h |
+| Pathfinder registration and quote | ~2 h |
+| Proposal | 2–4 h |
+
+The 90-day plan below comes to about **45–50 hours, or roughly 4 hours a week**.
+
+Warm funnel, working backwards [Assumption]:
+
+| Stage | Count | Conversion assumed |
+|---|---|---|
+| Warm asks | 40 | — |
+| Intros | ~16 | 30–50% of asks |
+| Qualified meetings | ~8 | ~50% of intros |
+| Snapshots (meetings plus inbound) | ~10 | — |
+| Quote requests / Pathfinder registrations | ~4 | 30–50% of snapshots |
+| Proposals | ~2 | ~50% |
+| Signed orders | ~0.5–0.8 | 25–40% of proposals |
+
+A signed order inside 90 days is therefore a **stretch**, not the base case. The base case is a qualified pipeline in Twenty.
+
+**Rules that hold on every channel:**
+
+- Nothing is sent before Jeramey approves the exact batch (TOL-3559, item 2).
+- No firm pricing or carrier names go to anyone without a mutual NDA.
+- Internal Avant rates are never shown.
+- Every touch is logged in Twenty against the stage model in `docs/operations/twenty-connectivity-model.md`. Bulk writes happen only on deduped, sourced records, with an undo log and approval (TOL-462 rules).
 
 ---
 
 ## 6. 90-day targets (2026-11-16 → 2027-02-13)
 
-Targets are leading indicators. Residual cash will not arrive in this window (§2, lag).
+Every target is warm-path or inbound and costs $0. Residual cash will not arrive in this window (see the lag point in §2).
 
-| Week | Target | Measure (where it shows) |
+| By | Target | Measure (where it shows) |
 |---|---|---|
-| By 2026-11-30 | Avant agreement read: Konative's actual split, evergreen clause, assignability, non-solicit scope | One-line answer on TOL-3545 (D1) |
-| By 2026-11-30 | TOL-1695 partner deal resolved to a written agent-of-record + fee structure, **or** closed lost | TOL-1695 |
-| By 2026-12-15 | Warm channels 1–3 each asked for a specific named intro (re-ask Avant + T4 with a fresh site list) | Twenty activity log |
-| By 2026-12-31 | **20 P0 + 12 P1 + 6 P1b** named accounts in Twenty with sourced trigger + verified role (deduped, undo-logged) | Twenty, W3 |
-| By 2027-01-15 | **10 One-Site Snapshots delivered** to people who asked for one | Twenty (artifact-requested stage) |
-| By 2027-02-13 | **8 qualified first meetings** (named buyer, real site, timeline) | Twenty opportunities |
-| By 2027-02-13 | **4 Pathfinder deal registrations, 2 proposals delivered** | Pathfinder IDs on Twenty opps |
-| By 2027-02-13 | **≥1 signed order ≥ $3k MRC**, or a signed SPIFF-bearing order | Twenty "Ordered" stage |
-| Ongoing | Bounce < 2%, complaints = 0, zero sends without approval | send receipts |
-| Ongoing | Weekly scoreboard (W8): accounts, snapshots, meetings, registrations, proposals, orders, MRC signed | TOL-3545 comments |
+| 2026-11-30 | Avant agreement read: actual split, evergreen clause, assignability, non-solicit scope. This is an input to the model (§2), not a decision. | One-line answer on TOL-3545 |
+| 2026-11-30 | TOL-1695 partner deal resolved to a written agent-of-record and fee structure, **or** closed lost | TOL-1695 |
+| 2026-12-05 | **Warm-path inventory: ≥ 40 warm contacts**, each with relationship evidence, mapped to P0 / P1 / P1b accounts (channels 1–5). Read-only. | Evidence sheet; no Twenty writes without approval |
+| 2026-12-15 | **First warm batch (≤ 10 recipients) proposed to Jeramey**, with recipients, copy version, sender, suppression result and stop condition | TOL-3559, item 2 |
+| 2027-01-15 | 40 warm asks made (after approval), giving ~16 intros | Twenty activity log |
+| 2027-02-13 | **8 qualified first meetings** (named buyer, real site, timeline) | Twenty opportunities |
+| 2027-02-13 | **10 One-Site Snapshots delivered** to people who asked, including **≥ 3 inbound** requests | Twenty (artifact-requested stage) |
+| 2027-02-13 | **4 Pathfinder deal registrations, 2 proposals delivered** | Pathfinder IDs on Twenty opportunities |
+| 2027-02-13 | Stretch: **1 signed order ≥ $3k MRC**, or a signed SPIFF-bearing order | Twenty "Ordered" stage |
+| Ongoing | $0 spend; zero cold sends; zero sends without approval | Send receipts |
+| Ongoing | Weekly scoreboard (W8): warm contacts, asks, intros, meetings, snapshots, registrations, proposals, orders, MRC signed | TOL-3545 comments |
 
-Mix assumption: ~70% effort P0 DC, ~30% P1 / P1b tribal, pending D4.
+Working effort mix: ~70% P0 DC and ~30% P1 / P1b tribal. DC carries the MRC; tribal carries the long cycle and the moat.
 
 ---
 
 ## 7. Kill criteria
 
-Checked at **day 45 (2026-12-31)** and **day 90 (2027-02-13)**. Each line names what stops and what happens next.
+Checked at **day 45 (2026-12-31)** and **day 90 (2027-02-13)**. Each line names what stops and what happens next. Cold outbound is never the fallback.
 
 | # | Trigger | Action |
 |---|---|---|
 | K1 | The Avant agreement **lacks evergreen residuals that survive termination, or bars assignment**, and Avant won't amend | Stop scaling origination through Avant. Multi-home to a second TSD (the average advisor uses ~2.9) or pause. The "book is the asset" thesis is void. |
-| K2 | **Day 45: < 3 named meetings from warm channels 1–3 combined** | Warm-path thesis fails at current relationships. Reshape to partner-led only (channel 5), or pause outbound and go inbound-only. Escalate to Jeramey. |
-| K3 | **Day 90: 0 Pathfinder registrations and 0 proposals** | Stop P0 DC origination. Hold the site as inbound / authority only. Make a venture-level continue / hold decision. |
-| K4 | **10 snapshots delivered → 0 quote requests** | The snapshot is content, not proof. Stop producing it; redesign around non-public carrier facts or drop it. |
-| K5 | Any deal where Konative would both shape a grant-funded procurement **and** take a supplier commission | Stop that deal immediately. Apply the pick-a-side rule. Never both. |
-| K6 | Any cold send off a compliant path, any complaint, or bounce ≥ 2% | Halt all sending. Post-mortem before any resume. |
-| K7 | Jeramey time on Konative > **6 hours/week** [Assumption, to be set in D5] for 4 straight weeks with 0 qualified opportunities | Cut to inbound + partner deals only. |
-| K8 | **Venture-level, 2027-05-15 (6 months):** < $5k MRC signed in total | Wind down active GTM. Keep the site, navigator and residuals; no new campaign spend or engine work. |
+| K2 | **2026-12-05: warm-path inventory < 20 real warm contacts** | The warm-only plan cannot reach these targets. Halve the targets, concentrate on the strongest channel plus inbound, and tell Jeramey. |
+| K3 | **Day 45: < 3 named meetings from warm channels combined** | Warm reach is too thin at current relationships. Narrow to the one channel that produced, plus inbound, and escalate to Jeramey. |
+| K4 | **Day 90: 0 Pathfinder registrations and 0 proposals** | Stop P0 DC origination. Hold the site as inbound / authority only. Make a venture-level continue / hold decision. |
+| K5 | **10 snapshots delivered → 0 quote requests** | The snapshot is content, not proof. Stop producing it; redesign around non-public carrier facts or drop it. |
+| K6 | Any deal where Konative would both shape a grant-funded procurement **and** take a supplier commission | Stop that deal immediately. Apply the pick-a-side rule. Never both. |
+| K7 | Any send without approval, any cold send, any spend, or any complaint | Halt all outreach. Post-mortem before resuming. |
+| K8 | Konative takes more than **6 hours a week** of Jeramey's time [Assumption] for 4 straight weeks with 0 qualified opportunities | Cut to inbound and partner deals only. |
+| K9 | **Venture-level, 2027-05-15 (6 months):** < $5k MRC signed in total | Wind down active GTM. Keep the site, the navigator and any residuals; no new engine work. |
 
 ---
 
-## 8. Decisions for Jeramey
+## 8. Decisions still open for Jeramey
 
-Each decision has options and a recommendation. Price and taste calls are left open on purpose.
+Two decisions are open. Both are tracked on TOL-3559.
 
-| # | Decision | Options | Recommendation |
+| # | Decision | Options | Notes |
 |---|---|---|---|
-| **D1** | **Read the Avant agreement** (this needs you; the agreement is not shared). What is Konative's split on Pathfinder gross rates? Are residuals evergreen past termination? Is it assignable? What is the non-solicit scope? | Read it yourself / have counsel redline against the four-clause checklist (legal brief §5; counsel = spend, ask first) | Read it yourself this week. It halves or doubles every number in §2. |
-| **D2** | **Paid tier** | A none / B credited assessment / C advisor-side (no commission) / D DC construction diligence (§4) | Your call on price. Note: C is required for any grant-funded deal; B is the lowest-regret way to test willingness to pay. |
-| **D3** | **TOL-1695 partner-deal posture** | (a) Insist Konative is agent of record on Avant orders; (b) accept a one-time referral fee; (c) onboard the partner as a channel supplier through Avant / Telarus (the drafted reply); (d) walk | Get the agent of record and fee **in writing** before more free work. The deal could be most of break-even, or zero. |
-| **D4** | **DC vs tribal effort split.** The July lock says 90/10 DC. The 2026-08-30 direction says intensify tribal. | 90/10 · 70/30 · 50/50 | 70/30. DC carries the MRC; tribal carries the moat and long cycle. Reconfirm. |
-| **D5** | **Your weekly hours for Konative** (sets snapshot volume and K7) | 3 / 6 / 10 h | Your call. 6 h ≈ 3–4 snapshots + 2 calls per week. |
-| **D6** | **Cold path** | (a) Stay warm-only until K2 is checked; (b) approve a dedicated cold domain + sequencer (monthly cost, separate from transactional mail) | (a). Revisit at day 45. |
-| **D7** | **Homepage alignment (W2):** the homepage leads with "TBCP 3 & Tribal grants" and shows internal pipeline counts, against the July messaging lock and `llms.txt` | Approve W2 to re-lead with the DC hero + snapshot CTA and remove the internal counts from public view | Approve W2 scope. The exact copy diff comes back to you before deploy. |
-| **D8** | **Public-claim consistency item** (internal; details in the private Notion version) | Confirm and correct the source document | Confirm before the next tribal-lane send. |
+| **1** | **Offer and pricing** (TOL-3559, item 1) | Approve the free One-Site Snapshot as the front door, with supplier-paid brokerage behind it. Then pick a paid tier: A none / B assessment with the fee credited against orders / C advisor-side, no commission / D DC construction diligence (§4), and its price. | C is the only structure allowed on a grant-funded procurement. Any paid tier changes the public "buyers pay nothing" line, so the site copy would change with it. |
+| **2** | **First-send approval** (TOL-3559, item 2) | Approve, edit or reject the exact first warm batch (≤ 10 recipients) when it is presented around 2026-12-15 | Nothing goes out before this approval. |
+
+**Settled 2026-11-15:**
+
+- Warm intros only, at $0: no cold domain or tool and no paid lead data (TOL-3559).
+- The homepage pipeline-metrics block is being removed (TOL-3549).
 
 ---
 
