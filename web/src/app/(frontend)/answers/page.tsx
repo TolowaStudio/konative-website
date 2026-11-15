@@ -199,7 +199,7 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     question: "How fast will Konative respond to my inquiry?",
     answer:
-      "Response time depends on how the inquiry is triaged, not a flat SLA for everyone. Priority inquiries — a named organization or entity, a business email, a specific capacity/timeline, or an active grant campaign like NTIA TBCP — are routed for a same-business-day response. Inquiries with clear intent but less detail are typically answered within one business day. General or exploratory inquiries are still answered, usually within a few business days. If your situation is time-sensitive — a grant deadline, a capital raise milestone, a contract renewal — say so explicitly in your message; it moves you to a faster lane.",
+      "Response time depends on how the inquiry is triaged, not a flat SLA for everyone. Priority inquiries — a named organization or entity, a business email, a specific capacity/timeline, or a pending or funded award like NTIA TBCP — are routed for a same-business-day response. Inquiries with clear intent but less detail are typically answered within one business day. General or exploratory inquiries are still answered, usually within a few business days. If your situation is time-sensitive — an award milestone, a capital raise milestone, a contract renewal — say so explicitly in your message; it moves you to a faster lane.",
     category: "Working With Konative",
   },
   {
