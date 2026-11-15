@@ -31,6 +31,29 @@ describe("current NTIA facts", () => {
     expect(contents).not.toMatch(formerDeadline);
   });
 
+  // TBCP Round 3 and NEGP closed 2026-11-17 11:59 p.m. ET (TOL-3549). Public pages
+  // must not say they are still open or offer application-window sessions.
+  const PUBLIC_SITE_SURFACES = [
+    "src/app/(frontend)/HomePage.tsx",
+    "src/app/(frontend)/ntia/page.tsx",
+    "src/app/(frontend)/answers/page.tsx",
+    "src/app/(frontend)/tribal/page.tsx",
+    "src/app/(frontend)/tribal/grants/page.tsx",
+    "src/app/(frontend)/tribal/funding-navigator/page.tsx",
+    "src/app/(frontend)/tribal/funding-navigator/DeadlineCountdown.tsx",
+    "src/components/Footer.tsx",
+    "public/llms.txt",
+    "public/llms-full.txt",
+  ] as const;
+
+  const stillOpenCopy =
+    /\b(?:close|closes|due|by)\s+Nov(?:ember|\.)?\s+17|application-window|during the application window|window is open|framing TBCP applications/i;
+
+  it.each(PUBLIC_SITE_SURFACES)("does not describe TBCP 3 / NEGP as still open in %s", (path) => {
+    const contents = readFileSync(resolve(process.cwd(), path), "utf8");
+    expect(contents).not.toMatch(stillOpenCopy);
+  });
+
   it("keeps the homepage cohort status exact and approval-gated", () => {
     const homepage = readFileSync(
       resolve(process.cwd(), "src/app/(frontend)/HomePage.tsx"),
