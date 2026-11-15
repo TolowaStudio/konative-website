@@ -16,20 +16,6 @@ const outcomes = [
   ["One accountable team", "Manage sourcing, ordering, installation, escalation, and renewal."],
 ];
 
-const gtmMotions = [
-  ["Tribal awards", "Use TBCP and NEGP signals to move from public funding to operating connectivity, security, voice, cloud, and managed network needs."],
-  ["Gaming uptime", "Review casino and hospitality WAN, payments, surveillance, guest access, voice, cybersecurity, and failover before renewal pressure hits."],
-  ["Data-center build signals", "Turn map, power, stalled-project, and Canada market signals into early carrier, fiber-path, transport, DCI, and cloud on-ramp reviews."],
-  ["Canada partnerships", "Build a credible northern lane with First Nations, Indigenous economic development, carrier, engineering, and capital partners."],
-];
-
-const signalRows = [
-  ["164", "proposed tribal contacts — pending review, 0 approved for campaign"],
-  ["17", "TBCP award-matched organizations ready for approval review"],
-  ["60", "gaming and casino contacts for uptime and resilience outreach"],
-  ["US + Canada", "operating focus for tribal, Indigenous, rural, and data-center connectivity"],
-];
-
 export default function HomePage() {
   return (
     <main style={{ color: TEXT, background: "#fff" }}>
@@ -71,37 +57,6 @@ export default function HomePage() {
           <Door href="/data-center-connectivity" number="02" title="Data-center connectivity" body="Determine whether a site can obtain the internet, transport, dark fiber, wavelengths, cloud access, DCI, and physical diversity its operating plan requires." cta="Evaluate site connectivity" />
         </div>
         <p style={{ color: MUTED, marginTop: 22, lineHeight: 1.7 }}>Also sourcing multi-site enterprise, gaming and hospitality, healthcare, public safety, UCaaS/CCaaS, managed networks, cloud, mobility, cybersecurity, and Canada partnership opportunities.</p>
-      </section>
-
-      <section style={{ background: "#fff", borderBlock: `1px solid ${LINE}`, padding: "88px 32px" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,420px),1fr))", gap: 42, alignItems: "start" }}>
-            <div>
-              <p style={{ ...eyebrow, color: RED }}>GTM engine</p>
-              <h2 style={sectionTitle}>The site feeds reviewed outreach, not generic traffic.</h2>
-              <p style={{ color: MUTED, lineHeight: 1.75, fontSize: 16, maxWidth: 650, marginTop: 24 }}>
-                Every useful visitor should land in a lane, campaign, or partner motion. Konative turns public award data, market maps, stalled-project signals, and relationship context into approved Twenty CRM queues before any outreach begins.
-              </p>
-            </div>
-            <div style={{ border: `1px solid ${LINE}`, background: "#F7F8FA" }}>
-              {signalRows.map(([value, label]) => (
-                <div key={value} style={{ display: "grid", gridTemplateColumns: "120px 1fr", gap: 18, padding: "20px 24px", borderBottom: `1px solid ${LINE}`, alignItems: "baseline" }}>
-                  <strong style={{ fontFamily: DISPLAY, fontSize: 34, lineHeight: 1, color: RED, textTransform: "uppercase" }}>{value}</strong>
-                  <span style={{ color: MUTED, lineHeight: 1.55, fontSize: 14 }}>{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,260px),1fr))", gap: 0, marginTop: 44, border: `1px solid ${LINE}` }}>
-            {gtmMotions.map(([title, body], i) => (
-              <div key={title} style={{ padding: 28, borderRight: `1px solid ${LINE}`, background: i % 2 === 0 ? "#fff" : "#F9FAFB" }}>
-                <span style={{ color: RED, fontWeight: 800, fontSize: 12 }}>0{i + 1}</span>
-                <h3 style={{ fontFamily: DISPLAY, textTransform: "uppercase", fontSize: 28, lineHeight: 1, margin: "14px 0 12px" }}>{title}</h3>
-                <p style={{ color: MUTED, lineHeight: 1.65, margin: 0, fontSize: 14 }}>{body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
 
       <section style={{ background: "#F7F8FA", borderBlock: `1px solid ${LINE}`, padding: "88px 32px" }}>
