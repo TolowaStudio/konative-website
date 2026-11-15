@@ -45,8 +45,8 @@ Jeramey
 
 ## 2. T4DevCo / WestPorch
 
-Rules for this one: keep it to the Konative ask. Do not mention Tolowa ×
-WestPorch partnership terms (confidential, Notion only).
+Rules for this one: keep it to the Konative ask. Do not mention any other
+Tolowa business with this contact.
 
 **Subject:** One site, one question — [Site / Project]
 
