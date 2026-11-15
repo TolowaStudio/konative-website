@@ -51,10 +51,10 @@ const sections = [
   },
   {
     href: "/news",
-    label: "News Feed",
-    eyebrow: "News + Analysis",
+    label: "News Archive",
+    eyebrow: "Archive · Paused",
     headline: "Tribal data centers, energy, broadband grants, and infrastructure coverage",
-    summary: "Curated external briefings on DOE and NTIA programs, tribal DC projects, connectivity grants, and market signals tied to procurement decisions.",
+    summary: "Curated external briefings through August 2026 on DOE and NTIA programs, tribal DC projects, connectivity grants, and market signals. The feed is paused and kept as an archive.",
   },
   {
     href: "/governors",
@@ -160,7 +160,7 @@ export default function IntelligenceIndexPage() {
             The weekly digest covers what moved in the connectivity markets: site selection, capital flows, carrier supply, utility constraints, and the deals worth knowing.
           </p>
           <Link href="/news" style={{ background: RED, color: "#fff", padding: "16px 32px", textDecoration: "none", fontWeight: 800, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-            Read the feed
+            Browse the news archive
           </Link>
         </div>
       </section>

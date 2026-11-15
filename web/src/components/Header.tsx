@@ -34,7 +34,6 @@ const navLinks: NavItem[] = [
       { label: "Lateral Estimator", url: "/tools/lateral-estimator" },
     ],
   },
-  { label: "News", url: "/news" },
   { label: "About", url: "/about" },
 ];
 
