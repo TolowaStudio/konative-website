@@ -54,7 +54,6 @@ export default function Footer() {
             title="Company"
             links={[
               ["About — Native-owned", "/about"],
-              ["Team", "/#team"],
               ["Contact", "/contact"],
               ["Data Sources", "/licenses"],
               ["Book a call", "https://cal.com/jeramey-james/15min"],
