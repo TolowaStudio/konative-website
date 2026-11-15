@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import posthog from 'posthog-js';
+import { SITE_SUPER_PROPERTIES, analyticsEnv } from '@/lib/analyticsEnv';
 
 function stripQuery(value: string) {
   try {
@@ -24,7 +25,7 @@ export default function PostHogAnalytics() {
       rageclick: false, respect_dnt: true,
       // Super properties (TOL-1738 taxonomy): site is the production hostname, venture the slug.
       // Registered in `loaded` so the initial $pageview carries them.
-      loaded: (ph) => ph.register({ site: 'konative.com', venture: 'konative' }),
+      loaded: (ph) => ph.register({ ...SITE_SUPER_PROPERTIES, env: analyticsEnv() }),
       before_send: (event) => {
         if (!event) return event;
         for (const key of ['$current_url', '$referrer']) {
@@ -44,7 +45,12 @@ export default function PostHogAnalytics() {
     };
     const captureDiscoveryCta = (event: MouseEvent) => {
       const link = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[href*="cal.com"]') : null;
-      if (link) posthog.capture('discovery_cta_clicked', { placement: window.location.pathname });
+      if (link) {
+        posthog.capture('cta_click', {
+          cta_id: 'book_cal',
+          placement: window.location.pathname,
+        });
+      }
     };
     window.addEventListener('tolowa:analytics', capture);
     document.addEventListener('click', captureDiscoveryCta);
