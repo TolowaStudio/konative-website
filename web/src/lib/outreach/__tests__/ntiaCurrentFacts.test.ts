@@ -64,4 +64,19 @@ describe("current NTIA facts", () => {
 
     expect(homepage).not.toMatch(/GTM engine|proposed tribal contacts|gaming and casino contacts/i);
   });
+
+  // Jeramey, TOL-3559 (2026-11-15): no public copy promising cold outreach or
+  // paid list-building. Warm introductions and opt-in newsletters are fine.
+  it.each([
+    "src/app/(frontend)/HomePage.tsx",
+    "src/app/(frontend)/canada/page.tsx",
+    "src/app/(frontend)/data-center-connectivity/page.tsx",
+    "src/app/(frontend)/tribal/page.tsx",
+    "src/app/(frontend)/answers/page.tsx",
+  ])("does not promise outreach campaigns or list-building in %s", (path) => {
+    const contents = readFileSync(resolve(process.cwd(), path), "utf8");
+    expect(contents).not.toMatch(
+      /map-backed outreach|target outreach|context for outreach|outreach and planning|grant campaign|list[- ]building|lead lists?|prospect lists?|cold (?:outreach|email)/i,
+    );
+  });
 });

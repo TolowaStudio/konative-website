@@ -454,7 +454,7 @@ export default function TribalPage() {
               <h3 style={proofTitleStyle}>Tribal Connectivity Index</h3>
               <p style={proofDescStyle}>
                 The Tribal Connectivity Index is a searchable intelligence layer tracking public TBCP award
-                records and funding activity for Tribal connectivity planning. It gives outreach and planning
+                records and funding activity for Tribal connectivity planning. It gives Tribal planning
                 conversations a shared public reference point before the supplier-market review begins.
               </p>
               <Link href="/tribal/index" style={proofCtaStyle}>

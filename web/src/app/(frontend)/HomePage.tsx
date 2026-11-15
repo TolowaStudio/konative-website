@@ -35,7 +35,7 @@ export default function HomePage() {
               <Link href="/tribal/grants" style={secondary}>TBCP 3 / NEGP awardees</Link>
             </div>
             <div className="home-signal-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", maxWidth: 800, marginTop: 48, border: "1px solid rgba(255,255,255,.15)" }}>
-              {["Tribal + rural", "Data-center connectivity", "US + Canada", "Map-backed outreach"].map(x => <div key={x} style={{ padding: "16px 18px", color: "#fff", fontSize: 11, fontWeight: 700, letterSpacing: ".11em", textTransform: "uppercase", borderRight: "1px solid rgba(255,255,255,.12)" }}>{x}</div>)}
+              {["Tribal + rural", "Data-center connectivity", "US + Canada", "Map-backed sourcing"].map(x => <div key={x} style={{ padding: "16px 18px", color: "#fff", fontSize: 11, fontWeight: 700, letterSpacing: ".11em", textTransform: "uppercase", borderRight: "1px solid rgba(255,255,255,.12)" }}>{x}</div>)}
             </div>
           </div>
           <div className="home-hero-map" style={{ minHeight: 520, border: "1px solid rgba(255,255,255,.16)", background: "rgba(255,255,255,.04)", boxShadow: "0 28px 80px rgba(0,0,0,.32)", position: "relative", overflow: "hidden" }}>
