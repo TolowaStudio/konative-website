@@ -49,7 +49,9 @@ describe("current NTIA facts", () => {
     expect(contents).not.toMatch(stillOpenCopy);
   });
 
-  it("keeps the homepage cohort status exact and approval-gated", () => {
+  // TOL-3549 / TOL-3559: internal pipeline metrics (contact cohort counts) are not
+  // published on the homepage. Revert this commit to restore the block and its test.
+  it("does not publish internal pipeline metrics on the homepage", () => {
     const homepage = readFileSync(
       resolve(process.cwd(), "src/app/(frontend)/HomePage.tsx"),
       "utf8",
