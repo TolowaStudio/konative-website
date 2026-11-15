@@ -3,7 +3,7 @@ status: DRAFT — not created in Ghost
 publication: Tribal Infrastructure Brief (Konative)
 issue: 001
 target_send: none — needs Jeramey's approval (anything the public sees)
-audience: opted-in Ghost members only (see COMPLIANCE.md §5)
+audience: existing opted-in Ghost subscribers only. No imports from Twenty or any other list (see COMPLIANCE.md §5)
 cta: One-Site Snapshot — https://konative.com/contact#request
 ---
 

@@ -1,92 +1,75 @@
-# Konative campaign set — 2026-11 (DRAFTS ONLY)
+# Konative outreach set — 2026-11 (DRAFTS ONLY, WARM ONLY)
 
 **Status: DRAFT. Nothing in this folder has been sent, scheduled, or loaded
-into Mailgun, Resend, Ghost, Twenty, LinkedIn or Cal.com.** First send needs
-Jeramey's explicit approval of the exact batch (≤10 recipients, warm-path-first)
-through the Konative decision gate (Linear TOL-3559, item 2).
+into Mailgun, Resend, Ghost, Twenty, LinkedIn or Cal.com.**
 
-Linear: TOL-3553 (W4) · parent TOL-3545 · compliance origin TOL-659.
+**Decision (Jeramey, 2026-11-15 11:38 AM PT, recorded on TOL-3559):** Konative
+outreach is **warm intros only, at $0**. No cold-email domain, no sequencer or
+sending tool, no paid lead data. Every message is a plain 1:1 message Jeramey
+writes and sends himself. LinkedIn is used only for existing first-degree
+connections or people reached through an intro, never cold InMail.
+
+Linear: TOL-3553 (W4) · parent TOL-3545 · decisions TOL-3559 · compliance
+background TOL-659.
 
 ## What is here
 
 | File | What it is |
 |---|---|
-| [`warm-intros.md`](./warm-intros.md) | Warm-intro asks: Avant, T4DevCo / WestPorch, existing tribal relationships. **Run these first.** |
-| [`tier-dc-under-construction.md`](./tier-dc-under-construction.md) | P0 — data centers under construction: 3-touch email + LinkedIn variants |
-| [`tier-tribal-enterprise-gaming.md`](./tier-tribal-enterprise-gaming.md) | P1 — tribal enterprise / gaming / multi-site ops: 3-touch email + LinkedIn |
-| [`tier-tbcp-awardees-operations.md`](./tier-tbcp-awardees-operations.md) | P1b — prior TBCP awardees moving into operations: 3-touch email + LinkedIn |
-| [`newsletter-tribal-infrastructure-brief-001.md`](./newsletter-tribal-infrastructure-brief-001.md) | Ghost newsletter issue draft (markdown only; not created in Ghost) |
-| [`COMPLIANCE.md`](./COMPLIANCE.md) | Filled pre-send checklist: CAN-SPAM, WA CEMA, suppression/DNC, sending path, sender identity |
+| [`warm-intros.md`](./warm-intros.md) | Ask a partner about one named account: Avant, T4DevCo / WestPorch, existing tribal relationships |
+| [`follow-ups.md`](./follow-ups.md) | 1:1 follow-ups to people with a two-way history in Twenty (data-center, tribal enterprise/gaming, earlier TBCP awardee contacts) + LinkedIn to first-degree connections |
+| [`referral-asks.md`](./referral-asks.md) | "Who do you know?" asks to existing contacts, plus the thank-you |
+| [`newsletter-tribal-infrastructure-brief-001.md`](./newsletter-tribal-infrastructure-brief-001.md) | Ghost newsletter issue draft for existing subscribers only (markdown; not created in Ghost) |
+| [`COMPLIANCE.md`](./COMPLIANCE.md) | Warm-only rule, CAN-SPAM, WA CEMA, do-not-contact, sender identity |
 
-## Order of operations (warm-path-first)
-
-From the 2026-07-15 roast RESHAPE and the 2026-07-15 messaging lock
-(`docs/strategy/2026-07-15-validated-business-model-wedge-moat.md`):
-
-1. For each target account, search for a warm path (Avant, T4DevCo / WestPorch,
-   tribal peer). If one exists, use `warm-intros.md` — not the tier sequence.
-2. Only if no warm path exists, the account becomes eligible for the tier
-   sequence (cold residual), and only on a compliant sending path
-   (see `COMPLIANCE.md` §4 — **not** Mailgun or Resend).
-3. LinkedIn variants are manual, 1:1, from Jeramey's own profile. No automation
-   tools.
+Removed on 2026-11-15 after the decision: the three cold 3-touch tier
+sequences (DC under construction, tribal enterprise/gaming, TBCP awardees).
+They are in this PR's git history only and must not be revived without a new
+decision from Jeramey.
 
 ## The single CTA
 
-Every prospect-facing touch has one ask: **request a One-Site Snapshot** at
-`https://konative.com/contact#request`.
+Every message has one ask: a free **One-Site Snapshot**, requested by replying
+or at `https://konative.com/contact#request`.
 
-What a One-Site Snapshot is (from the W1 offer, TOL-3546 / TOL-3559 item 1 —
-pending Jeramey's offer approval): a free, one-page read on one named site —
-which carriers can actually reach it, physical-path diversity, and the renewal
-or construction timing that matters. Supplier-paid brokerage sits behind it.
+What it is (W1 offer, TOL-3546 / TOL-3559 item 1, pending Jeramey's offer
+approval): a free, one-page read on one named site: which carriers can actually
+reach it, physical-path diversity, and the renewal or construction timing that
+matters. Supplier-paid brokerage sits behind it.
 
-> **Naming gap (blocking for send, not for drafts):** konative.com does not yet
-> use the words "One-Site Snapshot". Today the site says "One-Page Site Brief"
-> (`/data-center-connectivity`) and "Continuity Snapshot" (`/tribal`), both
-> pointing at `/contact#request`. The contact form also ignores the
-> `?projectType=` query string those pages send. Before first send, either the
-> site adopts "One-Site Snapshot" (W2, TOL-3549) or these drafts are changed to
-> the site's wording. A prospect must land on a page that matches the email.
+> **Naming gap:** konative.com doesn't use the words "One-Site Snapshot" yet.
+> It says "One-Page Site Brief" (`/data-center-connectivity`) and "Continuity
+> Snapshot" (`/tribal`). The contact form also ignores the `?projectType=`
+> query those pages send. Either the site adopts "One-Site Snapshot" (W2,
+> TOL-3549) or these drafts switch to the site's wording before use.
 
-## Reuse map — what this builds on (not duplicated)
+## Reuse map
 
-| Prior work | How it is reused here |
+| Prior work | How it is reused |
 |---|---|
-| `docs/outreach/tribal-connectivity-campaign-drafts.md` (Campaigns A–D) | Body language for award-to-operations, tribal resilience, gaming uptime and DC planning was tightened into the 3-touch tier sequences. Its approval checklist is carried into `COMPLIANCE.md`. That file stays as the earlier version. |
-| `docs/strategy/2026-07-15-validated-business-model-wedge-moat.md` | Messaging lock, hero lines, cold-residual email shape, "messages that waste air" list. |
-| `docs/outreach/README.md` | 3-touch spacing (5–7 business days) and the "Touch 3 = close the loop" pattern. Its `/readiness-audit` CTA is **not** reused (old powered-land offer). |
-| `docs/tribal-campaign-readiness-plan.md` | Approved-for-outreach status, logging every send to Twenty. |
-| `web/src/lib/jev/sendSafetyGate.ts`, `web/src/lib/outreach/campaign/batchLifecycle.ts` | Existing send gate takes a `suppression_checked` flag; `COMPLIANCE.md` §3 says what must be true before that flag is set. |
-| Stash `/projects/konative` | July 2026 cold campaign outcome (102 delivered, 0 real replies) — reason cold is residual only. |
+| `docs/outreach/tribal-connectivity-campaign-drafts.md` | Award-to-operations, tribal resilience, gaming-uptime and DC language, rewritten as 1:1 follow-ups. That file stays as the earlier version; its cold campaigns are superseded by the warm-only decision. |
+| `docs/strategy/2026-07-15-validated-business-model-wedge-moat.md` | Messaging lock and the "messages that waste air" list. Its cold-residual email is superseded by the warm-only decision. |
+| `docs/outreach/README.md` | Nothing. Its `/readiness-audit` CTA and 3-touch cold cadence don't apply. |
+| `docs/tribal-campaign-readiness-plan.md` | Logging every message to Twenty. |
 
 ## Claims register
 
-Every factual claim used in these drafts, with its source. Anything not on this
-list must not be added to a send without a source.
+Every factual claim used in these drafts, with its source. Nothing else may be
+added to a message without a source.
 
 | # | Claim used in copy | Source |
 |---|---|---|
 | C1 | Konative is a vendor-neutral connectivity brokerage | konative.com site copy; Stash /projects/konative (June 2026 repositioning) |
-| C2 | Konative is an Avant sub-agent (Avant calls the role "Trusted Advisor") | Jeramey, 2026-10-27 (Stash /projects/konative) |
-| C3 | Suppliers pay Konative when they win the business; no advisory fee to the buyer | konative.com site copy ("Suppliers pay Konative's fee when they win the business. There is no advisory charge…"); `docs/strategy/2026-07-15-validated-business-model-wedge-moat.md` §model |
-| C4 | Konative is Native-owned | konative.com site copy ("Native-owned"); venture brief |
-| C5 | Konative is a trade name of Tolowa Pacific LLC | Venture brief; TOL-3549 (footer correction "Total" → "Tolowa") |
+| C2 | Konative is an Avant partner / sub-agent ("Trusted Advisor") | Jeramey, 2026-10-27 (Stash /projects/konative); site "Avant Partner" |
+| C3 | Suppliers pay Konative when they win the business; no advisory fee to the buyer | konative.com site copy ("Suppliers pay Konative's fee when they win the business. There is no advisory charge…") |
+| C4 | Konative is Native-owned | konative.com site copy; venture brief |
+| C5 | Konative is a trade name of Tolowa Pacific LLC | Venture brief; TOL-3549 |
 | C6 | Konative does not write grants and is not a TBCP3/NEGP applicant | TOL-3545 hard rules |
-| C7 | A named organization received a TBCP award (P1b only) | **Per-recipient**: NTIA public award listing URL must be pasted into the Twenty record before the touch is approved. No award amount in copy unless it is on that page. |
-| C8 | A named DC project is under construction (P0 only) | **Per-recipient**: public signal URL (permit, press release, utility filing) pasted into the Twenty record before approval. |
+| C7 | Facts about a contact's own project (award, construction) | Only what the contact told Jeramey, or a public source URL saved on the Twenty record. No award amounts. |
 
-Deliberately **not** claimed anywhere: percentages saved, supplier counts, "the
-only…" superlatives, carrier on-net counts for a prospect's site (those belong
-in the Snapshot itself, after research), any TBCP3/NEGP deadline or eligibility
-statement, and anything about the Avant agreement's terms.
-
-## Merge fields
-
-`[First name]`, `[Organization]`, `[Site / Project]`, `[City, State]`,
-`[Signal]` + `[Signal URL]` (P0), `[Award source URL]` (P1b),
-`[Warm contact first name]`, `{{POSTAL_ADDRESS}}`, `{{UNSUBSCRIBE}}`.
-A draft with an unfilled merge field fails the pre-send check.
+Not claimed anywhere: savings percentages, supplier counts, "the only…"
+superlatives, carrier counts for a contact's site, any TBCP3/NEGP deadline or
+eligibility statement, or terms of the Avant agreement.
 
 ## Undo
 
