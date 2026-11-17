@@ -110,6 +110,16 @@ jobs:
           else
             echo "konative-ADMIN_ACCESS_TOKEN missing — deploy without admin lock until operator adds secret"
           fi
+          # TOL-3556: --set-secrets REPLACES the service's whole secret list, so a CAL_WEBHOOK_SECRET
+          # mapped by hand would be dropped on the next deploy. Bind it here whenever the secret
+          # exists; until then /api/cal/webhook stays fail-closed (503) and the deploy still succeeds.
+          if gcloud secrets describe konative-cal-webhook-secret \
+            --project "${{ env.GCP_PROJECT }}" >/dev/null 2>&1; then
+            SECRETS="${SECRETS},CAL_WEBHOOK_SECRET=konative-cal-webhook-secret:latest"
+            echo "konative-cal-webhook-secret found — binding Cal.com webhook secret"
+          else
+            echo "konative-cal-webhook-secret missing — /api/cal/webhook stays fail-closed (503) until operator adds secret"
+          fi
           gcloud run deploy "${{ env.SERVICE_NAME }}" \
             --project "${{ env.GCP_PROJECT }}" \
             --image "${IMAGE}" \
