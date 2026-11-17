@@ -37,24 +37,35 @@
 
 Supabase Pro ~$25–45/mo → Cloudflare marginal ~$0 (within Workers Paid $5/mo plan).
 
-## TOL-324 status (2026-11-16): what still reads Supabase
+## TOL-324 status (2026-11-17): what still reads Supabase
 
-Slice 1 (this PR) makes the TBCP read paths honest: `tribal/index`, `tribal/awards`,
+Slice 1 (#106) made the TBCP read paths honest: `tribal/index`, `tribal/awards`,
 `tribal/awards/[slug]` and `lib/data/tbcp.ts` go through
-`readWithSupabaseFallback` (`web/src/lib/db/supabaseFallback.ts`). Every fallback logs
-`{event: "supabase_fallback", site}`; `KONATIVE_SUPABASE_FALLBACK=off` makes an empty
-primary read throw instead. Default behaviour is unchanged.
+`readWithSupabaseFallback` (`web/src/lib/db/supabaseFallback.ts`).
 
-Still reading Supabase directly (no D1/Postgres read first, or fallback not yet routed
-through the helper). Each needs the same treatment, one PR per group:
+Slice 2 does the same for the API routes that already read a primary store first:
+`api/v1/map-data` (facilities, network, power), `api/v1/queue`,
+`api/v1/availability-score` (new: it read Supabase only before), `api/v1/sponsors/placement`
+and `api/v1/analytics/sponsors`. Where "no rows" can be a real answer (no active
+sponsor right now) the route checks that the primary table has any row at all
+(`isD1SponsorshipReady`, `isD1QueueReady`) and only then calls `noteSupabaseFallback`.
+
+Every fallback logs `{event: "supabase_fallback", site}` (greppable); a Supabase read
+that itself fails logs `{event: "supabase_fallback_error", site}` instead of
+looking like an empty result. `KONATIVE_SUPABASE_FALLBACK=off` makes an unmigrated
+site throw. Default behaviour is unchanged.
+
+Still reading Supabase directly with no primary read first. These need a query
+module per table, which depends on the database choice below, so they are not
+agent-doable yet:
 
 | Group | Files | Note |
 | --- | --- | --- |
-| Map | `api/v1/map-data/route.ts` | D1 first, three Supabase fallbacks |
-| Queue | `api/v1/queue/route.ts`, `api/v1/availability-score/route.ts` | Supabase `rpc("get_interconnection_queue_radius")` |
-| Sponsors | `api/v1/sponsors/placement/route.ts`, `api/v1/analytics/sponsors/route.ts` | placement is D1-first; analytics is Supabase-only |
 | Supabase-only | `projects/page.tsx`, `projects/[id]/page.tsx`, `markets/[state]/page.tsx`, `dashboard/page.tsx`, `api/v1/deals/route.ts`, `api/v1/analytics/track/route.ts` | no D1 query module exists for `dc_availability_scores`, `investment_deals`, `feed_sources`, `market_intel_articles`, `analytics_events` |
 | Health | `api/v1/health/route.ts` | `water_sites` stays on Supabase (not migrated) |
+
+Log search that proves a site is migrated: zero `supabase_fallback` hits for that
+`site` over a week of normal traffic.
 
 ## Jeramey-only steps (cannot be done by an agent)
 

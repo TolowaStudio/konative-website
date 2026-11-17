@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { queryInterconnectionQueueRadius, isD1QueueReady } from "@/lib/db";
+import {
+  isD1QueueReady,
+  logSupabaseFallbackError,
+  noteSupabaseFallback,
+  queryInterconnectionQueueRadius,
+} from "@/lib/db";
 import type { InterconnectionQueueRow, QueueAuthority, QueueRadiusResponse } from "@/types/queue";
 
 export const dynamic = "force-dynamic";
@@ -131,6 +136,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(buildResponse(lat, lng, radiusKm, rows));
   }
 
+  noteSupabaseFallback("api/v1/queue", "D1 interconnection_queue is empty");
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!supabaseUrl || !supabaseAnon) {
@@ -148,6 +155,7 @@ export async function GET(req: NextRequest) {
   });
 
   if (error) {
+    logSupabaseFallbackError("api/v1/queue", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 

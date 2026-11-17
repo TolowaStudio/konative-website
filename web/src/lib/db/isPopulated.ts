@@ -38,6 +38,23 @@ export async function isD1QueueReady(): Promise<boolean> {
   return cachedReady;
 }
 
+/**
+ * True when the reachable D1 sponsorship_placements table has any row at all
+ * (active or not). Sponsor reads trust D1 once it has rows: "no active
+ * sponsor right now" is a real answer, not a reason to re-read Supabase.
+ */
+export async function isD1SponsorshipReady(): Promise<boolean> {
+  const db = await getD1();
+  try {
+    const row = await db
+      .prepare("SELECT 1 AS ok FROM sponsorship_placements LIMIT 1")
+      .first<{ ok: number }>();
+    return !!row;
+  } catch (error) {
+    return rethrowD1OperationFailure("isD1SponsorshipReady", error);
+  }
+}
+
 export function resetD1ReadyCache(): void {
   cachedReady = null;
   cachedAt = 0;

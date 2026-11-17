@@ -39,6 +39,49 @@ function hasData<T>(value: T | null | undefined): value is T {
 }
 
 /**
+ * Record that a request is about to read Supabase instead of the primary
+ * database, or throw when the fallback is switched off. For call sites that
+ * decide "the primary has no data" themselves (a readiness check on the table)
+ * rather than from the rows they just read: a legitimately empty result, such
+ * as "no active sponsor right now", must not count as a miss.
+ */
+export function noteSupabaseFallback(
+  site: string,
+  reason = "primary database returned no rows",
+): void {
+  const disabled = isSupabaseFallbackDisabled();
+  console.error("Konative Supabase fallback", {
+    event: "supabase_fallback",
+    site,
+    reason,
+    fallbackDisabled: disabled,
+  });
+  if (disabled) throw new SupabaseFallbackDisabledError(site);
+}
+
+/**
+ * A Supabase fallback read that itself failed. Callers that degrade to an empty
+ * result instead of throwing must call this first, so the failure is in the
+ * logs instead of looking like "no data".
+ */
+export function logSupabaseFallbackError(site: string, error: unknown): void {
+  console.error("Konative Supabase fallback read failed", {
+    event: "supabase_fallback_error",
+    site,
+    error: describeError(error),
+  });
+}
+
+/** supabase-js and PostgREST return `{ message }` objects, not Error instances. */
+function describeError(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === "object" && "message" in error) {
+    return String((error as { message: unknown }).message);
+  }
+  return String(error);
+}
+
+/**
  * Read from the primary database; if it has nothing, fall back to Supabase
  * (visibly), or throw when the fallback is switched off.
  *
@@ -53,13 +96,6 @@ export async function readWithSupabaseFallback<T>(
   const primaryResult = await primary();
   if (hasData(primaryResult)) return primaryResult;
 
-  const disabled = isSupabaseFallbackDisabled();
-  console.error("Konative Supabase fallback", {
-    event: "supabase_fallback",
-    site,
-    reason: "primary database returned no rows",
-    fallbackDisabled: disabled,
-  });
-  if (disabled) throw new SupabaseFallbackDisabledError(site);
+  noteSupabaseFallback(site);
   return supabase();
 }
