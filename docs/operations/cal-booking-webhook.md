@@ -20,9 +20,12 @@ reschedule, `PING`) are acknowledged and ignored.
 ## Not done by this PR (needs an owner with Cal.com / Cloud Run access)
 
 1. **Secret.** Create GCP Secret Manager `konative-cal-webhook-secret` in project
-   `tolowa-studio` (random 32+ bytes; pipe with `printf`, never `echo`) and map it
-   to Cloud Run env `CAL_WEBHOOK_SECRET` on `konative-website-staging`.
-2. **Deploy** this PR through the normal Konative deploy.
+   `tolowa-studio` (random 32+ bytes; pipe with `printf`, never `echo`). No manual
+   Cloud Run mapping: `deploy-cloud-run.yml` binds it as `CAL_WEBHOOK_SECRET` on every
+   deploy once the secret exists (`--set-secrets` replaces the whole list, so a
+   hand-made mapping would be dropped by the next deploy). The runtime service
+   account already has project-level `secretmanager.secretAccessor`.
+2. **Redeploy** (re-run the Konative deploy on `main`) so the binding picks the secret up.
 3. **Cal.com subscriber.** Settings → Developer → Webhooks → New: subscriber URL
    `https://konative.com/api/cal/webhook`, trigger **Booking created**, secret =
    the value from step 1. Use "Test webhook" (PING): expect HTTP 200 with
