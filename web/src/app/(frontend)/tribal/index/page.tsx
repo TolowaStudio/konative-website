@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
-import { queryTbcpAwardsList, isD1TbcpReady } from "@/lib/db";
+import {
+  queryTbcpAwardsList,
+  isD1TbcpReady,
+  readWithSupabaseFallback,
+} from "@/lib/db";
 import { JsonLd, breadcrumbSchema, SITE_URL } from "@/components/seo/JsonLd";
 import IndexTableClient, { type AwardRow } from "./IndexTableClient";
 
@@ -33,30 +37,34 @@ export const metadata: Metadata = {
 // --- Data ---------------------------------------------------------------
 
 async function getAwards(): Promise<AwardRow[]> {
-  if (await isD1TbcpReady()) {
-    const d1Rows = await queryTbcpAwardsList(1000);
-    if (d1Rows && d1Rows.length > 0) return d1Rows as AwardRow[];
-  }
+  return readWithSupabaseFallback<AwardRow[]>(
+    "tribal/index",
+    async () =>
+      (await isD1TbcpReady())
+        ? ((await queryTbcpAwardsList(1000)) as AwardRow[] | null)
+        : null,
+    async () => {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey =
+        process.env.SUPABASE_SERVICE_ROLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (!supabaseUrl || !supabaseKey) return [];
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseKey) return [];
-
-  const supabase = createClient(supabaseUrl, supabaseKey);
-  const { data, error } = await supabase
-    .from("tbcp_awards")
-    .select(
-      "id,slug,grantee_name,award_amount_usd,nofo_round,project_type,lat,lng"
-    )
-    .order("award_amount_usd", { ascending: false })
-    .limit(1000);
-  if (error) {
-    console.error("[tribal/index] Supabase error:", error.message);
-    return [];
-  }
-  return (data as AwardRow[]) || [];
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      const { data, error } = await supabase
+        .from("tbcp_awards")
+        .select(
+          "id,slug,grantee_name,award_amount_usd,nofo_round,project_type,lat,lng"
+        )
+        .order("award_amount_usd", { ascending: false })
+        .limit(1000);
+      if (error) {
+        console.error("[tribal/index] Supabase error:", error.message);
+        return [];
+      }
+      return (data as AwardRow[]) || [];
+    },
+  );
 }
 
 function fmt(n: number | null) {

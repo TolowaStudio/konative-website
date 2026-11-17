@@ -9,6 +9,11 @@ export {
   getD1,
   rethrowD1OperationFailure,
 } from "./client";
+export {
+  readWithSupabaseFallback,
+  isSupabaseFallbackDisabled,
+  SupabaseFallbackDisabledError,
+} from "./supabaseFallback";
 export { isD1TbcpReady, isD1QueueReady, resetD1ReadyCache } from "./isPopulated";
 export {
   queryTbcpAwards,

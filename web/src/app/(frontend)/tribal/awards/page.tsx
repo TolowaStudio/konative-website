@@ -5,7 +5,7 @@ import {
   breadcrumbSchema,
   SITE_URL,
 } from "@/components/seo/JsonLd";
-import { queryTbcpAwardsList } from "@/lib/db";
+import { queryTbcpAwardsList, readWithSupabaseFallback } from "@/lib/db";
 import AwardsClient from "./AwardsClient";
 
 export const revalidate = 3600;
@@ -84,37 +84,49 @@ function parseRawProperties(
 }
 
 async function getAwards() {
-  const d1Rows = await queryTbcpAwardsList(500);
-  if (d1Rows && d1Rows.length > 0) {
-    return d1Rows.map((row) => ({
-      id: row.id,
-      slug: row.slug,
-      grantee_name: row.grantee_name,
-      award_amount_usd: row.award_amount_usd,
-      nofo_round: row.nofo_round,
-      project_type: row.project_type ?? null,
-      lat: row.lat,
-      lng: row.lng,
-      raw_properties: parseRawProperties(row.raw_properties),
-    }));
-  }
+  type Mapped = ReturnType<typeof mapRow>;
+  return readWithSupabaseFallback<Mapped[]>(
+    "tribal/awards",
+    async () => {
+      const d1Rows = await queryTbcpAwardsList(500);
+      return d1Rows ? d1Rows.map(mapRow) : null;
+    },
+    async () => {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey =
+        process.env.SUPABASE_SERVICE_ROLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (!supabaseUrl || !supabaseKey) return [];
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseKey) return [];
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      const { data, error } = await supabase
+        .from("tbcp_awards")
+        .select(
+          "id,slug,grantee_name,award_amount_usd,nofo_round,project_type,lat,lng,raw_properties",
+        )
+        .order("award_amount_usd", { ascending: false })
+        .limit(500);
+      if (error) {
+        console.error("[tribal/awards] Supabase error:", error.message);
+        return [];
+      }
+      return (data ?? []).map(mapRow);
+    },
+  );
+}
 
-  const supabase = createClient(supabaseUrl, supabaseKey);
-  const { data, error } = await supabase
-    .from("tbcp_awards")
-    .select(
-      "id,slug,grantee_name,award_amount_usd,nofo_round,project_type,lat,lng,raw_properties",
-    )
-    .order("award_amount_usd", { ascending: false })
-    .limit(500);
-  if (error) return [];
-  return (data ?? []).map((row) => ({
+function mapRow(row: {
+  id: string;
+  slug: string;
+  grantee_name: string;
+  award_amount_usd: number | null;
+  nofo_round: string | null;
+  project_type?: string | null;
+  lat: number | null;
+  lng: number | null;
+  raw_properties?: string | Record<string, unknown> | null;
+}) {
+  return {
     id: row.id,
     slug: row.slug,
     grantee_name: row.grantee_name,
@@ -124,7 +136,7 @@ async function getAwards() {
     lat: row.lat,
     lng: row.lng,
     raw_properties: parseRawProperties(row.raw_properties),
-  }));
+  };
 }
 
 export default async function TBCPAwardsPage() {

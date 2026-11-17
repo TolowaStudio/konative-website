@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
-import { queryTbcpAwardBySlug } from "@/lib/db";
+import {
+  isD1TbcpReady,
+  queryTbcpAwardBySlug,
+  readWithSupabaseFallback,
+  SupabaseFallbackDisabledError,
+} from "@/lib/db";
 import {
   JsonLd,
   breadcrumbSchema,
@@ -66,22 +71,39 @@ function mapAward(row: {
 }
 
 async function getAward(slug: string): Promise<Award | null> {
-  const d1Row = await queryTbcpAwardBySlug(slug);
-  if (d1Row) return mapAward(d1Row);
+  let rows: Award[];
+  try {
+    rows = await readWithSupabaseFallback<Award[]>(
+      "tribal/awards/[slug]",
+      async () => {
+        const d1Row = await queryTbcpAwardBySlug(slug);
+        return d1Row ? [mapAward(d1Row)] : null;
+      },
+      async () => {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseKey =
+          process.env.SUPABASE_SERVICE_ROLE_KEY ||
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+        if (!supabaseUrl || !supabaseKey) return [];
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseKey) return null;
-
-  const supabase = createClient(supabaseUrl, supabaseKey);
-  const { data } = await supabase
-    .from("tbcp_awards")
-    .select("*")
-    .eq("slug", slug)
-    .single();
-  return data as Award | null;
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        const { data } = await supabase
+          .from("tbcp_awards")
+          .select("*")
+          .eq("slug", slug)
+          .single();
+        return data ? [data as Award] : [];
+      },
+    );
+  } catch (error) {
+    // Fallback is off: a slug missing from a populated D1 is a real 404; an
+    // empty D1 is a migration problem and must surface, not render "not found".
+    if (error instanceof SupabaseFallbackDisabledError && (await isD1TbcpReady())) {
+      return null;
+    }
+    throw error;
+  }
+  return rows[0] ?? null;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
