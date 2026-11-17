@@ -2,6 +2,8 @@ import {
   CloudflareBindingUnavailableError,
   queryTbcpAwards,
   isD1TbcpReady,
+  readWithSupabaseFallback,
+  SupabaseFallbackDisabledError,
 } from "@/lib/db";
 import { supabase } from "@/lib/supabase";
 
@@ -14,7 +16,8 @@ import { supabase } from "@/lib/supabase";
  * compact, on-brand summary for display on the marketing site.
  *
  * If Supabase is unreachable, misconfigured (missing env vars), or returns
- * nothing, `getTbcpSummary()` returns `null`. A missing Cloudflare D1 binding is
+ * nothing, `getTbcpSummary()` returns `null`. A missing Cloudflare D1 binding (or an
+ * empty D1 with `KONATIVE_SUPABASE_FALLBACK=off`) is
  * different: it is rethrown so callers do not render missing data as a healthy
  * empty section.
  */
@@ -67,24 +70,31 @@ function toNumber(v: number | string | null): number {
  * Returns `null` for non-D1 data failures. Missing D1 bindings are rethrown.
  */
 async function fetchAwardRows(): Promise<AwardRow[] | null> {
-  if (await isD1TbcpReady()) {
-    const d1Rows = await queryTbcpAwards("state, award_amount_usd, nofo_round");
-    if (d1Rows && d1Rows.length > 0) return d1Rows as AwardRow[];
-  }
+  const rows = await readWithSupabaseFallback<AwardRow[]>(
+    "lib/data/tbcp",
+    async () =>
+      (await isD1TbcpReady())
+        ? ((await queryTbcpAwards("state, award_amount_usd, nofo_round")) as
+            | AwardRow[]
+            | null)
+        : null,
+    async () => {
+      if (
+        !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+        !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      ) {
+        return [];
+      }
 
-  if (
-    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  ) {
-    return null;
-  }
+      const { data, error } = await supabase
+        .from("tbcp_awards")
+        .select("state, award_amount_usd, nofo_round");
 
-  const { data, error } = await supabase
-    .from("tbcp_awards")
-    .select("state, award_amount_usd, nofo_round");
-
-  if (error || !data || data.length === 0) return null;
-  return data as AwardRow[];
+      if (error || !data || data.length === 0) return [];
+      return data as AwardRow[];
+    },
+  );
+  return rows.length > 0 ? rows : null;
 }
 
 export async function getTbcpSummary(
@@ -145,6 +155,8 @@ export async function getTbcpSummary(
     };
   } catch (error) {
     if (error instanceof CloudflareBindingUnavailableError) throw error;
+    // Fallback switched off and the primary DB is empty: surface, do not render "no data".
+    if (error instanceof SupabaseFallbackDisabledError) throw error;
     // Supabase/network failure or unexpected data shape — degrade.
     return null;
   }
