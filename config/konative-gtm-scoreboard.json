@@ -1,0 +1,34 @@
+{
+  "version": "konative-gtm-scoreboard-v0.1.0",
+  "window_start": "2026-11-16",
+  "day45": "2026-12-31",
+  "day90": "2027-02-13",
+  "twenty": {
+    "base_url": "https://crm.tolowastudio.com",
+    "opportunity_scope": null,
+    "_opportunity_scope_note": "Set to {\"field\": \"<Twenty Opportunity field>\", \"values\": [\"<value>\", ...]} once the live schema is introspected (see docs/ops/konative-gtm-scoreboard.md, step 1). While null, every opportunity-derived metric reports SCOPE_UNSET instead of counting other ventures' opportunities as Konative's."
+  },
+  "posthog": {
+    "host": "https://us.posthog.com",
+    "project_id": "620985",
+    "site": "konative.com",
+    "env": "prod"
+  },
+  "metrics": [
+    { "key": "warm_contacts", "label": "Warm contacts with relationship evidence", "target": 40, "due": "2026-12-05", "source": { "kind": "manual" } },
+    { "key": "warm_asks", "label": "Warm asks made", "target": 40, "due": "2027-01-15", "source": { "kind": "manual" } },
+    { "key": "intros", "label": "Intros received", "target": 16, "due": "2027-01-15", "source": { "kind": "manual" } },
+    { "key": "meetings", "label": "Qualified first meetings", "target": 8, "due": "2027-02-13", "source": { "kind": "opportunity_stage", "stages": ["MEETING", "PROPOSAL", "CUSTOMER"] } },
+    { "key": "snapshots", "label": "One-Site Snapshots delivered", "target": 10, "due": "2027-02-13", "source": { "kind": "manual" } },
+    { "key": "inbound_requests", "label": "Inbound snapshot requests", "target": 3, "due": "2027-02-13", "source": { "kind": "manual" } },
+    { "key": "registrations", "label": "Pathfinder deal registrations", "target": 4, "due": "2027-02-13", "source": { "kind": "manual" } },
+    { "key": "proposals", "label": "Proposals delivered", "target": 2, "due": "2027-02-13", "source": { "kind": "opportunity_stage", "stages": ["PROPOSAL", "CUSTOMER"] } },
+    { "key": "orders", "label": "Signed orders", "target": 1, "due": "2027-02-13", "source": { "kind": "opportunity_stage", "stages": ["CUSTOMER"] } },
+    { "key": "mrc_signed_usd", "label": "MRC signed (USD)", "target": null, "due": "2027-02-13", "source": { "kind": "manual" } }
+  ],
+  "kill_checks": [
+    { "id": "K2", "when": "2026-12-05", "metric": "warm_contacts", "trigger": "below", "threshold": 20, "action": "Warm-only plan cannot reach targets: halve targets, tell Jeramey." },
+    { "id": "K3", "when": "day45", "metric": "meetings", "trigger": "below", "threshold": 3, "action": "Warm reach too thin: narrow to the producing channel plus inbound, escalate to Jeramey." },
+    { "id": "K4", "when": "day90", "metric": "registrations", "trigger": "equals_zero_and", "and_metric": "proposals", "action": "Stop P0 DC origination; venture-level continue / hold decision." }
+  ]
+}
