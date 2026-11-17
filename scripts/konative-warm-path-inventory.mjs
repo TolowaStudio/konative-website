@@ -18,10 +18,13 @@
  * It has no sender, audience, or campaign operation, never creates a Person
  * or Company, and never edits an existing field.
  */
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+
+import { isTribalScope } from './konative-crm-campaign-audit.mjs';
 
 export const TOOL_VERSION = 'konative-warm-path-inventory-v0.1.0';
 export const NOTE_MARKER = '[konative-warm-path]';
@@ -45,6 +48,12 @@ export const INBOUND_SOURCES = Object.freeze(['konative-form', 'konative-website
 // outreachStatus values that must never be logged as warm.
 export const SUPPRESSED_STATUSES = Object.freeze(['DNC', 'OPTED_OUT', 'BOUNCED', 'QUEUED']);
 
+// Our own mailboxes and automated senders are not a two-way relationship. The
+// Twenty mail/calendar sync pulls in every thread on the shared CRM, so a
+// "from" row can be a robot or a teammate (first live run, TOL-3555: 14 + 13).
+export const AUTOMATED_LOCAL_PART = /^(no-?reply|do-?not-?reply|notifications?|mailer-daemon|postmaster|newsletter|bounces?|alerts?|billing|invoices?|receipts?)([._+-]|$)/i;
+export const INTERNAL_DOMAINS = Object.freeze(['tolowa.net', 'tolowa.studio', 'tolowastudio.com', 'konative.com']);
+
 export const WARM_CHANNELS = Object.freeze(['avant', 't4devco', 'tribal', 'referral']);
 
 const norm = (v) => (v === null || v === undefined ? '' : String(v).trim());
@@ -60,6 +69,13 @@ export function classifyPerson(person) {
   if (person?.doNotContact === true) return { warm: false, reason: 'do_not_contact' };
   const status = norm(person?.outreachStatus).toUpperCase();
   if (SUPPRESSED_STATUSES.includes(status)) return { warm: false, reason: `suppressed_status:${status}` };
+
+  const email = lower(person?.emails?.primaryEmail);
+  if (email) {
+    const [local, domain = ''] = email.split('@');
+    if (INTERNAL_DOMAINS.includes(domain)) return { warm: false, reason: 'internal_address' };
+    if (AUTOMATED_LOCAL_PART.test(local)) return { warm: false, reason: 'automated_sender' };
+  }
 
   const evidence = [];
   for (const signal of person?.signals || []) {
@@ -84,6 +100,10 @@ function dedupeKeys(person) {
 }
 
 /** Pure: classify + dedupe. Union-find over email and name+company keys. */
+export function k2Status(n) {
+  return n < K2_FLOOR ? 'BREACH' : n < TARGET ? 'BELOW_TARGET' : 'MET';
+}
+
 export function buildInventory(people, { externalCandidates = [] } = {}) {
   const excluded = [];
   const warm = [];
@@ -120,6 +140,7 @@ export function buildInventory(people, { externalCandidates = [] } = {}) {
       name: personDisplayName(keep.person),
       company: norm(keep.person.company?.name),
       has_email: Boolean(lower(keep.person.emails?.primaryEmail)),
+      konative_scope: isTribalScope(keep.person),
       evidence_classes: [...new Set(evidence.map((e) => e.type))].sort(),
       evidence_count: evidence.length,
       evidence: evidence.slice(0, 10),
@@ -142,13 +163,17 @@ export function buildInventory(people, { externalCandidates = [] } = {}) {
       people_read: people.length,
       warm_unique: count,
       excluded: excluded.length,
+      warm_unique_konative_scope: records.filter((r) => r.konative_scope).length,
       duplicates_collapsed: duplicates.length,
       public_candidates: candidates.length,
       public_candidates_rejected: rejected_candidates.length,
     },
     target: TARGET,
     k2_floor: K2_FLOOR,
-    k2_status: count < K2_FLOOR ? 'BREACH' : count < TARGET ? 'BELOW_TARGET' : 'MET',
+    // K2 is judged on records Konative can actually use: the shared Twenty also holds
+    // other ventures' contacts, which are not Konative warm paths (TOL-3555 first live run:
+    // 1,792 relationship rows, only a fraction in tribal scope).
+    k2_status: k2Status(records.filter((r) => r.konative_scope).length),
     by_evidence_class: Object.fromEntries(EVIDENCE_CLASSES.map((c) => [c, records.filter((r) => r.evidence_classes.includes(c)).length])),
     records,
     duplicates,
@@ -205,12 +230,14 @@ export function noteBody(record, runId) {
 /** Pure: which inventory records still need a note (idempotent by marker). */
 export function planNotes(inventory, existingMarkerPersonIds, { limit = MAX_APPLY } = {}) {
   const have = new Set(existingMarkerPersonIds);
-  const todo = inventory.records.filter((r) => !have.has(r.person_id));
+  // Konative notes go only on Konative-scope people; other ventures' contacts are never touched.
+  const inScope = inventory.records.filter((r) => r.konative_scope === true);
+  const todo = inScope.filter((r) => !have.has(r.person_id));
   if (!Number.isInteger(limit) || limit < 1 || limit > MAX_APPLY) throw new Error(`limit must be 1..${MAX_APPLY}`);
   return {
     create: todo.slice(0, limit).map((r) => r.person_id),
     remaining_after_run: Math.max(0, todo.length - limit),
-    skip_already_logged: inventory.records.filter((r) => have.has(r.person_id)).map((r) => r.person_id),
+    skip_already_logged: inScope.filter((r) => have.has(r.person_id)).map((r) => r.person_id),
   };
 }
 
@@ -267,8 +294,8 @@ export function buildPeopleQuery(relations) {
       pageInfo { hasNextPage endCursor }
       edges { node {
         id createdAt name { firstName lastName } emails { primaryEmail }
-        doNotContact outreachStatus sourceProject
-        company { id name }
+        doNotContact outreachStatus sourceProject vertical tribalCategory
+        company { id name vertical orgType }
         ${rel}
       } }
     }
@@ -306,7 +333,29 @@ async function readPeople({ baseUrl, token }) {
   return { people, relations };
 }
 
-function parseArgs(argv) {
+const SECRET_NAME = /^[A-Za-z0-9_-]{1,255}$/;
+export const GSM_PROJECT = 'tolowa-studio';
+
+/**
+ * Resolve the Twenty token. TWENTY_API_TOKEN wins when a human supplied it.
+ * With --token-secret <name> the token is read from Secret Manager INSIDE this
+ * process (same pattern as linear-ro, TOL-2027): it stays in memory, is never
+ * printed, exported or written, and no error message includes it. This is what
+ * lets an unattended lane run the read-only inventory without exporting a secret.
+ */
+export function resolveToken(args, env = process.env, spawn = spawnSync) {
+  const fromEnv = norm(env.TWENTY_API_TOKEN);
+  if (fromEnv) return fromEnv;
+  if (!args.tokenSecret) throw new Error('TWENTY_API_TOKEN is required (or pass --token-secret <Secret Manager name>)');
+  if (!SECRET_NAME.test(args.tokenSecret)) throw new Error('--token-secret must be a plain Secret Manager secret name');
+  const r = spawn('gcloud', ['secrets', 'versions', 'access', 'latest', `--secret=${args.tokenSecret}`, `--project=${GSM_PROJECT}`],
+    { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 30000 });
+  const token = norm(r?.stdout);
+  if (r?.status !== 0 || !token) throw new Error(`Could not read secret ${args.tokenSecret} from Secret Manager (exit ${r?.status ?? 'none'}); no value printed`);
+  return token;
+}
+
+export function parseArgs(argv) {
   const args = { baseUrl: 'https://crm.tolowastudio.com', apply: false };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -318,6 +367,7 @@ function parseArgs(argv) {
     else if (arg === '--approval-sha256') args.approvalSha = next();
     else if (arg === '--run-id') args.runId = next();
     else if (arg === '--limit') args.limit = Number(next());
+    else if (arg === '--token-secret') args.tokenSecret = next();
     else if (arg === '--apply') args.apply = true;
     else throw new Error(`Unknown argument: ${arg}`);
   }
@@ -338,8 +388,7 @@ function findRepoRoot(start) {
 
 export async function main(argv = process.argv.slice(2)) {
   const args = parseArgs(argv);
-  const token = norm(process.env.TWENTY_API_TOKEN);
-  if (!token) throw new Error('TWENTY_API_TOKEN is required');
+  const token = resolveToken(args);
   const repoRoot = findRepoRoot(dirname(fileURLToPath(import.meta.url))) || process.cwd();
   const outputDir = assertOutputOutsideRepo(args.outputDir, repoRoot);
   mkdirSync(outputDir, { recursive: true, mode: 0o700 });

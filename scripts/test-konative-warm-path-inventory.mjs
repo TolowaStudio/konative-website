@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   K2_FLOOR,
+  TARGET,
   MAX_APPLY,
   NOTE_MARKER,
   assertOutputOutsideRepo,
@@ -10,9 +11,12 @@ import {
   buildInventory,
   buildPeopleQuery,
   classifyPerson,
+  GSM_PROJECT,
   noteBody,
   nodeToPerson,
+  parseArgs,
   planNotes,
+  resolveToken,
   sha256,
   validateExternalCandidate,
   verifyApproval,
@@ -105,7 +109,7 @@ test('apply needs the exact reviewed inventory hash', () => {
 });
 
 test('planNotes is idempotent and bounded per run', () => {
-  const inv = { records: Array.from({ length: 30 }, (_, i) => ({ person_id: `p${i}` })) };
+  const inv = { records: Array.from({ length: 30 }, (_, i) => ({ person_id: `p${i}`, konative_scope: true })) };
   const first = planNotes(inv, [], { limit: 1 });
   assert.deepEqual(first.create, ['p0']);
   assert.equal(first.remaining_after_run, 29);
@@ -127,4 +131,79 @@ test('note body carries the marker, the evidence, and the not-an-approval line, 
 test('private artifacts may not be written inside the repo', () => {
   assert.throws(() => assertOutputOutsideRepo('/repo/out', '/repo'), /inside Git repository/);
   assert.equal(assertOutputOutsideRepo('/elsewhere/out', '/repo'), '/elsewhere/out');
+});
+
+test('--token-secret reads the token in-process from Secret Manager, never via env or stdout', () => {
+  const calls = [];
+  const spawn = (cmd, argv, opts) => { calls.push({ cmd, argv, opts }); return { status: 0, stdout: 'fake-token-value\n' }; };
+  const args = parseArgs(['--output-dir', '/out', '--token-secret', 'motion-twenty-crm-api-token']);
+  assert.equal(resolveToken(args, {}, spawn), 'fake-token-value');
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].cmd, 'gcloud');
+  assert.ok(calls[0].argv.includes('--secret=motion-twenty-crm-api-token'));
+  assert.ok(calls[0].argv.includes(`--project=${GSM_PROJECT}`));
+  assert.deepEqual(calls[0].opts.stdio, ['ignore', 'pipe', 'ignore'], 'child stderr is dropped, stdout is captured, nothing inherits the terminal');
+});
+
+test('token resolution: env wins, no source is an error, a failed read never leaks a value', () => {
+  const never = () => { throw new Error('gcloud must not be called'); };
+  assert.equal(resolveToken({ tokenSecret: 'x' }, { TWENTY_API_TOKEN: ' from-env ' }, never), 'from-env');
+  assert.throws(() => resolveToken({}, {}, never), /TWENTY_API_TOKEN is required/);
+  assert.throws(() => resolveToken({ tokenSecret: 'a b; rm -rf' }, {}, never), /plain Secret Manager secret name/);
+  const failing = () => ({ status: 1, stdout: 'partial-secret-leak' });
+  assert.throws(() => resolveToken({ tokenSecret: 'motion-twenty-crm-api-token' }, {}, failing),
+    (e) => /Could not read secret/.test(e.message) && !e.message.includes('partial-secret-leak'));
+  assert.throws(() => resolveToken({ tokenSecret: 'motion-twenty-crm-api-token' }, {}, () => ({ status: 0, stdout: '  \n' })), /Could not read secret/);
+});
+
+const tribalPerson = (i, over = {}) => person(String(i), {
+  emails: { primaryEmail: `t${i}@example.test` }, name: { firstName: 'T', lastName: String(i) },
+  vertical: 'TRIBAL', signals: [meeting], ...over,
+});
+
+test('the shared Twenty holds other ventures: K2 counts only Konative-scope warm people', () => {
+  const others = Array.from({ length: TARGET + 5 }, (_, i) => person(`o${i}`, {
+    emails: { primaryEmail: `o${i}@example.test` }, name: { firstName: 'O', lastName: String(i) }, signals: [meeting] }));
+  const inv = buildInventory(others);
+  assert.equal(inv.counts.warm_unique, TARGET + 5);
+  assert.equal(inv.counts.warm_unique_konative_scope, 0);
+  assert.equal(inv.k2_status, 'BREACH', 'many warm rows from other ventures must not satisfy K2');
+  const mixed = buildInventory([...others, ...Array.from({ length: TARGET }, (_, i) => tribalPerson(i))]);
+  assert.equal(mixed.counts.warm_unique_konative_scope, TARGET);
+  assert.equal(mixed.k2_status, 'MET');
+  assert.equal(mixed.records.filter((r) => r.konative_scope).length, TARGET);
+});
+
+test('scope follows the campaign-audit predicate: person vertical, tribalCategory, company vertical or orgType', () => {
+  const scoped = (over) => buildInventory([tribalPerson(1, { vertical: null, ...over })]).records[0].konative_scope;
+  assert.equal(scoped({ vertical: 'TRIBAL' }), true);
+  assert.equal(scoped({ tribalCategory: 'GAMING' }), true);
+  assert.equal(scoped({ company: { id: 'c', name: 'X', vertical: 'tribal' } }), true);
+  assert.equal(scoped({ company: { id: 'c', name: 'X', orgType: 'TRIBAL_GOVERNMENT' } }), true);
+  assert.equal(scoped({ company: { id: 'c', name: 'X', vertical: 'MEDIA' } }), false);
+});
+
+test('our own addresses and automated senders are never warm, even with evidence', () => {
+  const reply = { type: 'reply', ref: 'messageParticipants:m1', at: '' };
+  for (const email of ['noreply@vendor.test', 'No-Reply@vendor.test', 'notifications@vendor.test', 'mailer-daemon@vendor.test', 'billing+x@vendor.test', 'me@konative.com', 'ME@Tolowa.net']) {
+    const r = classifyPerson(person('1', { emails: { primaryEmail: email }, signals: [reply] }));
+    assert.equal(r.warm, false, email);
+  }
+  assert.equal(classifyPerson(person('2', { emails: { primaryEmail: 'norman@vendor.test' }, signals: [reply] })).warm, true, 'a real name starting with "no" is fine');
+  assert.equal(classifyPerson(person('3', { emails: { primaryEmail: 'a@mail.konative.com.example.test' }, signals: [reply] })).warm, true);
+});
+
+test('apply plans notes only for Konative-scope records', () => {
+  const inv = { records: [
+    { person_id: 'in1', konative_scope: true }, { person_id: 'out1', konative_scope: false },
+    { person_id: 'old-record-without-flag' }, { person_id: 'in2', konative_scope: true },
+  ] };
+  const plan = planNotes(inv, ['in2'], { limit: 5 });
+  assert.deepEqual(plan.create, ['in1']);
+  assert.deepEqual(plan.skip_already_logged, ['in2']);
+});
+
+test('people query asks for the scope fields', () => {
+  const q = buildPeopleQuery([]);
+  for (const f of ['vertical', 'tribalCategory', 'orgType']) assert.match(q, new RegExp(f));
 });
