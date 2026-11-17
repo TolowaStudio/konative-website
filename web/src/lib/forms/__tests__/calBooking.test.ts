@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { bookingEmail, bookingToCrmData, parseCalWebhook, verifyCalSignature } from "@/lib/forms/calBooking";
+import { bookingEmail, bookingToCrmData, eventSlugAllowed, parseCalWebhook, parseEventSlugAllowlist, verifyCalSignature } from "@/lib/forms/calBooking";
 
 describe("verifyCalSignature", () => {
   const raw = '{"a":1}';
@@ -39,7 +39,7 @@ describe("bookingEmail", () => {
   it("escapes HTML in attacker-controlled attendee fields", () => {
     const html = bookingEmail({
       externalId: "cal-1", name: "<script>x</script>", email: "a@b.co", organization: "", phone: "",
-      title: "t", startTime: "", endTime: "", timeZone: "", notes: "<img src=x>",
+      title: "t", eventSlug: "", startTime: "", endTime: "", timeZone: "", notes: "<img src=x>",
     }).html;
     expect(html).not.toContain("<script>");
     expect(html).not.toContain("<img");
@@ -50,8 +50,26 @@ describe("bookingToCrmData", () => {
   it("omits the notes clause when there are none", () => {
     const d = bookingToCrmData({
       externalId: "cal-1", name: "N", email: "a@b.co", organization: "", phone: "",
-      title: "Call", startTime: "", endTime: "", timeZone: "", notes: "",
+      title: "Call", eventSlug: "", startTime: "", endTime: "", timeZone: "", notes: "",
     });
     expect(String(d.requirement)).not.toContain("Notes:");
+  });
+});
+
+describe("event slug allowlist (TOL-3556)", () => {
+  it("parses a comma list, trimmed and lowercased; unset or blank is empty", () => {
+    expect(parseEventSlugAllowlist(" 15min, Intro-Call ,,")).toEqual(["15min", "intro-call"]);
+    expect(parseEventSlugAllowlist(undefined)).toEqual([]);
+    expect(parseEventSlugAllowlist("  ")).toEqual([]);
+  });
+  it("allows everything when the list is empty, otherwise only listed slugs (a missing slug is not listed)", () => {
+    expect(eventSlugAllowed([], "anything")).toBe(true);
+    expect(eventSlugAllowed(["15min"], "15MIN")).toBe(true);
+    expect(eventSlugAllowed(["15min"], "tolowa-intro")).toBe(false);
+    expect(eventSlugAllowed(["15min"], "")).toBe(false);
+  });
+  it("reads the slug from payload.type", () => {
+    const r = parseCalWebhook({ triggerEvent: "BOOKING_CREATED", payload: { uid: "u", type: "15Min", attendees: [{ email: "a@b.co" }] } });
+    expect(r.kind === "booking" && r.booking.eventSlug).toBe("15min");
   });
 });

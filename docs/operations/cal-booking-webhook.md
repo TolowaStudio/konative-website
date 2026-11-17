@@ -33,13 +33,17 @@ reschedule, `PING`) are acknowledged and ignored.
 4. **Smoke.** Book one labeled test slot; expect one `calBooking` opportunity and
    task in Twenty and one email to `RESEND_TO`; delete the synthetic records.
 
-## Known gap: one Cal.com account serves every venture
+## One Cal.com account serves every venture: event-type filter
 
 Only `cal.com/jeramey-james` is a valid booking URL (per-venture slugs 404), so
-an account-level webhook also fires for Tolowa Studio bookings. Scope the
-webhook to the event types the Konative site links to (`/15min`, per
-`CalEmbed.tsx`) or add a metadata/source filter before enabling it broadly;
-otherwise non-Konative bookings create Konative opportunities.
+an account-level webhook also fires for Tolowa Studio bookings. Set Cloud Run env
+`CAL_WEBHOOK_EVENT_SLUGS` (comma list of Cal.com event-type slugs, e.g. `15min`,
+the one most Konative CTAs link to) and only those event types create Konative
+opportunities; others get 200 `{"ignored":"event type ... not in
+CAL_WEBHOOK_EVENT_SLUGS"}` with no CRM write and no email. Unset = no filter. The
+`/contact` page links the bare account URL, where a visitor can pick any event type,
+so decide the list deliberately (and prefer also scoping the Cal.com webhook to those
+event types in Cal.com). Which slugs are Konative's is Jeramey's call.
 
 ## Also noticed (not changed here)
 

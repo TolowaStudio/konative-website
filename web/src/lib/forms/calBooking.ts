@@ -30,6 +30,8 @@ export interface CalBooking {
   organization: string;
   phone: string;
   title: string;
+  /** Cal.com event-type slug (payload.type, e.g. "15min"); "" when the payload omits it. */
+  eventSlug: string;
   startTime: string;
   endTime: string;
   timeZone: string;
@@ -84,12 +86,27 @@ export function parseCalWebhook(body: unknown): CalParseResult {
       organization: response(responses, "organization") || response(responses, "company"),
       phone: str(attendee.phoneNumber) || response(responses, "attendeePhoneNumber"),
       title: str(payload.title) || str(payload.eventTitle) || "Discovery call",
+      eventSlug: str(payload.type).toLowerCase(),
       startTime: str(payload.startTime),
       endTime: str(payload.endTime),
       timeZone: str(attendee.timeZone),
       notes: str(payload.additionalNotes) || response(responses, "notes"),
     },
   };
+}
+
+/**
+ * One Cal.com account (cal.com/jeramey-james) serves every venture, so an account-level webhook also
+ * fires for non-Konative bookings. `CAL_WEBHOOK_EVENT_SLUGS` (comma list, e.g. "15min") limits which
+ * event types become Konative opportunities. Unset/empty = no filter. When set, a booking whose slug
+ * is missing or not listed is ignored (fail-closed on the filter), never routed.
+ */
+export function parseEventSlugAllowlist(raw: string | undefined): string[] {
+  return (raw ?? "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
+}
+
+export function eventSlugAllowed(allowlist: string[], slug: string): boolean {
+  return allowlist.length === 0 || allowlist.includes(slug.toLowerCase());
 }
 
 /**

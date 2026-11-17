@@ -48,6 +48,7 @@ describe("POST /api/cal/webhook", () => {
     process.env.RESEND_FROM = "Konative <team@konative.com>";
     process.env.RESEND_TO = "owner@example.com";
     delete process.env.CRM_WEBHOOK_REQUIRED;
+    delete process.env.CAL_WEBHOOK_EVENT_SLUGS;
   });
 
   it("returns 503 and does nothing when CAL_WEBHOOK_SECRET is unset", async () => {
@@ -147,5 +148,39 @@ describe("POST /api/cal/webhook", () => {
     });
     expect(res.status).toBe(400);
     expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  describe("CAL_WEBHOOK_EVENT_SLUGS (TOL-3556)", () => {
+    const withType = (type?: string) => ({ ...bookingBody, payload: { ...bookingBody.payload, ...(type ? { type } : {}) } });
+
+    it("routes a listed event type", async () => {
+      process.env.CAL_WEBHOOK_EVENT_SLUGS = "15min";
+      const res = await post(withType("15min"));
+      expect(res.status).toBe(200);
+      expect(crmCalls()).toHaveLength(1);
+      expect(resendCalls()).toHaveLength(1);
+    });
+
+    it("ignores another venture's event type: 200, no opportunity, no email", async () => {
+      process.env.CAL_WEBHOOK_EVENT_SLUGS = "15min";
+      const res = await post(withType("tolowa-intro"));
+      expect(res.status).toBe(200);
+      expect((await res.json()).ignored).toContain("tolowa-intro");
+      expect(crmCalls()).toHaveLength(0);
+      expect(resendCalls()).toHaveLength(0);
+    });
+
+    it("ignores a booking with no event type when a list is set", async () => {
+      process.env.CAL_WEBHOOK_EVENT_SLUGS = "15min";
+      const res = await post(withType());
+      expect(res.status).toBe(200);
+      expect(crmCalls()).toHaveLength(0);
+    });
+
+    it("routes every event type when the list is unset (current behaviour)", async () => {
+      const res = await post(withType("tolowa-intro"));
+      expect(res.status).toBe(200);
+      expect(crmCalls()).toHaveLength(1);
+    });
   });
 });

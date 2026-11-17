@@ -4,7 +4,9 @@ import {
   CAL_SIGNATURE_HEADER,
   bookingEmail,
   bookingToCrmData,
+  eventSlugAllowed,
   parseCalWebhook,
+  parseEventSlugAllowlist,
   verifyCalSignature,
 } from "@/lib/forms/calBooking";
 import { forwardToCrm, sendResendEmail } from "@/lib/forms/submit";
@@ -44,6 +46,14 @@ export async function POST(request: Request) {
   }
 
   const { booking } = parsed;
+
+  const allowlist = parseEventSlugAllowlist(process.env.CAL_WEBHOOK_EVENT_SLUGS);
+  if (!eventSlugAllowed(allowlist, booking.eventSlug)) {
+    return NextResponse.json({
+      success: true,
+      ignored: `event type "${booking.eventSlug || "unknown"}" not in CAL_WEBHOOK_EVENT_SLUGS`,
+    });
+  }
 
   try {
     await forwardToCrm({
