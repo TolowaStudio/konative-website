@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { queryActiveSponsorshipPlacement } from "@/lib/db";
+import {
+  isD1SponsorshipReady,
+  logSupabaseFallbackError,
+  noteSupabaseFallback,
+  queryActiveSponsorshipPlacement,
+} from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +19,11 @@ export async function GET(request: NextRequest) {
   if (d1Row) {
     return NextResponse.json({ placement: d1Row });
   }
+  // D1 has the table populated: "no active sponsor" is the answer, not a miss.
+  if (await isD1SponsorshipReady()) {
+    return NextResponse.json({ placement: null });
+  }
+  noteSupabaseFallback("api/v1/sponsors/placement");
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -33,6 +43,7 @@ export async function GET(request: NextRequest) {
     .limit(1);
 
   if (error) {
+    logSupabaseFallbackError("api/v1/sponsors/placement", error);
     return NextResponse.json({ placement: null });
   }
 

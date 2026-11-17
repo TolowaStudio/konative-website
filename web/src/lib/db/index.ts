@@ -11,10 +11,17 @@ export {
 } from "./client";
 export {
   readWithSupabaseFallback,
+  noteSupabaseFallback,
+  logSupabaseFallbackError,
   isSupabaseFallbackDisabled,
   SupabaseFallbackDisabledError,
 } from "./supabaseFallback";
-export { isD1TbcpReady, isD1QueueReady, resetD1ReadyCache } from "./isPopulated";
+export {
+  isD1TbcpReady,
+  isD1QueueReady,
+  isD1SponsorshipReady,
+  resetD1ReadyCache,
+} from "./isPopulated";
 export {
   queryTbcpAwards,
   queryTbcpAwardsList,

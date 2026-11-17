@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { assembleCAS, type EnvironmentalFlags } from '@/lib/availability-score'
+import {
+  CloudflareBindingUnavailableError,
+  DatabaseUnavailableError,
+  isD1QueueReady,
+  logSupabaseFallbackError,
+  noteSupabaseFallback,
+  queryInterconnectionQueueRadius,
+} from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -24,17 +32,71 @@ interface QueueRpcRow {
   distance_km: number
 }
 
-async function fetchQueueData(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supabase: any,
-  lat: number,
-  lng: number
-): Promise<{
+interface QueueSummary {
   totalMwWithin50Km: number
   queueProjectCount: number
   nearestQueueKm: number | null
   queueCountWithin25Km: number
-}> {
+}
+
+const EMPTY_QUEUE: QueueSummary = {
+  totalMwWithin50Km: 0,
+  queueProjectCount: 0,
+  nearestQueueKm: null,
+  queueCountWithin25Km: 0,
+}
+
+function summarizeQueue(rows: QueueRpcRow[]): QueueSummary {
+  const totalMwWithin50Km = rows.reduce((s: number, r: QueueRpcRow) => s + Number(r.capacity_mw ?? 0), 0)
+  const queueProjectCount = rows.length
+  const distances = rows.map((r: QueueRpcRow) => r.distance_km).filter((d): d is number => typeof d === 'number')
+  const nearestQueueKm = distances.length > 0 ? Math.min(...distances) : null
+  const queueCountWithin25Km = rows.filter((r: QueueRpcRow) => r.distance_km <= 25).length
+
+  return { totalMwWithin50Km, queueProjectCount, nearestQueueKm, queueCountWithin25Km }
+}
+
+/**
+ * D1/Postgres first (same table the /api/v1/queue route reads). Supabase is the
+ * fallback only while the D1 queue table is empty, and that is logged (or throws
+ * with KONATIVE_SUPABASE_FALLBACK=off). Before this the score read Supabase
+ * only, and any Supabase failure came back as a believable all-zero queue.
+ */
+async function fetchQueueData(lat: number, lng: number): Promise<QueueSummary> {
+  // This endpoint worked on Supabase alone before, so an unreachable primary
+  // store keeps degrading to the fallback (logged, or thrown when switched off)
+  // instead of turning a live endpoint into a 500.
+  let primaryUnavailable: string | null = null
+  let d1Ready = false
+  try {
+    d1Ready = await isD1QueueReady()
+  } catch (error) {
+    if (!(error instanceof DatabaseUnavailableError || error instanceof CloudflareBindingUnavailableError)) {
+      throw error
+    }
+    primaryUnavailable = `primary database unavailable: ${error.message}`
+  }
+
+  if (d1Ready) {
+    const d1Rows = await queryInterconnectionQueueRadius(lat, lng, 50)
+    return summarizeQueue(
+      (d1Rows ?? []).map((r) => ({
+        id: r.id,
+        capacity_mw: r.capacity_mw,
+        poi_lat: r.poi_lat,
+        poi_lng: r.poi_lng,
+        distance_km: r.distance_km ?? 0,
+      })),
+    )
+  }
+
+  noteSupabaseFallback(
+    'api/v1/availability-score',
+    primaryUnavailable ?? 'D1 interconnection_queue is empty',
+  )
+  const supabase = getSupabase()
+  if (!supabase) return EMPTY_QUEUE
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any).rpc('get_interconnection_queue_radius', {
     p_lat: lat,
@@ -43,17 +105,10 @@ async function fetchQueueData(
   })
 
   if (error || !data) {
-    return { totalMwWithin50Km: 0, queueProjectCount: 0, nearestQueueKm: null, queueCountWithin25Km: 0 }
+    logSupabaseFallbackError('api/v1/availability-score', error ?? 'rpc returned no data')
+    return EMPTY_QUEUE
   }
-
-  const rows = data as QueueRpcRow[]
-  const totalMwWithin50Km = rows.reduce((s: number, r: QueueRpcRow) => s + Number(r.capacity_mw ?? 0), 0)
-  const queueProjectCount = rows.length
-  const distances = rows.map((r: QueueRpcRow) => r.distance_km).filter((d): d is number => typeof d === 'number')
-  const nearestQueueKm = distances.length > 0 ? Math.min(...distances) : null
-  const queueCountWithin25Km = rows.filter((r: QueueRpcRow) => r.distance_km <= 25).length
-
-  return { totalMwWithin50Km, queueProjectCount, nearestQueueKm, queueCountWithin25Km }
+  return summarizeQueue(data as QueueRpcRow[])
 }
 
 // ── Environmental constraint bbox approximation ───────────────────────────────
@@ -123,12 +178,7 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const supabase = getSupabase()
-
-  // Fetch queue data (needs Supabase) — gracefully degrade if unavailable
-  const queueData = supabase
-    ? await fetchQueueData(supabase, lat, lng)
-    : { totalMwWithin50Km: 0, queueProjectCount: 0, nearestQueueKm: null, queueCountWithin25Km: 0 }
+  const queueData = await fetchQueueData(lat, lng)
 
   // Environmental constraint approximation (static — no DB needed)
   const envFlags = checkEnvironmentalConstraints(lat, lng)

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { querySponsorshipPlacements } from '@/lib/db'
+import {
+  isD1SponsorshipReady,
+  noteSupabaseFallback,
+  querySponsorshipPlacements,
+} from '@/lib/db'
 import { supabase } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
@@ -22,6 +26,12 @@ export async function GET(request: NextRequest) {
     }))
     return NextResponse.json({ placements })
   }
+
+  // D1 has the table populated: an empty filtered result is the answer, not a miss.
+  if (d1Rows && (await isD1SponsorshipReady())) {
+    return NextResponse.json({ placements: [] })
+  }
+  noteSupabaseFallback('api/v1/analytics/sponsors')
 
   let query = supabase
     .from('sponsorship_placements')
