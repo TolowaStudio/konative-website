@@ -36,7 +36,9 @@ the exit audit's claim was stale).
 **Cloudflare Worker:** Still deployed with Monday cron triggers until an operator runs
 `scripts/cloudflare-clear-konative-cron.mjs`. See `docs/konative-leftover-compute.md`.
 
-Pick **one** scheduler surface before re-enabling weekly ingest — not GHA + Worker in parallel.
+The chosen scheduler surface is GCP Cloud Scheduler (TOL-547): see `web/scripts/scheduler/` and
+`docs/konative-leftover-compute.md`. Create those jobs, confirm one 200, then clear this Worker.
+Not GHA + Worker + Scheduler in parallel.
 
 ## Railway note
 
