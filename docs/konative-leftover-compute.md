@@ -38,6 +38,35 @@ Token needs **Workers Scripts:Edit** on the Tolowa Studio account. `CLOUDFLARE_A
 
 **Railway:** `workers/index.js` + `workers/railway.toml` were never deployed for Konative cron — no Railway cron to clear.
 
+## Weekly ingest — the one scheduler surface is Cloud Scheduler (TOL-547)
+
+Canada queue + IESO ingest had no live scheduler: the Worker above and `ingest-weekly.yml` were the only callers, and both are retired or being retired. Cloudflare is not in the stack, so the replacement is GCP Cloud Scheduler calling the live Cloud Run site (`https://konative.com`), same Monday UTC slots as before:
+
+| Job | Cron (UTC) | Target |
+|-----|------------|--------|
+| `konative-ingest-canada-queue` | `0 7 * * 1` | `GET /api/ingest-canada-queue` |
+| `konative-ingest-ieso` | `0 8 * * 1` | `GET /api/ingest-ieso` |
+
+Definitions live in `web/scripts/scheduler/jobs.ts`; `web/scripts/scheduler/apply.ts` creates or updates them (re-runnable). Both routes have `maxDuration = 300`, so the jobs use a 320s attempt deadline (Scheduler's 180s default would cut them off). Region `us-west1`, project `tolowa-studio`. Cost: Cloud Scheduler bills about $0.10 per job per month beyond the free tier, so about $0.20/month for both.
+
+**Operator step (needs a gcloud login with `cloudscheduler.admin` and `secretmanager.secretAccessor` on `konative-CRON_SECRET`):**
+
+```bash
+cd web
+npx tsx scripts/scheduler/apply.ts           # dry run, prints the redacted commands
+npx tsx scripts/scheduler/apply.ts --apply   # creates the two jobs
+gcloud scheduler jobs run konative-ingest-ieso --project=tolowa-studio --location=us-west1
+gcloud run services logs read konative-website-staging --project=tolowa-studio --region=us-west1 --limit=20   # expect a 200 on /api/ingest-ieso
+```
+
+`jobs run` fires a real ingest (it upserts into Sanity), which is the point: it proves the token, URL and deadline end to end. Do it once, then check the Sanity `ingestionRun` / project documents for fresh `_updatedAt`.
+
+The token sits in each job's header (Scheduler has no secret references), so after rotating `konative-CRON_SECRET`, run `--apply` again.
+
+**Order matters:** create the Scheduler jobs first, confirm one 200, *then* clear the Worker schedules (section above). Both routes are idempotent upserts, so a brief overlap is harmless, but a gap is what caused this ticket.
+
+Not covered: `/api/v1/queue/ingest` (the Supabase `interconnection_queue` nightly, 07:00 UTC, dropped with `vercel.json` on Jul 3) and news ingest (frozen on purpose). Add either as another entry in `INGEST_JOBS` if wanted; the test pins the current list so that is a deliberate change.
+
 ## Human action still required — TOL-316 GCS tiles
 
 R2 buckets **`konative-tiles`** and **`konative-data`** are off (account R2 restriction). Do **not** re-enable R2 or restore `refresh-tiles.yml` schedules until GCS is live.
@@ -80,7 +109,7 @@ curl -sfI "https://konative.com/api/v1/tiles/tiles/v1/manifest.json"  # or CDN U
 - [ ] `refresh-tiles.yml` migrated off R2; one manual layer refresh succeeds
 - [ ] Tiles proxy / manifest URLs point at GCS, not R2
 - [ ] News ingest still **off** unless product explicitly approves
-- [ ] Only **one** scheduler surface for weekly ingest (GHA **or** Worker — not both)
+- [ ] Only **one** scheduler surface for weekly ingest: Cloud Scheduler (TOL-547). Not GHA, not the Worker
 
 ## References
 
