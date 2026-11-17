@@ -30,7 +30,7 @@ function isCrmWebhookRequired(): boolean {
 }
 
 /** Fail-closed Resend send — throws when credentials are missing or Resend rejects the request. */
-async function sendResendEmail(args: { to: string; from: string; subject: string; html: string; logLabel: string }) {
+export async function sendResendEmail(args: { to: string; from: string; subject: string; html: string; logLabel: string }) {
   const apiKey = trimEnv(process.env.RESEND_API_KEY);
   if (!apiKey) {
     console.error(`[submitForm] RESEND_API_KEY not set — cannot send ${args.logLabel}`);
@@ -61,14 +61,16 @@ async function sendResendEmail(args: { to: string; from: string; subject: string
   }
 }
 
-async function forwardToCrm(args: {
+export async function forwardToCrm(args: {
   schemaType: string;
   docId: string;
   data: Record<string, unknown>;
   triage: TriageResult | null;
+  /** Override CRM_WEBHOOK_REQUIRED. Webhook-driven callers pass true so a lost lead returns an error, not a silent 200. */
+  required?: boolean;
 }): Promise<void> {
   const crmWebhookUrl = trimEnv(process.env.TWENTY_INTAKE_WEBHOOK_URL) || trimEnv(process.env.INQUIRY_WEBHOOK_URL);
-  const crmRequired = isCrmWebhookRequired();
+  const crmRequired = args.required ?? isCrmWebhookRequired();
 
   if (!crmWebhookUrl) {
     if (crmRequired) {
