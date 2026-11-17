@@ -39,10 +39,10 @@ export default function Footer() {
             title="Intelligence"
             links={[
               ["Intelligence Hub", "/intelligence"],
-              ["News Feed", "/news"],
+              ["News Archive", "/news"],
               ["Tribal DC Tracker", "/tribal/projects"],
               ["Market Coverage", "/markets"],
-              ["TBCP 3 / NEGP Help", "/tribal/grants"],
+              ["TBCP 3 / NEGP Awardees", "/tribal/grants"],
               ["Voice-to-Scope", "/tribal/scope"],
               ["TBCP Awards", "/tribal/awards"],
               ["Connectivity Map", "/map"],
@@ -54,7 +54,6 @@ export default function Footer() {
             title="Company"
             links={[
               ["About — Native-owned", "/about"],
-              ["Team", "/#team"],
               ["Contact", "/contact"],
               ["Data Sources", "/licenses"],
               ["Book a call", "https://cal.com/jeramey-james/15min"],
@@ -63,7 +62,7 @@ export default function Footer() {
         </div>
 
         <div style={{ borderTop: `1px solid ${DIVIDER}`, paddingTop: 24, display: "flex", justifyContent: "space-between", gap: 20, flexWrap: "wrap", fontFamily: "Inter, sans-serif", fontSize: 11, color: MUTED }}>
-          <span>© 2026 Konative · a trade name of Total Pacific LLC</span>
+          <span>© 2026 Konative · a trade name of Tolowa Pacific LLC</span>
           <span style={{ color: STEEL, fontWeight: 700 }}>Connectivity brokerage · Market intelligence · Avant partner</span>
         </div>
       </div>

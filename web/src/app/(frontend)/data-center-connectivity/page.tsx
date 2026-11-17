@@ -492,7 +492,7 @@ export default function DataCenterConnectivityPage() {
               <div style={bridgeNumStyle}>01</div>
               <h3 style={bridgeTitleStyle}>Stalled &amp; blocked projects</h3>
               <p style={bridgeDescStyle}>
-                Live tracker of stalled, canceled, paused, and blocked data-center projects in NV, WV, FL, and OK — with governor-level context for outreach. Where projects die is where connectivity demand disappears; knowing the map is part of every route-diversity assessment.
+                Live tracker of stalled, canceled, paused, and blocked data-center projects in NV, WV, FL, and OK — with governor-level policy context. Where projects die is where connectivity demand disappears; knowing the map is part of every route-diversity assessment.
               </p>
               <Link href="/governors" style={bridgeCtaStyle}>
                 View the stalled-project tracker →

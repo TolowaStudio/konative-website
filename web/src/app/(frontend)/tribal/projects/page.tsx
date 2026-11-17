@@ -122,7 +122,7 @@ export default async function TribalProjectsPage() {
               href="/news"
               style={{ color: RED, fontWeight: 600, textDecoration: "none" }}
             >
-              Tribal news feed →
+              Tribal news archive →
             </Link>
           </p>
           <div style={{ display: "flex", gap: 48, flexWrap: "wrap" }}>
