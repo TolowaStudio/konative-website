@@ -3,7 +3,7 @@
 | What | URL |
 |------|-----|
 | **Production** | [https://konative.com](https://konative.com) |
-| **Git repository** | [github.com/tolowa-studio/konative-website](https://github.com/tolowa-studio/konative-website) (`main`) |
+| **Git repository** | [github.com/TolowaStudio/konative-website](https://github.com/TolowaStudio/konative-website) (`main`) |
 
 Founder OS structure and PRD live in **`docs/`**. Notion hub (live): [konative.com](https://www.notion.so/konative-com-34132e0a547481489537d232018bbbb0).
 
