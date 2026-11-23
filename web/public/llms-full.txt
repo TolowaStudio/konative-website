@@ -1,7 +1,7 @@
 # Konative — Full Reference
 
 > Konative (konative.com) is a Native-owned, vendor-neutral connectivity brokerage — an Avant
-> sub-agent — for data centers under construction and Tribal enterprises across the US and Canada.
+> sub-agent — for data centers under construction and Tribal enterprises, domestic and international, any market.
 > Core claim: nearby fiber is not deliverable fiber. Primary offer is a one-page site-specific
 > Market Connectivity Brief. Suppliers pay Konative's fee; buyers pay nothing. The TBCP/NEGP
 > funding navigator is a free reference, separate from brokerage — federal money never flows through Konative.
