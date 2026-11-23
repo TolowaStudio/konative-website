@@ -16,6 +16,7 @@ import LayerControlPanel from './LayerControlPanel'
 import MapSearchBar from './MapSearchBar'
 import MapReadout from './MapReadout'
 import DemoViews from './DemoViews'
+import { resolveTileUrl, tileProxyHttpUrl } from '@/lib/tiles/resolveTileUrl'
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -144,18 +145,6 @@ function colourFeature(f: Feature): Feature {
 
 // ── component ─────────────────────────────────────────────────────────────────
 
-// R2 bucket lacks CORS headers — rewrite absolute R2 URLs to the same-origin
-// tile proxy so the browser can load PMTiles without CORS failures.
-const R2_CDN = 'https://pub-70584c42a8ad4fb1a38f5273a1665067.r2.dev/'
-const TILE_PROXY = '/api/v1/tiles/'
-function resolveTileUrl(tilesUrl: string): string {
-  if (tilesUrl.startsWith(R2_CDN)) {
-    return `pmtiles://${window.location.origin}${TILE_PROXY}${tilesUrl.slice(R2_CDN.length)}`
-  }
-  if (tilesUrl.startsWith('http')) return `pmtiles://${tilesUrl}`
-  return `pmtiles://${window.location.origin}${tilesUrl}`
-}
-
 // Register the pmtiles:// protocol once for the page lifetime.
 let _pmtilesProtocolRegistered = false
 function ensurePMTilesProtocol() {
@@ -209,8 +198,11 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
   // Live GeoJSON data for manifest entries with sourceType === 'geojson'
   const [liveInfraData, setLiveInfraData] = useState<Record<string, FeatureCollection>>({})
   const [liveInfraLoading, setLiveInfraLoading] = useState<Record<string, boolean>>({})
+  const [pmtilesLayerErrors, setPmtilesLayerErrors] = useState<Record<string, string>>({})
+  const [tileOrigin, setTileOrigin] = useState('')
 
   useEffect(() => { ensurePMTilesProtocol() }, [])
+  useEffect(() => { setTileOrigin(window.location.origin) }, [])
 
   useEffect(() => {
     fetch('/api/v1/layer-manifest')
@@ -228,6 +220,8 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
       if (layer.category !== 'indigenous' && layer.country !== 'CA' && layer.country !== 'GLOBAL') continue
       // Politics layers are owned by /governors and should not appear on /map
       if (layer.category === 'politics') continue
+      const sourceType = layer.sourceType ?? 'pmtiles'
+      if (sourceType === 'pmtiles' && !layer.tilesUrl?.trim()) continue
       map[layer.category]?.push(layer)
     }
     return map
@@ -254,6 +248,47 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
         .finally(() => setLiveInfraLoading(prev => ({ ...prev, [layer.id]: false })))
     }
   }, [infraManifest, effectiveInfraEnabled]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Probe PMTiles availability when a category is enabled — show errors instead of silent blanks.
+  useEffect(() => {
+    if (!tileOrigin || !infraManifest) return
+
+    const origin = tileOrigin
+    const layers = infraManifest.layers.filter((l) => {
+      const sourceType = l.sourceType ?? 'pmtiles'
+      if (sourceType !== 'pmtiles') return false
+      if (!effectiveInfraEnabled[l.category]) return false
+      return Boolean(l.tilesUrl?.trim())
+    })
+
+    for (const layer of layers) {
+      const probeUrl = tileProxyHttpUrl(layer.tilesUrl, origin)
+      if (!probeUrl) continue
+
+      fetch(probeUrl, { method: 'HEAD' })
+        .then((res) => {
+          if (res.ok) {
+            setPmtilesLayerErrors((prev) => {
+              if (!prev[layer.id]) return prev
+              const next = { ...prev }
+              delete next[layer.id]
+              return next
+            })
+            return
+          }
+          setPmtilesLayerErrors((prev) => ({
+            ...prev,
+            [layer.id]: `Layer unavailable (HTTP ${res.status})`,
+          }))
+        })
+        .catch(() => {
+          setPmtilesLayerErrors((prev) => ({
+            ...prev,
+            [layer.id]: 'Layer unavailable (network error)',
+          }))
+        })
+    }
+  }, [infraManifest, effectiveInfraEnabled, tileOrigin])
 
   // Per-category insight: shown in the panel when a category is on but data is sparse (<50 features)
   const categoryInsights = useMemo(() => {
@@ -543,12 +578,20 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
                 }
 
                 // ── PMTiles source (default) ────────────────────────────────────
+                const layerError = pmtilesLayerErrors[layer.id]
+                if (layerError) return null
+
+                if (!tileOrigin) return null
+
+                const pmtilesUrl = resolveTileUrl(layer.tilesUrl, tileOrigin)
+                if (!pmtilesUrl) return null
+
                 return (
                   <Source
                     key={layer.id}
                     id={`infra-${layer.id}`}
                     type="vector"
-                    url={resolveTileUrl(layer.tilesUrl)}
+                    url={pmtilesUrl}
                     attribution={layer.attribution}
                   >
                     {showFill && (
@@ -684,6 +727,26 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* PMTiles layer errors */}
+      {Object.keys(pmtilesLayerErrors).length > 0 && (
+        <div style={{
+          position: 'absolute', zIndex: 10, top: 72, left: 16, maxWidth: 360,
+          background: 'rgba(255,255,255,0.97)', border: '1px solid rgba(220,38,38,0.35)',
+          padding: '12px 16px', backdropFilter: 'blur(8px)',
+          fontFamily: 'Inter, sans-serif', fontSize: 11, color: '#0C2046',
+          boxShadow: '0 8px 24px rgba(17,24,39,0.12)',
+        }}>
+          <div style={{ fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#dc2626', marginBottom: 8 }}>
+            Infrastructure overlay unavailable
+          </div>
+          <ul style={{ margin: 0, paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {Object.entries(pmtilesLayerErrors).map(([id, message]) => (
+              <li key={id}><strong>{id}</strong>: {message}</li>
+            ))}
+          </ul>
         </div>
       )}
 
