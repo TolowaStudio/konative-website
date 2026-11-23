@@ -38,7 +38,11 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
+  // Admin paths + page routes (www→apex). Exclude /api so tile proxy and JSON APIs skip edge middleware.
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/cms/:path*",
+    "/studio/:path*",
+    "/dashboard/:path*",
+    "/((?!_next/static|_next/image|api/|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

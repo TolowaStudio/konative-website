@@ -41,11 +41,11 @@ export async function fetchGcsObject(
     });
   }
 
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     Authorization: `Bearer ${token.token}`,
   };
   const range = options.range?.trim();
-  if (range) headers["Range"] = range;
+  if (range) headers.Range = range;
 
   return fetch(url, {
     method: options.method ?? "GET",
