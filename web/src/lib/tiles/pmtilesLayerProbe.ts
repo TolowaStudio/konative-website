@@ -34,12 +34,29 @@ export function mergePmtilesHeadProbeResult(
   return { ...errors, [layerId]: result.message };
 }
 
-/** Mirrors DataCenterMap PMTiles branch — no <Source> when probe reported an error. */
+/** Mirrors DataCenterMap PMTiles branch — no <Source> while probing or after error. */
 export function shouldMountPmtilesInfraSource(
   layerId: string,
   errors: Record<string, string>,
+  pendingLayerIds?: ReadonlySet<string>,
 ): boolean {
+  if (pendingLayerIds?.has(layerId)) return false;
   return !errors[layerId];
+}
+
+export function clearPmtilesErrorsForLayerIds(
+  errors: Record<string, string>,
+  layerIds: Iterable<string>,
+): Record<string, string> {
+  let changed = false;
+  const next = { ...errors };
+  for (const id of layerIds) {
+    if (next[id]) {
+      delete next[id];
+      changed = true;
+    }
+  }
+  return changed ? next : errors;
 }
 
 export function pmtilesErrorBannerLayerIds(

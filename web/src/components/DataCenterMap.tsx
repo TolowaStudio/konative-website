@@ -21,6 +21,7 @@ import {
   KONATIVE_MAP_PROJECTS_GEOJSON_SOURCE_ID,
 } from '@/lib/map/mapDisplayContract'
 import {
+  clearPmtilesErrorsForLayerIds,
   mergePmtilesHeadProbeResult,
   runPmtilesHeadProbe,
   shouldMountPmtilesInfraSource,
@@ -127,6 +128,8 @@ interface Props {
   initialCenter?: [number, number]
   /** Initial map zoom level. Defaults to 3.2. */
   initialZoom?: number
+  /** Test hook: override default infra category toggles. */
+  initialInfraEnabled?: Partial<Record<LayerCategory, boolean>>
 }
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -164,7 +167,14 @@ function ensurePMTilesProtocol() {
   _pmtilesProtocolRegistered = true
 }
 
-export default function DataCenterMap({ layerData: propData, counts: propCounts, backgroundMode, initialCenter, initialZoom }: Props) {
+export default function DataCenterMap({
+  layerData: propData,
+  counts: propCounts,
+  backgroundMode,
+  initialCenter,
+  initialZoom,
+  initialInfraEnabled,
+}: Props) {
   const mapRef = useRef<MapRef | null>(null)
   const [layerData, setLayerData] = useState<LayerData | null>(propData ?? null)
   const [counts, setCounts]       = useState<MapCounts | null>(propCounts ?? null)
@@ -199,9 +209,10 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
 
   // Infrastructure (CA · beta) state
   const [infraManifest, setInfraManifest] = useState<LayerManifest | null>(null)
-  const [infraEnabled, setInfraEnabled] = useState<Record<LayerCategory, boolean>>(
-    () => (backgroundMode ? BACKGROUND_INFRA_ENABLED : DEFAULT_INFRA_ENABLED)
-  )
+  const [infraEnabled, setInfraEnabled] = useState<Record<LayerCategory, boolean>>(() => {
+    const base = backgroundMode ? BACKGROUND_INFRA_ENABLED : DEFAULT_INFRA_ENABLED
+    return initialInfraEnabled ? { ...base, ...initialInfraEnabled } : base
+  })
 
   const effectiveInfraEnabled = backgroundMode ? BACKGROUND_INFRA_ENABLED : infraEnabled
 
@@ -209,6 +220,9 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
   const [liveInfraData, setLiveInfraData] = useState<Record<string, FeatureCollection>>({})
   const [liveInfraLoading, setLiveInfraLoading] = useState<Record<string, boolean>>({})
   const [pmtilesLayerErrors, setPmtilesLayerErrors] = useState<Record<string, string>>({})
+  const [pmtilesProbePending, setPmtilesProbePending] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  )
   const [tileOrigin, setTileOrigin] = useState('')
 
   useEffect(() => { ensurePMTilesProtocol() }, [])
@@ -259,6 +273,27 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
     }
   }, [infraManifest, effectiveInfraEnabled]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Drop probe errors for layers in categories the user turned off.
+  useEffect(() => {
+    const disabledIds: string[] = []
+    for (const cat of INFRA_CATEGORIES) {
+      if (effectiveInfraEnabled[cat.key]) continue
+      for (const layer of infraLayersByCategory[cat.key]) {
+        disabledIds.push(layer.id)
+      }
+    }
+    if (disabledIds.length === 0) return
+    setPmtilesLayerErrors((prev) => clearPmtilesErrorsForLayerIds(prev, disabledIds))
+    setPmtilesProbePending((prev) => {
+      const next = new Set(prev)
+      let changed = false
+      for (const id of disabledIds) {
+        if (next.delete(id)) changed = true
+      }
+      return changed ? next : prev
+    })
+  }, [effectiveInfraEnabled, infraLayersByCategory])
+
   // Probe PMTiles availability when a category is enabled — show errors instead of silent blanks.
   useEffect(() => {
     if (!tileOrigin || !infraManifest) return
@@ -275,7 +310,14 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
       const probeUrl = tileProxyHttpUrl(layer.tilesUrl, origin)
       if (!probeUrl) continue
 
+      setPmtilesProbePending((prev) => new Set(prev).add(layer.id))
+
       void runPmtilesHeadProbe(probeUrl).then((result) => {
+        setPmtilesProbePending((prev) => {
+          const next = new Set(prev)
+          next.delete(layer.id)
+          return next
+        })
         setPmtilesLayerErrors((prev) =>
           mergePmtilesHeadProbeResult(prev, layer.id, result),
         )
@@ -571,7 +613,15 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
                 }
 
                 // ── PMTiles source (default) ────────────────────────────────────
-                if (!shouldMountPmtilesInfraSource(layer.id, pmtilesLayerErrors)) return null
+                if (
+                  !shouldMountPmtilesInfraSource(
+                    layer.id,
+                    pmtilesLayerErrors,
+                    pmtilesProbePending,
+                  )
+                ) {
+                  return null
+                }
 
                 if (!tileOrigin) return null
 

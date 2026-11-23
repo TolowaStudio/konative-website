@@ -9,6 +9,12 @@ import {
 describe("PMTiles HEAD probe (TS-4170 visible error)", () => {
   const layerId = "ca_nrcan_transmission_lines";
 
+  it("withholds Source while probe is pending", () => {
+    const layerId = "ca_nrcan_transmission_lines";
+    const pending = new Set([layerId]);
+    expect(shouldMountPmtilesInfraSource(layerId, {}, pending)).toBe(false);
+  });
+
   it("403 HEAD produces banner entry and blocks PMTiles Source mount", async () => {
     const result = await runPmtilesHeadProbe(
       "https://konative.com/api/v1/tiles/tiles/v1/ca_nrcan_transmission_lines.pmtiles",

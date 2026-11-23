@@ -54,7 +54,8 @@ async function proxyTile(
     }
 
     return new NextResponse(upstream.body, { status: upstream.status, headers: out });
-  } catch {
+  } catch (err) {
+    console.error("[tiles-proxy] GCS fetch failed", err);
     return NextResponse.json({ error: "tile fetch failed" }, { status: 502 });
   }
 }
