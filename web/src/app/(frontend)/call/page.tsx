@@ -8,7 +8,6 @@ export const metadata: Metadata = {
   title: "Book a 15-Minute Discovery Call | Konative",
   description:
     "Book a 15-minute discovery call with the Konative team. We'll confirm project fit and outline next steps. No pitch deck, no obligation.",
-  alternates: { canonical: "/call" },
   openGraph: {
     title: "Book a 15-Minute Discovery Call | Konative",
     description:
@@ -16,6 +15,7 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/call`,
     images: [siteOpenGraphImage()],
   },
+  alternates: { canonical: "/call" },
 };
 
 const NAVY = "#08142D";
