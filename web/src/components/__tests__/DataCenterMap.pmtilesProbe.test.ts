@@ -2,7 +2,14 @@
 import { createElement } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { FeatureCollection } from "geojson";
 import type { LayerManifestEntry } from "@/types/map-layers";
+import {
+  KONATIVE_MAP_CARTO_BASEMAP_STYLE,
+  KONATIVE_MAP_PROJECTS_GEOJSON_SOURCE_ID,
+} from "@/lib/map/mapDisplayContract";
+
+let lastDcGeoJsonSource: FeatureCollection | undefined;
 
 vi.mock("maplibre-gl/dist/maplibre-gl.css", () => ({}));
 
@@ -21,16 +28,35 @@ vi.mock("maplibre-gl", () => ({
 vi.mock("react-map-gl/maplibre", () => {
   const React = require("react") as typeof import("react");
   return {
-    Map: ({ children }: { children?: React.ReactNode }) =>
+    Map: ({
+      children,
+      mapStyle,
+    }: {
+      children?: React.ReactNode;
+      mapStyle?: string;
+    }) =>
       React.createElement(
         "div",
-        { "data-testid": "konative-map" },
+        {
+          "data-testid": "konative-map",
+          "data-map-style": mapStyle,
+        },
         children,
       ),
-    Source: ({ id }: { id: string }) =>
-      React.createElement("div", {
+    Source: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data?: FeatureCollection;
+    }) => {
+      if (id === KONATIVE_MAP_PROJECTS_GEOJSON_SOURCE_ID) {
+        lastDcGeoJsonSource = data;
+      }
+      return React.createElement("div", {
         "data-testid": `map-source-${id}`,
-      }),
+      });
+    },
     Layer: () => null,
     Popup: () => null,
   };
@@ -55,8 +81,20 @@ const PMTILES_LAYER: LayerManifestEntry = {
   sourceType: "pmtiles",
 };
 
+const MOCK_PROJECT_FEATURE = {
+  type: "Feature" as const,
+  geometry: { type: "Point" as const, coordinates: [-96.5, 45.2] },
+  properties: { name: "Probe Test DC", layer: "projects", country: "US" },
+};
+
+const MOCK_PROJECTS: FeatureCollection = {
+  type: "FeatureCollection",
+  features: [MOCK_PROJECT_FEATURE],
+};
+
 describe("DataCenterMap PMTiles HEAD probe wiring", () => {
   beforeEach(() => {
+    lastDcGeoJsonSource = undefined;
     Object.defineProperty(window, "location", {
       configurable: true,
       value: new URL("http://localhost:3000/map"),
@@ -119,7 +157,7 @@ describe("DataCenterMap PMTiles HEAD probe wiring", () => {
     render(
       createElement(DataCenterMap, {
         layerData: {
-          projects: { type: "FeatureCollection", features: [] },
+          projects: MOCK_PROJECTS,
           facilities: { type: "FeatureCollection", features: [] },
           network: { type: "FeatureCollection", features: [] },
           power: { type: "FeatureCollection", features: [] },
@@ -133,6 +171,18 @@ describe("DataCenterMap PMTiles HEAD probe wiring", () => {
         },
         initialInfraEnabled: { power: true },
       }),
+    );
+
+    const mapEl = screen.getByTestId("konative-map");
+    expect(mapEl.getAttribute("data-map-style")).toBe(
+      KONATIVE_MAP_CARTO_BASEMAP_STYLE,
+    );
+    expect(
+      screen.getByTestId(`map-source-${KONATIVE_MAP_PROJECTS_GEOJSON_SOURCE_ID}`),
+    ).toBeTruthy();
+    expect(lastDcGeoJsonSource?.features.length).toBeGreaterThan(0);
+    expect(lastDcGeoJsonSource?.features[0]?.properties?.name).toBe(
+      "Probe Test DC",
     );
 
     await waitFor(
