@@ -41,7 +41,7 @@ const dealTypes = [
 const why = [
   { num: '01', head: 'Off-market sourcing', body: 'We find powered land before it reaches the broker network. Most of what we transact never gets listed.' },
   { num: '02', head: 'Principal-level access', body: 'Every investor relationship is handled by a Konative principal. No associates, no handoffs, no SDR queue.' },
-  { num: '03', head: 'Operator relationships', body: 'Terry Van Roekel leads revenue and strategic development. His network spans hyperscalers, REITs, and mission-critical developers across North America.' },
+  { num: '03', head: 'Operator relationships', body: 'Terry Van Roekel leads revenue and strategic development. His network spans hyperscalers, REITs, and mission-critical developers domestic and international, any market.' },
   { num: '04', head: 'Full-stack execution', body: 'We source, structure, and manage the deal — power analysis, due diligence, buyer matching, and close. One team, end to end.' },
 ]
 
@@ -98,7 +98,7 @@ export default function InvestPage() {
         }}>
           Konative sources, structures, and manages data center land investments for family offices,
           private equity, and infrastructure funds. Powered land, build-to-suit, and operating
-          assets across North America — mostly off-market.
+          assets domestic and international, any market — mostly off-market.
         </p>
       </div>
 

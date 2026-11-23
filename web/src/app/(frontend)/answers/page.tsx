@@ -41,7 +41,7 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     question: "How is Konative different from going directly to a carrier?",
     answer:
-      "When you contact a carrier directly, you are subject to the carrier's service area, capacity, and pricing. Konative connects you to 100+ carriers, suppliers, and infrastructure providers across North America, expanding your options dramatically. Most importantly, Konative acts as your advocate, not the carrier's. We negotiate on your behalf, source competitive quotes, manage implementation logistics, and handle troubleshooting. There is zero cost to you for this service — Konative is paid only when a service is provisioned. Direct carrier relationships are valuable, but they leave you exposed to single-provider constraints and pricing power. Konative layers on choice, competition, and dedicated advocacy.",
+      "When you contact a carrier directly, you are subject to the carrier's service area, capacity, and pricing. Konative connects you to 100+ carriers, suppliers, and infrastructure providers domestic and international, any market, expanding your options dramatically. Most importantly, Konative acts as your advocate, not the carrier's. We negotiate on your behalf, source competitive quotes, manage implementation logistics, and handle troubleshooting. There is zero cost to you for this service — Konative is paid only when a service is provisioned. Direct carrier relationships are valuable, but they leave you exposed to single-provider constraints and pricing power. Konative layers on choice, competition, and dedicated advocacy.",
     category: "Connectivity Brokerage",
   },
   {
@@ -53,7 +53,7 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     question: "What connectivity services do you broker?",
     answer:
-      "Konative brokers a comprehensive range of connectivity and colocation services: internet connectivity (broadband and dark fiber), transport (MPLS, Ethernet, wavelengths), SD-WAN and managed services, colocation and rack space, cross-connects and direct port access, cloud on-ramps (AWS, Azure, GCP direct connect), interconnection services, and last-mile fiber installation. We source these services from carriers, regional providers, edge colocation facilities, and technology platforms across the US and Canada. For tribal and rural markets, we specialize in identifying non-traditional suppliers and infrastructure assets that mainstream brokers overlook.",
+      "Konative brokers a comprehensive range of connectivity and colocation services: internet connectivity (broadband and dark fiber), transport (MPLS, Ethernet, wavelengths), SD-WAN and managed services, colocation and rack space, cross-connects and direct port access, cloud on-ramps (AWS, Azure, GCP direct connect), interconnection services, and last-mile fiber installation. We source these services from carriers, regional providers, edge colocation facilities, and technology platforms domestic and international, any market. For tribal and rural markets, we specialize in identifying non-traditional suppliers and infrastructure assets that mainstream brokers overlook.",
     category: "Connectivity Brokerage",
   },
   {

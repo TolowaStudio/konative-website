@@ -332,7 +332,7 @@ export default function ConnectivityPage() {
         <PitchSection eyebrow="Infrastructure Data" heading="Backed by real infrastructure data">
           <p style={{ fontFamily: BODY, fontSize: 16, lineHeight: 1.75, color: MUTED, maxWidth: 720, marginBottom: 36 }}>
             Konative&apos;s brokerage is grounded in a proprietary infrastructure map — power, transmission,
-            interconnection, and indigenous-lands layers across the US and Canada. This is the data engine behind
+            interconnection, and indigenous-lands layers domestic and international, any market. This is the data engine behind
             how we assess carrier reach and infrastructure context for every engagement.
           </p>
           <MapEmbed

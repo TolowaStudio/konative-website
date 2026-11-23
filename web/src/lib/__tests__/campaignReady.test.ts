@@ -6,6 +6,10 @@ import {
 } from "node:fs";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import {
+  CONTACT_CAL_PROFILE,
+  revivedKonativeDiscoveryCal,
+} from "@/lib/qa/campaignPublicCopy";
 import { SITE_OG_IMAGE_PATH } from "@/lib/seo/siteOpenGraph";
 
 const webRoot = process.cwd();
@@ -128,6 +132,21 @@ describe("campaign-ready public surface (TS-4169)", () => {
     ]) {
       const contents = readFileSync(resolve(webRoot, path), "utf8");
       expect(contents, path).toContain(CAL_URL);
+    }
+  });
+
+  it("preserves the Cal.com contact profile link and does not revive konative/discovery", () => {
+    const contact = readFileSync(
+      resolve(webRoot, "src/app/(frontend)/contact/page.tsx"),
+      "utf8",
+    );
+    expect(contact).toContain(CONTACT_CAL_PROFILE);
+
+    const srcRoot = resolve(webRoot, "src");
+    const files = walkSourceFiles(srcRoot);
+    for (const file of files) {
+      const contents = readFileSync(file, "utf8");
+      expect(contents, file).not.toMatch(revivedKonativeDiscoveryCal);
     }
   });
 
