@@ -15,4 +15,11 @@ describe("toGcsObjectKey", () => {
   it("rejects traversal", () => {
     expect(toGcsObjectKey(["tiles", "v1", "..", "secret.pmtiles"])).toBeNull();
   });
+
+  it("rejects nested paths under tiles/v1", () => {
+    expect(
+      toGcsObjectKey(["tiles", "v1", "sub", "nested.pmtiles"]),
+    ).toBeNull();
+    expect(toGcsObjectKey(["tiles", "v1", ""])).toBeNull();
+  });
 });

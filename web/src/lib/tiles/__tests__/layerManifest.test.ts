@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { LayerManifest, LayerManifestEntry } from "@/types/map-layers";
+import { MAP_HIDDEN_LAYER_IDS } from "../constants";
 import {
   isLayerVisibleOnMap,
   mergeLayerManifests,
@@ -46,14 +47,18 @@ describe("isLayerVisibleOnMap", () => {
   });
 
   it("hides the seven unwired layer ids", () => {
-    expect(isLayerVisibleOnMap(layer({ id: "vi-fiber", sourceType: "geojson", tilesUrl: "" }))).toBe(
-      false,
-    );
-    expect(
-      isLayerVisibleOnMap(
-        layer({ id: "politics_governors", sourceType: "geojson", tilesUrl: "" }),
-      ),
-    ).toBe(false);
+    expect(MAP_HIDDEN_LAYER_IDS.size).toBe(7);
+    for (const id of MAP_HIDDEN_LAYER_IDS) {
+      expect(
+        isLayerVisibleOnMap(
+          layer({
+            id,
+            sourceType: "geojson",
+            tilesUrl: "/tiles/v1/would_show_if_not_hidden.pmtiles",
+          }),
+        ),
+      ).toBe(false);
+    }
   });
 });
 

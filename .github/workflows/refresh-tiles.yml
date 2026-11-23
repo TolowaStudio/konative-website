@@ -43,18 +43,14 @@ env:
 jobs:
 
   gate:
-    name: GCS tiles preflight (TOL-316)
+    name: Blocked — legacy R2 upload jobs (TOL-316)
     runs-on: ubuntu-latest
     steps:
-      - uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
-      - uses: google-github-actions/setup-gcloud@v2
-      - name: Verify bucket
+      - name: Fail fast — do not run R2 upload jobs
         run: |
-          gcloud storage buckets describe "gs://${GCS_TILES_BUCKET}" --project="${GCP_PROJECT}"
-          echo "GCS bucket ready — downstream jobs still use legacy R2 upload steps until migrated job-by-job."
+          echo "::error::refresh-tiles.yml downstream jobs still upload to retired R2. Gate must fail until each job is migrated to GCS (see scripts/upload-tiles-gcs.sh)."
+          echo "::error::Do not re-enable R2 secrets (R2_BUCKET_NAME, R2_PUBLIC_URL) or restore R2 upload steps."
+          exit 1
 
   # ── 1. CWFIS fire weather zones ─────────────────────────────────────────────
   cwfis:

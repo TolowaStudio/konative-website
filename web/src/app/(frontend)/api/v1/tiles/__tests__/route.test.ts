@@ -58,4 +58,37 @@ describe("/api/v1/tiles GCS proxy", () => {
       expect.objectContaining({ method: "HEAD" }),
     );
   });
+
+  it("proxies GET with Range and returns 206 with Content-Range", async () => {
+    mocks.fetchGcsObject.mockResolvedValue(
+      new Response(new Uint8Array([1, 2, 3]), {
+        status: 206,
+        headers: {
+          "Content-Range": "bytes 0-2/12345",
+          "Content-Length": "3",
+          "Accept-Ranges": "bytes",
+        },
+      }),
+    );
+
+    const { GET } = await loadHandlers();
+    const req = new NextRequest(
+      "http://localhost/api/v1/tiles/tiles/v1/ca_nrcan_transmission_lines.pmtiles",
+      {
+        headers: { Range: "bytes=0-2" },
+      },
+    );
+    const res = await GET(req, {
+      params: Promise.resolve({
+        path: ["tiles", "v1", "ca_nrcan_transmission_lines.pmtiles"],
+      }),
+    });
+
+    expect(res.status).toBe(206);
+    expect(res.headers.get("Content-Range")).toBe("bytes 0-2/12345");
+    expect(mocks.fetchGcsObject).toHaveBeenCalledWith(
+      "tiles/v1/ca_nrcan_transmission_lines.pmtiles",
+      expect.objectContaining({ method: "GET", range: "bytes=0-2" }),
+    );
+  });
 });

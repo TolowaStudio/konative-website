@@ -16,6 +16,11 @@ import LayerControlPanel from './LayerControlPanel'
 import MapSearchBar from './MapSearchBar'
 import MapReadout from './MapReadout'
 import DemoViews from './DemoViews'
+import {
+  PMTILES_ERROR_BANNER_HEADING,
+  pmtilesProbeErrorFromHttpStatus,
+  pmtilesProbeNetworkErrorMessage,
+} from '@/lib/tiles/pmtilesProbe'
 import { resolveTileUrl, tileProxyHttpUrl } from '@/lib/tiles/resolveTileUrl'
 
 // ── types ─────────────────────────────────────────────────────────────────────
@@ -278,13 +283,13 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
           }
           setPmtilesLayerErrors((prev) => ({
             ...prev,
-            [layer.id]: `Layer unavailable (HTTP ${res.status})`,
+            [layer.id]: pmtilesProbeErrorFromHttpStatus(res.status),
           }))
         })
         .catch(() => {
           setPmtilesLayerErrors((prev) => ({
             ...prev,
-            [layer.id]: 'Layer unavailable (network error)',
+            [layer.id]: pmtilesProbeNetworkErrorMessage(),
           }))
         })
     }
@@ -740,7 +745,7 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
           boxShadow: '0 8px 24px rgba(17,24,39,0.12)',
         }}>
           <div style={{ fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#dc2626', marginBottom: 8 }}>
-            Infrastructure overlay unavailable
+            {PMTILES_ERROR_BANNER_HEADING}
           </div>
           <ul style={{ margin: 0, paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
             {Object.entries(pmtilesLayerErrors).map(([id, message]) => (

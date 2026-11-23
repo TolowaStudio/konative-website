@@ -17,12 +17,12 @@ export function toGcsObjectKey(pathSegments: string[]): string | null {
   }
 
   if (
-    pathSegments.length >= 3 &&
+    pathSegments.length === 3 &&
     pathSegments[0] === "tiles" &&
     pathSegments[1] === "v1"
   ) {
-    const filename = pathSegments[pathSegments.length - 1] ?? "";
-    if (!PMTILES_NAME.test(filename)) return null;
+    const filename = pathSegments[2] ?? "";
+    if (!filename || !PMTILES_NAME.test(filename)) return null;
     return joined;
   }
 
