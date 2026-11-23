@@ -15,7 +15,7 @@ const BODY = "'Inter', sans-serif";
 export const metadata: Metadata = {
   title: "Tribal & First Nations Data Center Tracker | Konative",
   description:
-    "Searchable registry of tribal and First Nations data center projects domestic and international, any market — status, partner equity, interconnect relevance, and political outcomes.",
+    "Searchable registry of tribal and First Nations data center projects across the US and Canada — status, partner equity, interconnect relevance, and political outcomes.",
   alternates: { canonical: "/tribal/projects" },
   openGraph: {
     title: "Tribal & First Nations Data Center Tracker | Konative",

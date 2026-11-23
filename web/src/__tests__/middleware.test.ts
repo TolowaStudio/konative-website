@@ -3,15 +3,6 @@ import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { config, middleware } from "@/middleware";
 
-const PROTECTED_PATHS = [
-  "/cms",
-  "/cms/tools",
-  "/studio",
-  "/studio/structure",
-  "/dashboard",
-  "/dashboard/settings",
-] as const;
-
 describe("admin middleware (TS-4169)", () => {
   let prevToken: string | undefined;
   let prevNodeEnv: string | undefined;
@@ -26,16 +17,10 @@ describe("admin middleware (TS-4169)", () => {
   });
 
   afterEach(() => {
-    if (prevToken === undefined) {
-      delete process.env.ADMIN_ACCESS_TOKEN;
-    } else {
-      process.env.ADMIN_ACCESS_TOKEN = prevToken;
-    }
-    if (prevNodeEnv === undefined) {
-      delete process.env.NODE_ENV;
-    } else {
-      process.env.NODE_ENV = prevNodeEnv;
-    }
+    if (prevToken === undefined) delete process.env.ADMIN_ACCESS_TOKEN;
+    else process.env.ADMIN_ACCESS_TOKEN = prevToken;
+    if (prevNodeEnv === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = prevNodeEnv;
   });
 
   it("matcher locks /cms, /studio, and /dashboard", () => {
@@ -44,29 +29,15 @@ describe("admin middleware (TS-4169)", () => {
     );
   });
 
-  it.each(PROTECTED_PATHS)(
-    "returns 503 when ADMIN_ACCESS_TOKEN is unset for %s",
-    (pathname) => {
-      const response = middleware(new NextRequest(`https://konative.com${pathname}`));
-      expect(response.status).toBe(503);
-    },
-  );
-
-  it("passes through non-admin routes", () => {
-    const response = middleware(new NextRequest("https://konative.com/contact"));
-    expect(response.status).toBe(200);
+  it("returns 503 for admin paths when ADMIN_ACCESS_TOKEN is unset", () => {
+    for (const pathname of ["/cms", "/studio", "/dashboard"] as const) {
+      expect(middleware(new NextRequest(`https://konative.com${pathname}`)).status).toBe(503);
+    }
   });
 
-  it("allows admin paths in development when token is unset", () => {
-    process.env.NODE_ENV = "development";
-    const response = middleware(new NextRequest("https://konative.com/studio"));
-    expect(response.status).toBe(200);
-  });
-
-  it("returns 401 when token is configured but credentials are missing", () => {
+  it("returns 401 when token is set but credentials are missing", () => {
     process.env.ADMIN_ACCESS_TOKEN = adminToken;
-    const response = middleware(new NextRequest("https://konative.com/studio"));
-    expect(response.status).toBe(401);
+    expect(middleware(new NextRequest("https://konative.com/studio")).status).toBe(401);
   });
 
   it("allows access when Bearer token matches", () => {

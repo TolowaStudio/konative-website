@@ -121,7 +121,7 @@ export default function AssessmentPage() {
               color: 'rgba(255,255,255,0.45)', marginBottom: 36,
             }}>
               Built by the team that has developed mission-critical data center
-              projects — domestic and international, any market. Takes under 10 minutes. Get a scored
+              projects across North America. Takes under 10 minutes. Get a scored
               readiness report you can act on.
             </p>
 

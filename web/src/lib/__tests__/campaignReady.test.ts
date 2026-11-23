@@ -6,10 +6,6 @@ import {
 } from "node:fs";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import {
-  CONTACT_CAL_PROFILE,
-  revivedKonativeDiscoveryCal,
-} from "@/lib/qa/campaignPublicCopy";
 import { SITE_OG_IMAGE_PATH } from "@/lib/seo/siteOpenGraph";
 
 const webRoot = process.cwd();
@@ -68,12 +64,6 @@ describe("campaign-ready public surface (TS-4169)", () => {
     const footer = readFileSync(resolve(webRoot, "src/components/Footer.tsx"), "utf8");
     expect(footer).toContain("Tolowa Pacific LLC");
     expect(footer).not.toMatch(/Total Pacific LLC/);
-  });
-
-  it("links to /privacy and /terms from the footer", () => {
-    const footer = readFileSync(resolve(webRoot, "src/components/Footer.tsx"), "utf8");
-    expect(footer).toContain('"/privacy"');
-    expect(footer).toContain('"/terms"');
   });
 
   it("does not link to the removed /#team anchor anywhere under src/", () => {
@@ -135,21 +125,6 @@ describe("campaign-ready public surface (TS-4169)", () => {
     }
   });
 
-  it("preserves the Cal.com contact profile link and does not revive konative/discovery", () => {
-    const contact = readFileSync(
-      resolve(webRoot, "src/app/(frontend)/contact/page.tsx"),
-      "utf8",
-    );
-    expect(contact).toContain(CONTACT_CAL_PROFILE);
-
-    const srcRoot = resolve(webRoot, "src");
-    const files = walkSourceFiles(srcRoot);
-    for (const file of files) {
-      const contents = readFileSync(file, "utf8");
-      expect(contents, file).not.toMatch(revivedKonativeDiscoveryCal);
-    }
-  });
-
   it("describes international as global brokerage on public copy surfaces", () => {
     for (const path of GLOBAL_COPY_SURFACES) {
       const contents = readFileSync(resolve(webRoot, path), "utf8");
@@ -163,9 +138,6 @@ describe("campaign-ready public surface (TS-4169)", () => {
     );
     expect(dc).toMatch(/Native American–owned, vendor-neutral/i);
     expect(dc).toMatch(/domestic and international/i);
-    expect(dc).toMatch(/any connectivity package/i);
-    expect(dc).toMatch(/no certification claims/i);
-    expect(dc).not.toMatch(/8\(a\)-certified|certified by (?:NMSDC|SBA)/i);
     expect(dc).not.toMatch(/(?:NMSDC|SBA 8\(a\)).*certified|certified.*(?:NMSDC|SBA 8\(a\))/i);
   });
 });

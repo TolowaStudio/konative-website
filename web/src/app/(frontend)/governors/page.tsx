@@ -3,7 +3,7 @@ import GovernorMapClient from './GovernorMapClient'
 
 export const metadata: Metadata = {
   title: 'Market Signals — Stalled Data Center Projects & Tribal Brief | Konative',
-  description: 'A Konative market-signal brief for stalled data center projects, governors, and Tribal / First Nations data-center context domestic and international, any market.',
+  description: 'A Konative market-signal brief for stalled data center projects, governors, and Tribal / First Nations data-center context across North America.',
 }
 
 export default function GovernorsPage() {

@@ -42,7 +42,7 @@ const FAQ_ITEMS = [
   {
     question: "What services does Konative broker for Tribal enterprises?",
     answer:
-      "Konative brokers the full enterprise connectivity stack for Tribal organizations: dedicated internet access (DIA), SD-WAN, lit and dark fiber, middle-mile and last-mile transport, UCaaS and hosted voice, cloud connectivity (AWS Direct Connect, Azure ExpressRoute, Google Interconnect), managed security and SASE, mobility and fixed wireless, and colocation access. All sourced through Avant's portfolio of 100+ suppliers — domestic and international, any market.", // VERIFY: \"100+\" supplier count — verify current number at avant.com
+      "Konative brokers the full enterprise connectivity stack for Tribal organizations: dedicated internet access (DIA), SD-WAN, lit and dark fiber, middle-mile and last-mile transport, UCaaS and hosted voice, cloud connectivity (AWS Direct Connect, Azure ExpressRoute, Google Interconnect), managed security and SASE, mobility and fixed wireless, and colocation access. All sourced through Avant's portfolio of 100+ suppliers across the US and Canada.", // VERIFY: \"100+\" supplier count — verify current number at avant.com
   },
   {
     question: "What is the NTIA Tribal Broadband Connectivity Program (TBCP)?",
@@ -67,7 +67,7 @@ const FAQ_ITEMS = [
   {
     question: "What is Avant and why does it matter for Tribal connectivity?",
     answer:
-      "Avant is a leading global technology services distributor. As an Avant sub-agent, Konative has access to Avant's portfolio of 100+ carriers and cloud providers — domestic and international, any market. That means Tribal buyers get quotes from the whole market — not just the two or three suppliers that happen to knock on the door — normalized and compared by an advisor who works for the Tribe, not the carrier.", // VERIFY: \"100+\" supplier count — verify current number at avant.com
+      "Avant is North America's largest technology services distributor. As an Avant sub-agent, Konative has access to Avant's portfolio of 100+ carriers and cloud providers across North America. That means Tribal buyers get quotes from the whole market — not just the two or three suppliers that happen to knock on the door — normalized and compared by an advisor who works for the Tribe, not the carrier.", // VERIFY: \"100+\" supplier count — verify current number at avant.com
   },
   {
     question: "How do I get started with Konative for a Tribal connectivity project?",
@@ -378,7 +378,7 @@ export default function TribalPage() {
               {
                 num: "02",
                 title: "100+ suppliers via Avant", // VERIFY: \"100+\" supplier count — verify current number at avant.com
-                body: "As an Avant sub-agent, Konative accesses a leading global technology services distributor portfolio — 100+ carriers, cloud providers, and managed service vendors domestic and international, any market.",
+                body: "As an Avant sub-agent, Konative accesses North America's largest technology services distributor portfolio — 100+ carriers, cloud providers, and managed service vendors across the US and Canada.",
               },
               {
                 num: "03",
@@ -468,14 +468,14 @@ export default function TribalPage() {
         <PitchSection eyebrow="Infrastructure Data" heading="Mapped to sovereign and rural ground">
           <p style={{ fontFamily: BODY, fontSize: 16, lineHeight: 1.75, color: MUTED, maxWidth: 720, marginBottom: 36 }}>
             Konative maintains a proprietary infrastructure map with indigenous-lands, broadband, power, and
-            transmission layers in domestic and international markets — the geographic intelligence behind our Tribal
+            transmission layers across the US and Canada — the geographic intelligence behind our Tribal
             connectivity work. Explore the full interactive map to see sovereign lands and infrastructure context
             in one view.
           </p>
           <MapEmbed
             readout={false}
             height={460}
-            caption="Indigenous lands, broadband, power and transmission layers domestic and international, any market." /* VERIFY */
+            caption="Indigenous lands, broadband, power and transmission layers across the US and Canada." /* VERIFY */
           />
           <div style={{ marginTop: 20 }}>
             <Link

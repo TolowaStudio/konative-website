@@ -68,7 +68,7 @@ const sections = [
     label: "Tribal Index",
     eyebrow: "Proprietary Tracker",
     headline: "Tribal & First Nations DC project index",
-    summary: "Searchable index of Tribal and First Nations data-center projects domestic and international, any market — partner structures, land type, opportunity class, and current status.",
+    summary: "Searchable index of Tribal and First Nations data-center projects across the US and Canada — partner structures, land type, opportunity class, and current status.",
   },
   {
     href: "/map",
