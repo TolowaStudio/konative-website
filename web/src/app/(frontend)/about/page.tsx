@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { JsonLd, SITE_URL, breadcrumbSchema, faqSchema } from "@/components/seo/JsonLd";
+import { siteOpenGraphImage } from "@/lib/seo/siteOpenGraph";
 
 export const revalidate = 3600;
 
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
       "Native-owned AVANT desk for Tribal enterprises and data-center builds — published benchmarks and a written sovereignty commitment.",
     url: `${SITE_URL}/about`,
     type: "profile",
+    images: [siteOpenGraphImage()],
   },
 };
 

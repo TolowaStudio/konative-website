@@ -10,19 +10,21 @@ import {
   dataCenterConnectivityServiceSchema,
   SITE_URL,
 } from "@/components/seo/JsonLd";
+import { siteOpenGraphImage } from "@/lib/seo/siteOpenGraph";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Data Center Connectivity Broker | Transport, Dark Fiber & Interconnection | Konative",
   description:
-    "Nearby fiber is not deliverable fiber. Konative is a vendor-neutral data-center connectivity broker — an Avant sub-agent that proves multi-path deliverability for mid-build sites and sources laterals, waves, DIA, DCI, and cloud on-ramps. No cost to you.",
+    "Native American–owned, vendor-neutral data-center connectivity broker — domestic and international. Konative assembles any connectivity package and proves multi-path deliverability for mid-build sites. No certification claims; suppliers pay us.",
   alternates: { canonical: "/data-center-connectivity" },
   openGraph: {
     title: "Data Center Connectivity Broker | Transport, Dark Fiber & Interconnection | Konative",
     description:
       "Nearby fiber is not deliverable fiber. Konative proves multi-path deliverability for mid-build sites and sources laterals, waves, DIA, DCI, and cloud on-ramps — suppliers pay us.",
     url: `${SITE_URL}/data-center-connectivity`,
+    images: [siteOpenGraphImage()],
   },
 };
 
@@ -319,7 +321,7 @@ export default function DataCenterConnectivityPage() {
           { text: "DELIVERABLE", tone: "rust" },
           { text: "FIBER.", tone: "white" },
         ]}
-        subhead="Konative maps which carriers can actually reach your mid-build site — laterals, waves, DIA, DCI, and physical diversity — before the schedule slips. Vendor-neutral AVANT sub-agent. Suppliers pay us; you get a one-page market brief, then a competitive quote set."
+        subhead="Konative is a Native American–owned, vendor-neutral connectivity broker. We put together any connectivity package — domestic and international, any market — and map which carriers can actually reach your mid-build site before the schedule slips. No SBA 8(a), NMSDC, or other certification claims beyond ownership. Suppliers pay us; you get a one-page market brief, then a competitive quote set."
         primaryCta={{ label: "Get a One-Page Site Brief →", href: "/contact?projectType=data_center#request" }}
         secondaryCta={{ label: "Lateral Cost Estimator →", href: "/tools/lateral-estimator" }}
         heroImage={{
@@ -335,8 +337,8 @@ export default function DataCenterConnectivityPage() {
         <PitchSection eyebrow="What We Broker" heading="Connectivity into the facility">
           <p style={{ fontFamily: BODY, fontSize: 16, lineHeight: 1.75, color: MUTED, maxWidth: 720, marginBottom: 36 }}>
             Konative sources and manages every network layer a data center or campus requires — from long-haul
-            transport and dark fiber to cross-connects and cloud on-ramps. One vendor-neutral broker, the whole carrier
-            market, no supplier bias.
+            transport and dark fiber to cross-connects and cloud on-ramps — across domestic and international markets.
+            One vendor-neutral broker, the whole carrier market, no supplier bias.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 16 }}>
             {[

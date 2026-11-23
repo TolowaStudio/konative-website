@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JsonLd, serviceSchema, SITE_URL } from "@/components/seo/JsonLd";
+import { siteOpenGraphImage } from "@/lib/seo/siteOpenGraph";
 
 export const revalidate = 3600;
 
@@ -12,6 +13,8 @@ export const metadata: Metadata = {
     title: "Book a 15-Minute Discovery Call | Konative",
     description:
       "Book a 15-minute discovery call with the Konative team. We'll confirm project fit and outline next steps.",
+    url: `${SITE_URL}/call`,
+    images: [siteOpenGraphImage()],
   },
 };
 

@@ -28,14 +28,14 @@ export default function HomePage() {
               Source the network behind <span style={{ color: RED }}>critical infrastructure.</span>
             </h1>
             <p className="home-hero-copy" style={{ maxWidth: 680, color: "rgba(255,255,255,.72)", fontSize: 18, lineHeight: 1.7, marginBottom: 36 }}>
-              Konative is a vendor-neutral, sovereignty-aware brokerage for tribal and rural enterprises, Indigenous partners, and data-center teams across the United States and Canada. We use public data, maps, awards, and market signals to source internet, fiber, transport, cloud, voice, security, colocation, and interconnection.
+              Konative is a vendor-neutral, sovereignty-aware connectivity brokerage for tribal and rural enterprises, Indigenous partners, and data-center teams — domestic and international, any market. We use public data, maps, awards, and market signals to source internet, fiber, transport, cloud, voice, security, colocation, and interconnection worldwide.
             </p>
             <div className="home-hero-actions" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <Link href="/call" style={primary}>Book a connectivity review</Link>
               <Link href="/tribal/grants" style={secondary}>TBCP 3 / NEGP awardees</Link>
             </div>
             <div className="home-signal-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", maxWidth: 800, marginTop: 48, border: "1px solid rgba(255,255,255,.15)" }}>
-              {["Tribal + rural", "Data-center connectivity", "US + Canada", "Map-backed sourcing"].map(x => <div key={x} style={{ padding: "16px 18px", color: "#fff", fontSize: 11, fontWeight: 700, letterSpacing: ".11em", textTransform: "uppercase", borderRight: "1px solid rgba(255,255,255,.12)" }}>{x}</div>)}
+              {["Tribal + rural", "Data-center connectivity", "Domestic + international", "Map-backed sourcing"].map(x => <div key={x} style={{ padding: "16px 18px", color: "#fff", fontSize: 11, fontWeight: 700, letterSpacing: ".11em", textTransform: "uppercase", borderRight: "1px solid rgba(255,255,255,.12)" }}>{x}</div>)}
             </div>
           </div>
           <div className="home-hero-map" style={{ minHeight: 520, border: "1px solid rgba(255,255,255,.16)", background: "rgba(255,255,255,.04)", boxShadow: "0 28px 80px rgba(0,0,0,.32)", position: "relative", overflow: "hidden" }}>

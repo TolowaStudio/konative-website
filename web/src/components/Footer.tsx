@@ -20,7 +20,7 @@ export default function Footer() {
               <span style={{ color: RED }}>NATIVE</span>
             </Link>
             <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13, lineHeight: 1.7, color: MUTED, maxWidth: 330 }}>
-              Native-owned, vendor-neutral connectivity brokerage for data centers under construction and Tribal enterprises across North America. Nearby fiber is not deliverable fiber.
+              Native-owned, vendor-neutral connectivity brokerage — domestic and international, any market — for data centers, Tribal enterprises, and infrastructure buyers. Nearby fiber is not deliverable fiber.
             </p>
             <Link href="/call" style={{ display: "inline-block", marginTop: 18, background: RED, color: "#fff", padding: "12px 18px", textDecoration: "none", fontFamily: "Inter, sans-serif", fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase" }}>
               Book a call
@@ -55,6 +55,8 @@ export default function Footer() {
             links={[
               ["About — Native-owned", "/about"],
               ["Contact", "/contact"],
+              ["Privacy", "/privacy"],
+              ["Terms", "/terms"],
               ["Data Sources", "/licenses"],
               ["Book a call", "https://cal.com/jeramey-james/15min"],
             ]}
