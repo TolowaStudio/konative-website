@@ -17,10 +17,15 @@ import MapSearchBar from './MapSearchBar'
 import MapReadout from './MapReadout'
 import DemoViews from './DemoViews'
 import {
-  PMTILES_ERROR_BANNER_HEADING,
-  pmtilesProbeErrorFromHttpStatus,
-  pmtilesProbeNetworkErrorMessage,
-} from '@/lib/tiles/pmtilesProbe'
+  KONATIVE_MAP_CARTO_BASEMAP_STYLE,
+  KONATIVE_MAP_PROJECTS_GEOJSON_SOURCE_ID,
+} from '@/lib/map/mapDisplayContract'
+import {
+  mergePmtilesHeadProbeResult,
+  runPmtilesHeadProbe,
+  shouldMountPmtilesInfraSource,
+} from '@/lib/tiles/pmtilesLayerProbe'
+import { PMTILES_ERROR_BANNER_HEADING } from '@/lib/tiles/pmtilesProbe'
 import { resolveTileUrl, tileProxyHttpUrl } from '@/lib/tiles/resolveTileUrl'
 
 // ── types ─────────────────────────────────────────────────────────────────────
@@ -270,28 +275,11 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
       const probeUrl = tileProxyHttpUrl(layer.tilesUrl, origin)
       if (!probeUrl) continue
 
-      fetch(probeUrl, { method: 'HEAD' })
-        .then((res) => {
-          if (res.ok) {
-            setPmtilesLayerErrors((prev) => {
-              if (!prev[layer.id]) return prev
-              const next = { ...prev }
-              delete next[layer.id]
-              return next
-            })
-            return
-          }
-          setPmtilesLayerErrors((prev) => ({
-            ...prev,
-            [layer.id]: pmtilesProbeErrorFromHttpStatus(res.status),
-          }))
-        })
-        .catch(() => {
-          setPmtilesLayerErrors((prev) => ({
-            ...prev,
-            [layer.id]: pmtilesProbeNetworkErrorMessage(),
-          }))
-        })
+      void runPmtilesHeadProbe(probeUrl).then((result) => {
+        setPmtilesLayerErrors((prev) =>
+          mergePmtilesHeadProbeResult(prev, layer.id, result),
+        )
+      })
     }
   }, [infraManifest, effectiveInfraEnabled, tileOrigin])
 
@@ -441,7 +429,7 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
       <Map
         ref={mapRef}
         initialViewState={{ longitude: initialCenter?.[0] ?? -96, latitude: initialCenter?.[1] ?? 45, zoom: initialZoom ?? 3.2 }}
-        mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+        mapStyle={KONATIVE_MAP_CARTO_BASEMAP_STYLE}
         interactiveLayerIds={backgroundMode ? [] : [
           'dc-bubbles',
           ...((['indigenous', 'exclusions', 'land-use'] as LayerCategory[]).flatMap(cat =>
@@ -463,7 +451,7 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
         attributionControl={backgroundMode ? false : { compact: true }}
         style={{ width: '100%', height: '100%' }}
       >
-        <Source id="dc" type="geojson" data={combined}>
+        <Source id={KONATIVE_MAP_PROJECTS_GEOJSON_SOURCE_ID} type="geojson" data={combined}>
           {showHeatmap && (
             <Layer
               id="dc-heat"
@@ -583,8 +571,7 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
                 }
 
                 // ── PMTiles source (default) ────────────────────────────────────
-                const layerError = pmtilesLayerErrors[layer.id]
-                if (layerError) return null
+                if (!shouldMountPmtilesInfraSource(layer.id, pmtilesLayerErrors)) return null
 
                 if (!tileOrigin) return null
 

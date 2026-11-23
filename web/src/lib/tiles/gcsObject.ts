@@ -5,9 +5,16 @@ const auth = new GoogleAuth({
   scopes: ["https://www.googleapis.com/auth/devstorage.read_only"],
 });
 
-function gcsMediaUrl(bucket: string, objectKey: string): string {
-  const encoded = objectKey.split("/").map(encodeURIComponent).join("%2F");
-  return `https://storage.googleapis.com/storage/v1/b/${encodeURIComponent(bucket)}/o/${encoded}?alt=media`;
+/**
+ * Authenticated XML API object URL — supports Range + 206 (JSON ?alt=media does not).
+ * @see https://cloud.google.com/storage/docs/xml-api/get-object-download
+ */
+export function gcsXmlObjectUrl(bucket: string, objectKey: string): string {
+  const objectPath = objectKey
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+  return `https://storage.googleapis.com/${encodeURIComponent(bucket)}/${objectPath}`;
 }
 
 export function tilesBucketName(): string {
@@ -24,7 +31,7 @@ export async function fetchGcsObject(
   options: GcsFetchOptions = {},
 ): Promise<Response> {
   const bucket = tilesBucketName();
-  const url = gcsMediaUrl(bucket, objectKey);
+  const url = gcsXmlObjectUrl(bucket, objectKey);
   const client = await auth.getClient();
   const token = await client.getAccessToken();
   if (!token.token) {

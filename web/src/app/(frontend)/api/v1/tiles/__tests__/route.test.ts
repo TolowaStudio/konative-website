@@ -86,9 +86,30 @@ describe("/api/v1/tiles GCS proxy", () => {
 
     expect(res.status).toBe(206);
     expect(res.headers.get("Content-Range")).toBe("bytes 0-2/12345");
+    expect(res.headers.get("Cache-Control")).toContain("max-age=86400");
     expect(mocks.fetchGcsObject).toHaveBeenCalledWith(
       "tiles/v1/ca_nrcan_transmission_lines.pmtiles",
       expect.objectContaining({ method: "GET", range: "bytes=0-2" }),
     );
+  });
+
+  it("does not cache upstream 403 responses", async () => {
+    mocks.fetchGcsObject.mockResolvedValue(
+      new Response(null, { status: 403 }),
+    );
+
+    const { HEAD } = await loadHandlers();
+    const req = new NextRequest(
+      "http://localhost/api/v1/tiles/tiles/v1/missing.pmtiles",
+      { method: "HEAD" },
+    );
+    const res = await HEAD(req, {
+      params: Promise.resolve({
+        path: ["tiles", "v1", "missing.pmtiles"],
+      }),
+    });
+
+    expect(res.status).toBe(403);
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
   });
 });

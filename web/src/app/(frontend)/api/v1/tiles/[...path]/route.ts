@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchGcsObject } from "@/lib/tiles/gcsObject";
+import { tileProxyCacheControl } from "@/lib/tiles/tileCachePolicy";
 import { toGcsObjectKey } from "@/lib/tiles/proxyPath";
 
 export const dynamic = "force-dynamic";
@@ -26,10 +27,7 @@ function passthroughHeaders(upstream: Response, out: Headers): void {
   if (!out.get("Content-Type")) {
     out.set("Content-Type", "application/vnd.pmtiles");
   }
-  out.set(
-    "Cache-Control",
-    "public, max-age=86400, stale-while-revalidate=3600",
-  );
+  out.set("Cache-Control", tileProxyCacheControl(upstream.status));
 }
 
 async function proxyTile(
