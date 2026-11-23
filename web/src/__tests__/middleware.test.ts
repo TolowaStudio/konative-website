@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { config, middleware } from "@/middleware";
@@ -14,10 +15,12 @@ const PROTECTED_PATHS = [
 describe("admin middleware (TS-4169)", () => {
   let prevToken: string | undefined;
   let prevNodeEnv: string | undefined;
+  let adminToken: string;
 
   beforeEach(() => {
     prevToken = process.env.ADMIN_ACCESS_TOKEN;
     prevNodeEnv = process.env.NODE_ENV;
+    adminToken = randomUUID();
     delete process.env.ADMIN_ACCESS_TOKEN;
     process.env.NODE_ENV = "production";
   });
@@ -28,7 +31,11 @@ describe("admin middleware (TS-4169)", () => {
     } else {
       process.env.ADMIN_ACCESS_TOKEN = prevToken;
     }
-    process.env.NODE_ENV = prevNodeEnv;
+    if (prevNodeEnv === undefined) {
+      delete process.env.NODE_ENV;
+    } else {
+      process.env.NODE_ENV = prevNodeEnv;
+    }
   });
 
   it("matcher locks /cms, /studio, and /dashboard", () => {
@@ -50,17 +57,23 @@ describe("admin middleware (TS-4169)", () => {
     expect(response.status).toBe(200);
   });
 
+  it("allows admin paths in development when token is unset", () => {
+    process.env.NODE_ENV = "development";
+    const response = middleware(new NextRequest("https://konative.com/studio"));
+    expect(response.status).toBe(200);
+  });
+
   it("returns 401 when token is configured but credentials are missing", () => {
-    process.env.ADMIN_ACCESS_TOKEN = "test-admin-token";
+    process.env.ADMIN_ACCESS_TOKEN = adminToken;
     const response = middleware(new NextRequest("https://konative.com/studio"));
     expect(response.status).toBe(401);
   });
 
   it("allows access when Bearer token matches", () => {
-    process.env.ADMIN_ACCESS_TOKEN = "test-admin-token";
+    process.env.ADMIN_ACCESS_TOKEN = adminToken;
     const response = middleware(
       new NextRequest("https://konative.com/cms", {
-        headers: { authorization: "Bearer test-admin-token" },
+        headers: { authorization: `Bearer ${adminToken}` },
       }),
     );
     expect(response.status).toBe(200);

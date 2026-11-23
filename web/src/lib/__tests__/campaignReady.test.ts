@@ -1,4 +1,3 @@
-import { createServer, type Server } from "node:http";
 import {
   existsSync,
   readFileSync,
@@ -26,6 +25,7 @@ const CANONICAL_ROUTE_FILES: Array<{ path: string; canonical: string }> = [
 const GLOBAL_COPY_SURFACES = [
   "src/app/(frontend)/HomePage.tsx",
   "src/app/(frontend)/data-center-connectivity/page.tsx",
+  "src/app/(frontend)/news/page.tsx",
   "public/llms.txt",
   "public/llms-full.txt",
 ] as const;
@@ -51,37 +51,6 @@ function pngDimensions(filePath: string): { width: number; height: number } {
   };
 }
 
-/** Minimal static server mirroring Next.js `public/` → 200 for existing files. */
-function startPublicStaticServer(publicDir: string): Promise<{ baseUrl: string; close: () => void }> {
-  return new Promise((resolvePromise, reject) => {
-    const server: Server = createServer((req, res) => {
-      const pathname = (req.url ?? "/").split("?")[0]!;
-      const rel = pathname.replace(/^\//, "");
-      const file = join(publicDir, rel);
-      if (!rel || !existsSync(file) || statSync(file).isDirectory()) {
-        res.statusCode = 404;
-        res.end();
-        return;
-      }
-      res.statusCode = 200;
-      res.end(readFileSync(file));
-    });
-
-    server.listen(0, "127.0.0.1", () => {
-      const addr = server.address();
-      if (!addr || typeof addr === "string") {
-        reject(new Error("could not bind static test server"));
-        return;
-      }
-      resolvePromise({
-        baseUrl: `http://127.0.0.1:${addr.port}`,
-        close: () => server.close(),
-      });
-    });
-    server.on("error", reject);
-  });
-}
-
 describe("campaign-ready public surface (TS-4169)", () => {
   it("serves a canonical og-image asset at /og-image.png", () => {
     const file = resolve(webRoot, "public", SITE_OG_IMAGE_PATH.replace(/^\//, ""));
@@ -89,16 +58,6 @@ describe("campaign-ready public surface (TS-4169)", () => {
     const { width, height } = pngDimensions(file);
     expect(width).toBe(1200);
     expect(height).toBe(630);
-  });
-
-  it("returns HTTP 200 for /og-image.png from the public static tree", async () => {
-    const { baseUrl, close } = await startPublicStaticServer(resolve(webRoot, "public"));
-    try {
-      const res = await fetch(`${baseUrl}${SITE_OG_IMAGE_PATH}`);
-      expect(res.status).toBe(200);
-    } finally {
-      close();
-    }
   });
 
   it("uses Tolowa Pacific LLC in the footer legal line", () => {

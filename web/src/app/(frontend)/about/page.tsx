@@ -57,7 +57,7 @@ const orgAboutSchema = {
   url: SITE_URL,
   founder: { "@id": `${SITE_URL}/about#jeramey-james` },
   description:
-    "A Native-owned, vendor-neutral connectivity and infrastructure brokerage serving Tribal nations, federally funded broadband programs, and data-center developers across North America.",
+    "A Native-owned, vendor-neutral connectivity and infrastructure brokerage serving Tribal nations, federally funded broadband programs, and data-center developers — domestic and international, any market.",
 };
 
 const ABOUT_FAQ = [

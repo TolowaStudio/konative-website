@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { stillOpenTbcpNegpCopy } from "@/lib/qa/campaignPublicCopy";
 
 const ACTIVE_FACT_SURFACES = [
   "src/app/(frontend)/HomePage.tsx",
@@ -46,12 +47,9 @@ describe("current NTIA facts", () => {
     "public/llms-full.txt",
   ] as const;
 
-  const stillOpenCopy =
-    /\b(?:close|closes|due|by)\s+Nov(?:ember|\.)?\s+17|application-window|during the application window|window is open|framing TBCP applications/i;
-
   it.each(PUBLIC_SITE_SURFACES)("does not describe TBCP 3 / NEGP as still open in %s", (path) => {
     const contents = readFileSync(resolve(process.cwd(), path), "utf8");
-    expect(contents).not.toMatch(stillOpenCopy);
+    expect(contents).not.toMatch(stillOpenTbcpNegpCopy);
   });
 
   // TOL-3549 / TOL-3559: internal pipeline metrics (contact cohort counts) are not
