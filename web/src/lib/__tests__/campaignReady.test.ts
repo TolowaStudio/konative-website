@@ -66,6 +66,12 @@ describe("campaign-ready public surface (TS-4169)", () => {
     expect(footer).not.toMatch(/Total Pacific LLC/);
   });
 
+  it("links to /privacy and /terms from the footer", () => {
+    const footer = readFileSync(resolve(webRoot, "src/components/Footer.tsx"), "utf8");
+    expect(footer).toContain('"/privacy"');
+    expect(footer).toContain('"/terms"');
+  });
+
   it("does not link to the removed /#team anchor anywhere under src/", () => {
     const srcRoot = resolve(webRoot, "src");
     const files = walkSourceFiles(srcRoot);
@@ -138,6 +144,9 @@ describe("campaign-ready public surface (TS-4169)", () => {
     );
     expect(dc).toMatch(/Native American–owned, vendor-neutral/i);
     expect(dc).toMatch(/domestic and international/i);
+    expect(dc).toMatch(/any connectivity package/i);
+    expect(dc).toMatch(/no certification claims/i);
+    expect(dc).not.toMatch(/8\(a\)-certified|certified by (?:NMSDC|SBA)/i);
     expect(dc).not.toMatch(/(?:NMSDC|SBA 8\(a\)).*certified|certified.*(?:NMSDC|SBA 8\(a\))/i);
   });
 });

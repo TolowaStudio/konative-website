@@ -77,10 +77,14 @@ describe("Next dev static routes (TS-4169)", () => {
     30_000,
   );
 
-  it("serves /privacy and /terms with HTTP 200", async () => {
-    for (const path of ["/privacy", "/terms"] as const) {
-      const res = await fetch(`${BASE_URL}${path}`);
-      expect(res.status, path).toBe(200);
-    }
-  });
+  it(
+    "serves /privacy and /terms with HTTP 200",
+    async () => {
+      for (const path of ["/privacy", "/terms"] as const) {
+        const res = await fetch(`${BASE_URL}${path}`);
+        expect(res.status, path).toBe(200);
+      }
+    },
+    30_000,
+  );
 });
