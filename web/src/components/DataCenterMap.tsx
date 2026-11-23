@@ -25,7 +25,7 @@ import {
   runPmtilesHeadProbe,
   shouldMountPmtilesInfraSource,
 } from '@/lib/tiles/pmtilesLayerProbe'
-import { PMTILES_ERROR_BANNER_HEADING } from '@/lib/tiles/pmtilesProbe'
+import { PmtilesInfraErrorBanner } from '@/components/map/PmtilesInfraErrorBanner'
 import { resolveTileUrl, tileProxyHttpUrl } from '@/lib/tiles/resolveTileUrl'
 
 // ── types ─────────────────────────────────────────────────────────────────────
@@ -722,25 +722,7 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
         </div>
       )}
 
-      {/* PMTiles layer errors */}
-      {Object.keys(pmtilesLayerErrors).length > 0 && (
-        <div style={{
-          position: 'absolute', zIndex: 10, top: 72, left: 16, maxWidth: 360,
-          background: 'rgba(255,255,255,0.97)', border: '1px solid rgba(220,38,38,0.35)',
-          padding: '12px 16px', backdropFilter: 'blur(8px)',
-          fontFamily: 'Inter, sans-serif', fontSize: 11, color: '#0C2046',
-          boxShadow: '0 8px 24px rgba(17,24,39,0.12)',
-        }}>
-          <div style={{ fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#dc2626', marginBottom: 8 }}>
-            {PMTILES_ERROR_BANNER_HEADING}
-          </div>
-          <ul style={{ margin: 0, paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {Object.entries(pmtilesLayerErrors).map(([id, message]) => (
-              <li key={id}><strong>{id}</strong>: {message}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <PmtilesInfraErrorBanner errors={pmtilesLayerErrors} />
 
       {/* Live layer loading indicator */}
       {Object.values(liveInfraLoading).some(Boolean) && (

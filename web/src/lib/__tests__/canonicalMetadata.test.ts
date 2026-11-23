@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
+import { resolveCanonicalUrl } from "@/lib/seo/resolveCanonicalUrl";
 
 beforeAll(() => {
   process.env.NEXT_PUBLIC_SUPABASE_URL = "https://example.supabase.co";
@@ -8,25 +9,42 @@ beforeAll(() => {
 });
 
 describe("canonical metadata (TS-4170)", () => {
-  it("sets canonical on homepage", async () => {
-    const { metadata: homeMetadata } = await import("@/app/(frontend)/page");
-    expect(homeMetadata.alternates?.canonical).toBe("/");
+  it("uses metadataBase https://konative.com in frontend layout", async () => {
+    const { metadata: layoutMetadata } = await import(
+      "@/app/(frontend)/layout"
+    );
+    expect(layoutMetadata.metadataBase?.toString()).toBe("https://konative.com/");
   });
 
-  it("sets canonical on markets index", async () => {
+  it("resolves absolute canonical URLs for / and /markets/*", async () => {
+    const { metadata: layoutMetadata } = await import(
+      "@/app/(frontend)/layout"
+    );
+    const base = layoutMetadata.metadataBase as URL;
+
+    const { metadata: homeMetadata } = await import("@/app/(frontend)/page");
+    expect(
+      resolveCanonicalUrl(String(homeMetadata.alternates?.canonical), base),
+    ).toBe("https://konative.com/");
+
     const { metadata: marketsIndexMetadata } = await import(
       "@/app/(frontend)/markets/page"
     );
-    expect(marketsIndexMetadata.alternates?.canonical).toBe("/markets");
-  });
+    expect(
+      resolveCanonicalUrl(
+        String(marketsIndexMetadata.alternates?.canonical),
+        base,
+      ),
+    ).toBe("https://konative.com/markets");
 
-  it("sets canonical on a sample market page", async () => {
     const { generateMetadata } = await import(
       "@/app/(frontend)/markets/[state]/page"
     );
-    const meta = await generateMetadata({
+    const marketMeta = await generateMetadata({
       params: Promise.resolve({ state: "virginia" }),
     });
-    expect(meta.alternates?.canonical).toBe("/markets/virginia");
+    expect(
+      resolveCanonicalUrl(String(marketMeta.alternates?.canonical), base),
+    ).toBe("https://konative.com/markets/virginia");
   });
 });
