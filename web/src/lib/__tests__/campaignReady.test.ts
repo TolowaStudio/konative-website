@@ -143,6 +143,17 @@ describe("campaign-ready public surface (TS-4169)", () => {
     }
   });
 
+  it("keeps /contact og:image on the layout (client page must not export metadata)", () => {
+    const layout = readFileSync(
+      resolve(webRoot, "src/app/(frontend)/contact/layout.tsx"),
+      "utf8",
+    );
+    const page = readFileSync(resolve(webRoot, "src/app/(frontend)/contact/page.tsx"), "utf8");
+    expect(layout).toMatch(/siteOpenGraphImage\(\)/);
+    expect(page).toMatch(/^"use client"/m);
+    expect(page).not.toMatch(/export const metadata/);
+  });
+
   it("preserves the canonical Cal.com 15-minute booking link on surfaces that use it", () => {
     for (const path of [
       "src/components/Footer.tsx",
