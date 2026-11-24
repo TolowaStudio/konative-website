@@ -4,41 +4,11 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-type NavLink = { label: string; url: string };
-type NavItem = NavLink | { label: string; children: NavLink[] };
+import { headerNavItems, type NavItem } from "@/lib/siteNavigation";
 
-const navLinks: NavItem[] = [
-  { label: "Data Center", url: "/data-center-connectivity" },
-  {
-    label: "Tribal & Rural",
-    children: [
-      { label: "Tribal Connectivity", url: "/tribal" },
-      { label: "Tribal DC Tracker", url: "/tribal/projects" },
-      { label: "Funding Navigator", url: "/tribal/funding-navigator" },
-      { label: "Carrier Check", url: "/tribal/carrier-check" },
-      { label: "TBCP Awards", url: "/tribal/awards" },
-      { label: "Sovereignty", url: "/tribal/sovereignty" },
-      { label: "NTIA / TBCP", url: "/ntia" },
-    ],
-  },
-  { label: "Connectivity", url: "/connectivity" },
-  {
-    label: "Map & Intelligence",
-    children: [
-      { label: "Interactive Map", url: "/map" },
-      { label: "Market Signals", url: "/governors" },
-      { label: "Canada", url: "/canada" },
-      { label: "Markets", url: "/markets" },
-      { label: "Intelligence", url: "/intelligence" },
-      { label: "Dispatch", url: "/dispatch" },
-      { label: "Lateral Estimator", url: "/tools/lateral-estimator" },
-    ],
-  },
-  { label: "News", url: "/news" },
-  { label: "About", url: "/about" },
-];
+const navLinks = headerNavItems;
 
-function isGroup(item: NavItem): item is { label: string; children: NavLink[] } {
+function isGroup(item: NavItem): item is { label: string; children: { label: string; url: string }[] } {
   return "children" in item;
 }
 

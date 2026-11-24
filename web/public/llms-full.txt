@@ -133,7 +133,7 @@ matters most. Fiber cable lead times run 20 weeks to a year (mid-2026).
 - /tribal/awards — Interactive NTIA TBCP award explorer compiled from public federal data
 - /map — Interactive infrastructure map
 - /markets — Per-state market pages
-- /intelligence, /answers, /dispatch — Intelligence and knowledge base
+- /intelligence, /answers — Intelligence and knowledge base
 - /call — Book a call (https://cal.com/jeramey-james/15min)
 - /contact — Contact form
 

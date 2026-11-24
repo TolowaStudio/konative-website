@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import NewsletterSignup from "@/components/NewsletterSignup";
-import {
-  ghostContentFetch,
-  ghostContentKey,
-  ghostUrl,
-  KONATIVE_TAG_SLUG,
-} from "@/lib/ghost";
+import { ghostContentFetch, ghostContentKey, ghostUrl } from "@/lib/ghost";
 import {
   JsonLd,
   SITE_URL,
@@ -97,12 +91,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = await getPost(slug);
   if (!post) return { title: "Post not found — Konative" };
-  const isDispatch = post.primary_tag?.slug === KONATIVE_TAG_SLUG;
-  // Canonical points to /dispatch for Dispatch issues so they don't
-  // double-rank under /blog/.
-  const canonical = isDispatch
-    ? `/dispatch/${post.slug}`
-    : `/blog/${post.slug}`;
+  const canonical = `/blog/${post.slug}`;
   return {
     title: `${post.title} — Konative`,
     description: post.excerpt,
@@ -192,10 +181,6 @@ export default async function BlogPostPage({
           className="blog-post__content"
           dangerouslySetInnerHTML={{ __html: post.html }}
         />
-
-        <div className="blog-post__cta">
-          <NewsletterSignup variant="banner" source="blog-post" />
-        </div>
 
         <p className="blog-post__back">
           <Link href="/blog">← All posts</Link>

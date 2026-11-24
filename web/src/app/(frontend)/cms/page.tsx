@@ -162,9 +162,8 @@ export default async function CmsSystemPage() {
               />
             </div>
             <p className="cms-hub__card-desc">
-              Shared Tolowa Studio Ghost — powers the{" "}
-              <Link href="/dispatch">Konative Dispatch</Link> newsletter and{" "}
-              <Link href="/blog">/blog</Link> via Content API.
+              Shared Tolowa Studio Ghost — powers Konative Dispatch (archive
+              paused) and <Link href="/blog">/blog</Link> via Content API.
             </p>
 
             {health.ghost.configured && ghostAdmin ? (

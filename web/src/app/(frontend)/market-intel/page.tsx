@@ -27,10 +27,6 @@ export default function MarketIntelPage() {
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
-  const [subscribing, setSubscribing] = useState(false);
-
   useEffect(() => {
     fetch("/api/v1/content?limit=100")
       .then((res) => res.json())
@@ -47,23 +43,6 @@ export default function MarketIntelPage() {
     activeCategory === "all"
       ? articles
       : articles.filter((a) => a.category === activeCategory);
-
-  async function handleSubscribe() {
-    if (!email || subscribing || subscribed) return;
-    setSubscribing(true);
-    try {
-      await fetch("/api/newsletter/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source: "market_intel_page" }),
-      });
-      setSubscribed(true);
-    } catch {
-      // silently fail
-    } finally {
-      setSubscribing(false);
-    }
-  }
 
   return (
     <div style={{ background: "#FFFFFF", minHeight: "100vh" }}>
@@ -240,7 +219,7 @@ export default function MarketIntelPage() {
             )}
           </div>
 
-          {/* Right column — Newsletter rail */}
+          {/* Right column — curated news CTA (Dispatch signup paused) */}
           <div style={{
             background: "#F2F0EB", padding: "40px 32px",
             position: "sticky", top: 128, alignSelf: "start",
@@ -250,7 +229,7 @@ export default function MarketIntelPage() {
               textTransform: "uppercase", letterSpacing: "0.2em",
               color: "#C8001F", marginBottom: 16,
             }}>
-              THE INTELLIGENCE BRIEF
+              CURATED SIGNAL
             </div>
 
             <h3 style={{
@@ -258,54 +237,28 @@ export default function MarketIntelPage() {
               fontSize: 26, textTransform: "uppercase", color: "#111111",
               lineHeight: 1, margin: "0 0 16px 0",
             }}>
-              GET THE FEED IN YOUR INBOX
+              MORE ON THE NEWS DESK
             </h3>
 
             <p style={{
               fontFamily: "'Inter', sans-serif", fontSize: 14, lineHeight: 1.6,
               color: "#555", margin: "0 0 24px 0",
             }}>
-              Data center land, power, and capital movement — twice a week for developers and investors.
+              Editor-curated tribal and data-center connectivity updates on the news feed — not recycled press releases.
             </p>
 
-            {subscribed ? (
-              <div style={{
+            <a
+              href="/news"
+              style={{
+                display: "inline-block", width: "100%", padding: 14, background: "#C8001F",
+                color: "#fff", border: "none", textAlign: "center", textDecoration: "none",
                 fontFamily: "'Inter', sans-serif", fontWeight: 600,
-                fontSize: 14, color: "#C8001F", padding: "14px 0",
-              }}>
-                Subscribed! ✓
-              </div>
-            ) : (
-              <>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  style={{
-                    width: "100%", padding: "12px 16px",
-                    border: "1px solid #E0DDD8", background: "#fff",
-                    fontFamily: "'Inter', sans-serif", fontSize: 14,
-                    marginBottom: 10, outline: "none",
-                    boxSizing: "border-box", borderRadius: 0,
-                  }}
-                />
-                <button
-                  onClick={handleSubscribe}
-                  disabled={subscribing}
-                  style={{
-                    width: "100%", padding: 14, background: "#C8001F",
-                    color: "#fff", border: "none",
-                    fontFamily: "'Inter', sans-serif", fontWeight: 600,
-                    fontSize: 12, textTransform: "uppercase", letterSpacing: "0.12em",
-                    cursor: subscribing ? "not-allowed" : "pointer",
-                    opacity: subscribing ? 0.7 : 1, borderRadius: 0,
-                  }}
-                >
-                  SUBSCRIBE FREE
-                </button>
-              </>
-            )}
+                fontSize: 12, textTransform: "uppercase", letterSpacing: "0.12em",
+                boxSizing: "border-box", borderRadius: 0,
+              }}
+            >
+              OPEN NEWS FEED
+            </a>
 
             <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: "#888", marginTop: 12 }}>
               Updated daily · {articles.length > 0 ? `${articles.length} articles indexed` : "12 live feeds"}
