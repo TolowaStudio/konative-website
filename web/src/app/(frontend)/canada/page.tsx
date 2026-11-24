@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@sanity/client'
 import HeroBackdrop from '@/components/marketing/HeroBackdrop'
 import { AsOfLabel } from '@/components/AsOfLabel'
-import { formatAsOfLabel, isFreshTimestamp } from '@/lib/contentFreshness'
+import { buildCanadaLiveStatsView } from '@/lib/publicStatSurfaces'
 
 export const revalidate = 3600;
 
@@ -143,20 +143,8 @@ async function getLiveStats() {
 
 export default async function CanadaPage() {
   const live = await getLiveStats()
-  const liveFresh = live && isFreshTimestamp(live.updatedAt)
-  const asOfLabel = formatAsOfLabel(live?.updatedAt)
-  const headlineStats = liveFresh
-    ? [
-        {
-          v: live.totalMw ? `${Math.round(live.totalMw).toLocaleString()} MW` : '—',
-          l: 'Tracked Canadian DC capacity (MW sum)',
-        },
-        {
-          v: `${live.operational} / ${live.pipeline}`,
-          l: 'Operational / pipeline (live dataset)',
-        },
-      ]
-    : []
+  const canadaView = buildCanadaLiveStatsView(live)
+  const { liveFresh, asOfLabel, headlineStats } = canadaView
   const staticStats = [
     { v: 'C$2B', l: 'Federal Sovereign AI Compute Strategy' },
     { v: '650 MW', l: 'Largest Indigenous-led project (Woodland Cree)' },
@@ -183,7 +171,7 @@ export default async function CanadaPage() {
               CANADA: 10 GW PIPELINE, FOUR DIFFERENT MARKETS
             </h1>
             <p style={{ color: '#c3cbdb', maxWidth: 640, lineHeight: 1.65, margin: '0 0 1.5rem', fontSize: '1.0625rem' }}>
-              {liveFresh ? (
+              {liveFresh && live ? (
                 <>
                   Canada has {live.operational} operational data centres tracked, {live.pipeline} in the pipeline, and {live.stalled} with stalled or blocked status in our research dataset.
                 </>

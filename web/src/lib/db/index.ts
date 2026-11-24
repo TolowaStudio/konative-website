@@ -25,6 +25,7 @@ export {
 export {
   queryTbcpAwards,
   queryTbcpAwardsList,
+  queryTbcpAwardsDatasetMeta,
   queryTbcpAwardBySlug,
   queryTbcpSlugs,
   type TbcpAwardRow,

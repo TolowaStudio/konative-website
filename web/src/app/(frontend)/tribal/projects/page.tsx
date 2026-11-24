@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { JsonLd, breadcrumbSchema, SITE_URL } from "@/components/seo/JsonLd";
 import { AsOfLabel } from "@/components/AsOfLabel";
-import { isFreshTimestamp, formatAsOfLabel } from "@/lib/contentFreshness";
+import { buildTribalProjectsCountStripView } from "@/lib/publicStatSurfaces";
 import { fetchTribalProjects, fetchTribalProjectsDatasetMeta } from "@/lib/tribalProjects";
 
 import ProjectsGridClient from "./ProjectsGridClient";
@@ -33,8 +33,8 @@ export default async function TribalProjectsPage() {
     fetchTribalProjectsDatasetMeta(),
   ]);
   const isDataUnavailable = projects.length === 0;
-  const asOfLabel = formatAsOfLabel(datasetMeta?.updatedAt);
-  const showLiveCounts = isFreshTimestamp(datasetMeta?.updatedAt) && projects.length > 0;
+  const countStrip = buildTribalProjectsCountStripView(datasetMeta?.updatedAt, projects.length);
+  const { showLiveCounts, asOfLabel } = countStrip;
 
   const usCount = projects.filter((p) => p.country === "US").length;
   const caCount = projects.filter((p) => p.country === "CA").length;

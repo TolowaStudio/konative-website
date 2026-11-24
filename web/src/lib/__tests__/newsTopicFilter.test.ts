@@ -27,6 +27,15 @@ describe("newsTopicFilter", () => {
     ).toBe(false);
   });
 
+  it("accepts federal funding and policy headlines", () => {
+    expect(
+      isNewsDeskEligible({
+        title: "White House releases federal AI policy framework",
+        summary: "New grant guidance covers data-center infrastructure planning.",
+      }),
+    ).toBe(true);
+  });
+
   it("accepts data-center and tribal connectivity stories", () => {
     expect(
       isNewsDeskEligible({

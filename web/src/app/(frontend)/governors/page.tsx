@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 import { AsOfLabel } from '@/components/AsOfLabel'
-import { resolveFreshStat } from '@/lib/contentFreshness'
+import { buildMarketSignalsHeroView } from '@/lib/publicStatSurfaces'
 import { fetchMarketSignalsStats } from '@/lib/marketSignalsStats'
 
 import GovernorMapClient from './GovernorMapClient'
@@ -15,8 +15,7 @@ export const revalidate = 3600
 
 export default async function GovernorsPage() {
   const stats = await fetchMarketSignalsStats()
-  const stalledStat = resolveFreshStat(stats?.stalled, stats?.updatedAt)
-  const governorStat = resolveFreshStat(stats?.focusGovernors, stats?.updatedAt)
+  const hero = buildMarketSignalsHeroView(stats)
 
   return (
     <main className="signals-page">
@@ -29,18 +28,20 @@ export default async function GovernorsPage() {
             Nations project signals. It is a research surface for connectivity strategy, not a finished
             public-policy product.
           </p>
-          {stalledStat.kind === 'live' ? <AsOfLabel label={stalledStat.asOfLabel} /> : null}
+          {hero.showStalledAsOf && hero.stalledAsOfLabel ? (
+            <AsOfLabel label={hero.stalledAsOfLabel} />
+          ) : null}
         </div>
         <div className="signals-stat-grid" aria-label="Current signal layers">
-          {stalledStat.kind === 'live' ? (
-            <span><strong>{stalledStat.value}</strong> stalled project records</span>
+          {hero.showStalledCount && hero.stalledCount != null ? (
+            <span><strong>{hero.stalledCount}</strong> stalled project records</span>
           ) : (
-            <span>Stalled project counts temporarily hidden — dataset refresh pending</span>
+            <span>{hero.stalledHiddenMessage}</span>
           )}
-          {governorStat.kind === 'live' ? (
-            <span><strong>{governorStat.value}</strong> governors with DC policy notes</span>
+          {hero.showGovernorCount && hero.governorCount != null ? (
+            <span><strong>{hero.governorCount}</strong> governors with DC policy notes</span>
           ) : (
-            <span>Governor context layer</span>
+            <span>{hero.governorFallbackMessage}</span>
           )}
           <span><strong>US + CA</strong> Tribal / First Nations context</span>
         </div>

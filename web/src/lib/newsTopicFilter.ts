@@ -52,6 +52,11 @@ const ON_TOPIC_PATTERNS: RegExp[] = [
   /\b\sMW\b/,
   /\bai\s+infrastructure\b/i,
   /\bsovereign\s+ai\b/i,
+  /\bpolicy\b/i,
+  /\bfederal\b/i,
+  /\bgrant\b/i,
+  /\bfunding\b/i,
+  /\bappropriation\b/i,
 ];
 
 const TOPIC_HINTS: { pattern: RegExp; topic: NewsTopicValue }[] = [

@@ -8,6 +8,32 @@ import {
   type NewsDoc,
 } from "../newsPageQuery";
 
+function docsInCurationWindow(docs: NewsDoc[], sinceIso: string): NewsDoc[] {
+  const sinceMs = new Date(sinceIso).getTime();
+  return docs.filter((doc) => {
+    if (!doc.publishedAt) return false;
+    return new Date(doc.publishedAt).getTime() >= sinceMs;
+  });
+}
+
+function createHonoringClient(pool: NewsDoc[]) {
+  return {
+    fetch: async <T>(query: string, params?: Record<string, unknown>): Promise<T> => {
+      const since = typeof params?.since === "string" ? params.since : undefined;
+      if (query.includes('"ca" in coalesce(countries')) {
+        return pool.filter((doc) => doc.countries?.includes("ca")) as T;
+      }
+      if (query.includes('"tax" in coalesce(topics')) {
+        return pool.filter((doc) => doc.topics?.includes("tax")) as T;
+      }
+      if (since && query.includes("publishedAt >= $since")) {
+        return docsInCurationWindow(pool, since) as T;
+      }
+      return pool as T;
+    },
+  };
+}
+
 describe("buildNewsListFilter", () => {
   it("includes the curation window by default", () => {
     const filter = buildNewsListFilter({ country: "all", topic: "all", withWindow: true });
@@ -75,6 +101,8 @@ describe("formatNewsDeskStatusLine", () => {
 });
 
 describe("fetchNewsPageData", () => {
+  const since = "2026-08-09T00:00:00.000Z";
+
   it("does not surface archive stories when the live window is empty", async () => {
     const staleOffDesk: NewsDoc[] = [
       {
@@ -85,64 +113,82 @@ describe("fetchNewsPageData", () => {
       },
     ];
 
+    const queries: string[] = [];
     const client = {
-      fetch: async <T>(_query: string): Promise<T> => staleOffDesk as T,
+      fetch: async <T>(query: string, params?: Record<string, unknown>): Promise<T> => {
+        queries.push(query);
+        const sinceParam = typeof params?.since === "string" ? params.since : since;
+        if (query.includes("publishedAt >= $since")) {
+          return docsInCurationWindow(staleOffDesk, sinceParam) as T;
+        }
+        return staleOffDesk as T;
+      },
     };
 
     const result = await fetchNewsPageData(client, {
       country: "all",
       topic: "all",
       currentPage: 1,
-      since: "2026-08-09T00:00:00.000Z",
+      since,
     });
 
+    expect(queries.some((q) => q.includes("publishedAt >= $since"))).toBe(true);
     expect(result.isShowingLatestFallback).toBe(false);
     expect(result.docs).toEqual([]);
   });
 
   it("keeps the empty state when filters match nothing", async () => {
-    const client = {
-      fetch: async <T>(_query: string): Promise<T> => [] as T,
-    };
+    const usOnlyDocs: NewsDoc[] = [
+      {
+        id: "news-us",
+        title: "Fiber backbone expands in Arizona",
+        summary: "Tribal connectivity",
+        topics: ["tribal-broadband"],
+        countries: ["us"],
+        publishedAt: "2026-11-20T00:00:00.000Z",
+      },
+    ];
+
+    const client = createHonoringClient(usOnlyDocs);
 
     const result = await fetchNewsPageData(client, {
       country: "ca",
       topic: "tax",
       currentPage: 1,
-      since: "2026-08-09T00:00:00.000Z",
+      since,
     });
 
     expect(result.isShowingLatestFallback).toBe(false);
     expect(result.docs).toEqual([]);
   });
 
-  it("filters default desk to on-topic stories", async () => {
-    const windowDocs: NewsDoc[] = [
+  it("filters default desk to on-topic stories within the window", async () => {
+    const mixed: NewsDoc[] = [
+      {
+        id: "news-off",
+        title: "Pickleball courts reshape office leasing",
+        summary: "Commercial Observer office survey",
+        publishedAt: "2026-11-20T00:00:00.000Z",
+      },
       {
         id: "news-fresh",
         title: "Hyperscaler expands tribal data center fiber route",
         summary: "NTIA TBCP-backed backbone supports interconnection queue.",
         topics: ["tribal-broadband"],
+        publishedAt: "2026-11-21T00:00:00.000Z",
       },
     ];
 
-    const client = {
-      fetch: async <T>(query: string): Promise<T> => {
-        if (query.includes("[0...8]")) {
-          return [] as T;
-        }
-        return windowDocs as T;
-      },
-    };
+    const client = createHonoringClient(mixed);
 
     const result = await fetchNewsPageData(client, {
       country: "all",
       topic: "all",
       currentPage: 1,
-      since: "2026-08-09T00:00:00.000Z",
+      since,
     });
 
     expect(result.isShowingLatestFallback).toBe(false);
-    expect(result.docs).toEqual(windowDocs);
+    expect(result.docs.map((d) => d.id)).toEqual(["news-fresh"]);
   });
 });

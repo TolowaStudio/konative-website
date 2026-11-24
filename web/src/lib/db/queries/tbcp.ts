@@ -63,6 +63,19 @@ export async function queryTbcpAwardsList(limit = 1000): Promise<TbcpAwardRow[] 
   }
 }
 
+export async function queryTbcpAwardsDatasetMeta(): Promise<{ updatedAt?: string } | null> {
+  const db = await getD1();
+  try {
+    const row = await db
+      .prepare(`SELECT max(updated_at) AS updatedAt FROM tbcp_awards`)
+      .first<{ updatedAt: string | null }>();
+    if (!row?.updatedAt) return null;
+    return { updatedAt: row.updatedAt };
+  } catch {
+    return null;
+  }
+}
+
 export async function queryTbcpSlugs(): Promise<string[]> {
   const db = await getD1();
   try {
