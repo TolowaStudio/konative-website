@@ -16,6 +16,18 @@ import LayerControlPanel from './LayerControlPanel'
 import MapSearchBar from './MapSearchBar'
 import MapReadout from './MapReadout'
 import DemoViews from './DemoViews'
+import {
+  KONATIVE_MAP_CARTO_BASEMAP_STYLE,
+  KONATIVE_MAP_PROJECTS_GEOJSON_SOURCE_ID,
+} from '@/lib/map/mapDisplayContract'
+import {
+  clearPmtilesErrorsForLayerIds,
+  mergePmtilesHeadProbeResult,
+  runPmtilesHeadProbe,
+  shouldMountPmtilesInfraSource,
+} from '@/lib/tiles/pmtilesLayerProbe'
+import { PmtilesInfraErrorBanner } from '@/components/map/PmtilesInfraErrorBanner'
+import { resolveTileUrl, tileProxyHttpUrl } from '@/lib/tiles/resolveTileUrl'
 
 // ── types ─────────────────────────────────────────────────────────────────────
 
@@ -116,6 +128,8 @@ interface Props {
   initialCenter?: [number, number]
   /** Initial map zoom level. Defaults to 3.2. */
   initialZoom?: number
+  /** Test hook: override default infra category toggles. */
+  initialInfraEnabled?: Partial<Record<LayerCategory, boolean>>
 }
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -144,18 +158,6 @@ function colourFeature(f: Feature): Feature {
 
 // ── component ─────────────────────────────────────────────────────────────────
 
-// R2 bucket lacks CORS headers — rewrite absolute R2 URLs to the same-origin
-// tile proxy so the browser can load PMTiles without CORS failures.
-const R2_CDN = 'https://pub-70584c42a8ad4fb1a38f5273a1665067.r2.dev/'
-const TILE_PROXY = '/api/v1/tiles/'
-function resolveTileUrl(tilesUrl: string): string {
-  if (tilesUrl.startsWith(R2_CDN)) {
-    return `pmtiles://${window.location.origin}${TILE_PROXY}${tilesUrl.slice(R2_CDN.length)}`
-  }
-  if (tilesUrl.startsWith('http')) return `pmtiles://${tilesUrl}`
-  return `pmtiles://${window.location.origin}${tilesUrl}`
-}
-
 // Register the pmtiles:// protocol once for the page lifetime.
 let _pmtilesProtocolRegistered = false
 function ensurePMTilesProtocol() {
@@ -165,7 +167,14 @@ function ensurePMTilesProtocol() {
   _pmtilesProtocolRegistered = true
 }
 
-export default function DataCenterMap({ layerData: propData, counts: propCounts, backgroundMode, initialCenter, initialZoom }: Props) {
+export default function DataCenterMap({
+  layerData: propData,
+  counts: propCounts,
+  backgroundMode,
+  initialCenter,
+  initialZoom,
+  initialInfraEnabled,
+}: Props) {
   const mapRef = useRef<MapRef | null>(null)
   const [layerData, setLayerData] = useState<LayerData | null>(propData ?? null)
   const [counts, setCounts]       = useState<MapCounts | null>(propCounts ?? null)
@@ -200,17 +209,29 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
 
   // Infrastructure (CA · beta) state
   const [infraManifest, setInfraManifest] = useState<LayerManifest | null>(null)
-  const [infraEnabled, setInfraEnabled] = useState<Record<LayerCategory, boolean>>(
-    () => (backgroundMode ? BACKGROUND_INFRA_ENABLED : DEFAULT_INFRA_ENABLED)
-  )
+  const [infraEnabled, setInfraEnabled] = useState<Record<LayerCategory, boolean>>(() => {
+    const base = backgroundMode ? BACKGROUND_INFRA_ENABLED : DEFAULT_INFRA_ENABLED
+    return initialInfraEnabled ? { ...base, ...initialInfraEnabled } : base
+  })
 
   const effectiveInfraEnabled = backgroundMode ? BACKGROUND_INFRA_ENABLED : infraEnabled
 
   // Live GeoJSON data for manifest entries with sourceType === 'geojson'
   const [liveInfraData, setLiveInfraData] = useState<Record<string, FeatureCollection>>({})
   const [liveInfraLoading, setLiveInfraLoading] = useState<Record<string, boolean>>({})
+  const [pmtilesLayerErrors, setPmtilesLayerErrors] = useState<Record<string, string>>({})
+  const [pmtilesProbePending, setPmtilesProbePending] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  )
+  const [tileOrigin, setTileOrigin] = useState('')
+  const effectiveInfraEnabledRef = useRef(effectiveInfraEnabled)
+
+  useEffect(() => {
+    effectiveInfraEnabledRef.current = effectiveInfraEnabled
+  }, [effectiveInfraEnabled])
 
   useEffect(() => { ensurePMTilesProtocol() }, [])
+  useEffect(() => { setTileOrigin(window.location.origin) }, [])
 
   useEffect(() => {
     fetch('/api/v1/layer-manifest')
@@ -228,6 +249,8 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
       if (layer.category !== 'indigenous' && layer.country !== 'CA' && layer.country !== 'GLOBAL') continue
       // Politics layers are owned by /governors and should not appear on /map
       if (layer.category === 'politics') continue
+      const sourceType = layer.sourceType ?? 'pmtiles'
+      if (sourceType === 'pmtiles' && !layer.tilesUrl?.trim()) continue
       map[layer.category]?.push(layer)
     }
     return map
@@ -254,6 +277,73 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
         .finally(() => setLiveInfraLoading(prev => ({ ...prev, [layer.id]: false })))
     }
   }, [infraManifest, effectiveInfraEnabled]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Drop probe errors for layers in categories the user turned off.
+  useEffect(() => {
+    const disabledIds: string[] = []
+    for (const cat of INFRA_CATEGORIES) {
+      if (effectiveInfraEnabled[cat.key]) continue
+      for (const layer of infraLayersByCategory[cat.key]) {
+        disabledIds.push(layer.id)
+      }
+    }
+    if (disabledIds.length === 0) return
+    setPmtilesLayerErrors((prev) => clearPmtilesErrorsForLayerIds(prev, disabledIds))
+    setPmtilesProbePending((prev) => {
+      const next = new Set(prev)
+      let changed = false
+      for (const id of disabledIds) {
+        if (next.delete(id)) changed = true
+      }
+      return changed ? next : prev
+    })
+  }, [effectiveInfraEnabled, infraLayersByCategory])
+
+  // Probe PMTiles availability when a category is enabled — show errors instead of silent blanks.
+  useEffect(() => {
+    if (!tileOrigin || !infraManifest) return
+
+    const origin = tileOrigin
+    const layers = infraManifest.layers.filter((l) => {
+      const sourceType = l.sourceType ?? 'pmtiles'
+      if (sourceType !== 'pmtiles') return false
+      if (!effectiveInfraEnabled[l.category]) return false
+      return Boolean(l.tilesUrl?.trim())
+    })
+
+    for (const layer of layers) {
+      const tilesUrl = layer.tilesUrl?.trim()
+      if (!tilesUrl) continue
+
+      const probeUrl = tileProxyHttpUrl(tilesUrl, origin)
+      if (!probeUrl) continue
+
+      setPmtilesProbePending((prev) => new Set(prev).add(layer.id))
+
+      const layerCategory = layer.category
+      void runPmtilesHeadProbe(probeUrl)
+        .then((result) => {
+          setPmtilesProbePending((prev) => {
+            const next = new Set(prev)
+            next.delete(layer.id)
+            return next
+          })
+          if (!effectiveInfraEnabledRef.current[layerCategory]) {
+            return
+          }
+          setPmtilesLayerErrors((prev) =>
+            mergePmtilesHeadProbeResult(prev, layer.id, result),
+          )
+        })
+        .catch(() => {
+          setPmtilesProbePending((prev) => {
+            const next = new Set(prev)
+            next.delete(layer.id)
+            return next
+          })
+        })
+    }
+  }, [infraManifest, effectiveInfraEnabled, tileOrigin])
 
   // Per-category insight: shown in the panel when a category is on but data is sparse (<50 features)
   const categoryInsights = useMemo(() => {
@@ -401,7 +491,7 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
       <Map
         ref={mapRef}
         initialViewState={{ longitude: initialCenter?.[0] ?? -96, latitude: initialCenter?.[1] ?? 45, zoom: initialZoom ?? 3.2 }}
-        mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+        mapStyle={KONATIVE_MAP_CARTO_BASEMAP_STYLE}
         interactiveLayerIds={backgroundMode ? [] : [
           'dc-bubbles',
           ...((['indigenous', 'exclusions', 'land-use'] as LayerCategory[]).flatMap(cat =>
@@ -423,7 +513,7 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
         attributionControl={backgroundMode ? false : { compact: true }}
         style={{ width: '100%', height: '100%' }}
       >
-        <Source id="dc" type="geojson" data={combined}>
+        <Source id={KONATIVE_MAP_PROJECTS_GEOJSON_SOURCE_ID} type="geojson" data={combined}>
           {showHeatmap && (
             <Layer
               id="dc-heat"
@@ -543,12 +633,30 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
                 }
 
                 // ── PMTiles source (default) ────────────────────────────────────
+                if (
+                  !shouldMountPmtilesInfraSource(
+                    layer.id,
+                    pmtilesLayerErrors,
+                    pmtilesProbePending,
+                  )
+                ) {
+                  return null
+                }
+
+                if (!tileOrigin) return null
+
+                const tilesUrl = layer.tilesUrl?.trim()
+                if (!tilesUrl) return null
+
+                const pmtilesUrl = resolveTileUrl(tilesUrl, tileOrigin)
+                if (!pmtilesUrl) return null
+
                 return (
                   <Source
                     key={layer.id}
                     id={`infra-${layer.id}`}
                     type="vector"
-                    url={resolveTileUrl(layer.tilesUrl)}
+                    url={pmtilesUrl}
                     attribution={layer.attribution}
                   >
                     {showFill && (
@@ -686,6 +794,8 @@ export default function DataCenterMap({ layerData: propData, counts: propCounts,
           </div>
         </div>
       )}
+
+      <PmtilesInfraErrorBanner errors={pmtilesLayerErrors} />
 
       {/* Live layer loading indicator */}
       {Object.values(liveInfraLoading).some(Boolean) && (
