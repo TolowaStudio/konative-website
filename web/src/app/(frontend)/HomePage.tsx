@@ -16,20 +16,6 @@ const outcomes = [
   ["One accountable team", "Manage sourcing, ordering, installation, escalation, and renewal."],
 ];
 
-const gtmMotions = [
-  ["Tribal awards", "Use TBCP and NEGP signals to move from public funding to operating connectivity, security, voice, cloud, and managed network needs."],
-  ["Gaming uptime", "Review casino and hospitality WAN, payments, surveillance, guest access, voice, cybersecurity, and failover before renewal pressure hits."],
-  ["Data-center build signals", "Turn map, power, stalled-project, and Canada market signals into early carrier, fiber-path, transport, DCI, and cloud on-ramp reviews."],
-  ["Canada partnerships", "Build a credible northern lane with First Nations, Indigenous economic development, carrier, engineering, and capital partners."],
-];
-
-const signalRows = [
-  ["164", "proposed tribal contacts — pending review, 0 approved for campaign"],
-  ["17", "TBCP award-matched organizations ready for approval review"],
-  ["60", "gaming and casino contacts for uptime and resilience outreach"],
-  ["US + Canada", "operating focus for tribal, Indigenous, rural, and data-center connectivity"],
-];
-
 export default function HomePage() {
   return (
     <main style={{ color: TEXT, background: "#fff" }}>
@@ -42,14 +28,14 @@ export default function HomePage() {
               Source the network behind <span style={{ color: RED }}>critical infrastructure.</span>
             </h1>
             <p className="home-hero-copy" style={{ maxWidth: 680, color: "rgba(255,255,255,.72)", fontSize: 18, lineHeight: 1.7, marginBottom: 36 }}>
-              Konative is a vendor-neutral, sovereignty-aware brokerage for tribal and rural enterprises, Indigenous partners, and data-center teams across the United States and Canada. We use public data, maps, awards, and market signals to source internet, fiber, transport, cloud, voice, security, colocation, and interconnection.
+              Konative is a vendor-neutral, sovereignty-aware connectivity brokerage for tribal and rural enterprises, Indigenous partners, and data-center teams — domestic and international, any market. We use public data, maps, awards, and market signals to source internet, fiber, transport, cloud, voice, security, colocation, and interconnection worldwide.
             </p>
             <div className="home-hero-actions" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <Link href="/call" style={primary}>Book a connectivity review</Link>
-              <Link href="/tribal/grants" style={secondary}>TBCP 3 / NEGP help</Link>
+              <Link href="/tribal/grants" style={secondary}>TBCP 3 / NEGP awardees</Link>
             </div>
             <div className="home-signal-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", maxWidth: 800, marginTop: 48, border: "1px solid rgba(255,255,255,.15)" }}>
-              {["Tribal + rural", "Data-center connectivity", "US + Canada", "Map-backed outreach"].map(x => <div key={x} style={{ padding: "16px 18px", color: "#fff", fontSize: 11, fontWeight: 700, letterSpacing: ".11em", textTransform: "uppercase", borderRight: "1px solid rgba(255,255,255,.12)" }}>{x}</div>)}
+              {["Tribal + rural", "Data-center connectivity", "Domestic + international", "Map-backed sourcing"].map(x => <div key={x} style={{ padding: "16px 18px", color: "#fff", fontSize: 11, fontWeight: 700, letterSpacing: ".11em", textTransform: "uppercase", borderRight: "1px solid rgba(255,255,255,.12)" }}>{x}</div>)}
             </div>
           </div>
           <div className="home-hero-map" style={{ minHeight: 520, border: "1px solid rgba(255,255,255,.16)", background: "rgba(255,255,255,.04)", boxShadow: "0 28px 80px rgba(0,0,0,.32)", position: "relative", overflow: "hidden" }}>
@@ -67,41 +53,10 @@ export default function HomePage() {
         <p style={{ ...eyebrow, color: RED }}>Start with your situation</p>
         <h2 style={sectionTitle}>Two go-to-market lanes. One sourcing desk.</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,430px),1fr))", gap: 18, marginTop: 42 }}>
-          <Door href="/tribal/grants" number="01" title="TBCP 3 & Tribal grants" body="Turn TBCP 3, NEGP, award records, renewals, gaming uptime, healthcare, education, and rural enterprise needs into carrier-neutral sourcing and installed service." cta="Plan funded connectivity" />
+          <Door href="/tribal/grants" number="01" title="TBCP 3 awardees & Tribal enterprise" body="Turn TBCP 3 and NEGP awards (rolling from Spring 2027), award records, renewals, gaming uptime, healthcare, education, and rural enterprise needs into carrier-neutral sourcing and installed service." cta="Plan funded connectivity" />
           <Door href="/data-center-connectivity" number="02" title="Data-center connectivity" body="Determine whether a site can obtain the internet, transport, dark fiber, wavelengths, cloud access, DCI, and physical diversity its operating plan requires." cta="Evaluate site connectivity" />
         </div>
         <p style={{ color: MUTED, marginTop: 22, lineHeight: 1.7 }}>Also sourcing multi-site enterprise, gaming and hospitality, healthcare, public safety, UCaaS/CCaaS, managed networks, cloud, mobility, cybersecurity, and Canada partnership opportunities.</p>
-      </section>
-
-      <section style={{ background: "#fff", borderBlock: `1px solid ${LINE}`, padding: "88px 32px" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,420px),1fr))", gap: 42, alignItems: "start" }}>
-            <div>
-              <p style={{ ...eyebrow, color: RED }}>GTM engine</p>
-              <h2 style={sectionTitle}>The site feeds reviewed outreach, not generic traffic.</h2>
-              <p style={{ color: MUTED, lineHeight: 1.75, fontSize: 16, maxWidth: 650, marginTop: 24 }}>
-                Every useful visitor should land in a lane, campaign, or partner motion. Konative turns public award data, market maps, stalled-project signals, and relationship context into approved Twenty CRM queues before any outreach begins.
-              </p>
-            </div>
-            <div style={{ border: `1px solid ${LINE}`, background: "#F7F8FA" }}>
-              {signalRows.map(([value, label]) => (
-                <div key={value} style={{ display: "grid", gridTemplateColumns: "120px 1fr", gap: 18, padding: "20px 24px", borderBottom: `1px solid ${LINE}`, alignItems: "baseline" }}>
-                  <strong style={{ fontFamily: DISPLAY, fontSize: 34, lineHeight: 1, color: RED, textTransform: "uppercase" }}>{value}</strong>
-                  <span style={{ color: MUTED, lineHeight: 1.55, fontSize: 14 }}>{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,260px),1fr))", gap: 0, marginTop: 44, border: `1px solid ${LINE}` }}>
-            {gtmMotions.map(([title, body], i) => (
-              <div key={title} style={{ padding: 28, borderRight: `1px solid ${LINE}`, background: i % 2 === 0 ? "#fff" : "#F9FAFB" }}>
-                <span style={{ color: RED, fontWeight: 800, fontSize: 12 }}>0{i + 1}</span>
-                <h3 style={{ fontFamily: DISPLAY, textTransform: "uppercase", fontSize: 28, lineHeight: 1, margin: "14px 0 12px" }}>{title}</h3>
-                <p style={{ color: MUTED, lineHeight: 1.65, margin: 0, fontSize: 14 }}>{body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
 
       <section style={{ background: "#F7F8FA", borderBlock: `1px solid ${LINE}`, padding: "88px 32px" }}>

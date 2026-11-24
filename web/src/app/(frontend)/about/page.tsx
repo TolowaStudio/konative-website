@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { JsonLd, SITE_URL, breadcrumbSchema, faqSchema } from "@/components/seo/JsonLd";
+import { siteOpenGraphImage } from "@/lib/seo/siteOpenGraph";
 
 export const revalidate = 3600;
 
@@ -24,6 +25,7 @@ export const metadata: Metadata = {
       "Native-owned AVANT desk for Tribal enterprises and data-center builds — published benchmarks and a written sovereignty commitment.",
     url: `${SITE_URL}/about`,
     type: "profile",
+    images: [siteOpenGraphImage()],
   },
 };
 
@@ -55,7 +57,7 @@ const orgAboutSchema = {
   url: SITE_URL,
   founder: { "@id": `${SITE_URL}/about#jeramey-james` },
   description:
-    "A Native-owned, vendor-neutral connectivity and infrastructure brokerage serving Tribal nations, federally funded broadband programs, and data-center developers across North America.",
+    "A Native-owned, vendor-neutral connectivity and infrastructure brokerage serving Tribal nations, federally funded broadband programs, and data-center developers — domestic and international, any market.",
 };
 
 const ABOUT_FAQ = [

@@ -3,7 +3,7 @@
 ## Cover
 
 **Prepared for:** [Organization]  
-**Prepared by:** Konative, a trade name of Total Pacific LLC  
+**Prepared by:** Konative, a trade name of Tolowa Pacific LLC  
 **Date:** [Date]  
 **Opportunity:** [Project / sites / requirement]
 
@@ -80,7 +80,7 @@ in writing.
 
 ## Important disclosure
 
-Konative is a trade name of Total Pacific LLC and operates as an independent
+Konative is a trade name of Tolowa Pacific LLC and operates as an independent
 technology advisor/sub-agent. Supplier availability, pricing, incentives and
 service terms are controlled by the applicable supplier and distributor
 agreements.

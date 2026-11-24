@@ -18,9 +18,9 @@ import {
 import { getSanityReadClient } from "../../../sanity/readClient";
 
 export const metadata: Metadata = {
-  title: "News — Konative",
+  title: "News Archive — Konative",
   description:
-    "Curated news on tribal data centers, tribal energy, broadband grants, and connectivity infrastructure across North America.",
+    "Archive of curated news (through August 2026) on tribal data centers, tribal energy, broadband grants, and connectivity infrastructure — domestic and international, any market. The feed is paused.",
 };
 
 export const revalidate = 3600;
@@ -290,7 +290,7 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
                 margin: "0 0 10px",
               }}
             >
-              Intelligence Feed
+              News Archive · Feed Paused
             </p>
             <h1
               style={{
@@ -316,7 +316,9 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
                 maxWidth: 640,
               }}
             >
-              Policy, power, fiber, and capital signals across tribal and rural North America.
+              Policy, power, fiber, and capital signals for tribal and rural connectivity — domestic and
+              international, any market. This feed is paused: stories run through August 2026 and are kept
+              here as an archive.
             </p>
           </div>
           <div
@@ -332,7 +334,7 @@ export default async function NewsPage({ searchParams }: NewsPageProps) {
               textTransform: "uppercase",
             }}
           >
-            North America Desk · Policy · Power · Fiber
+            Global Connectivity Desk · Policy · Power · Fiber
           </div>
         </div>
       </section>

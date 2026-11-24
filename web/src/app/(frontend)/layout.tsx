@@ -9,6 +9,7 @@ import {
   organizationSchema,
   websiteSchema,
 } from "@/components/seo/JsonLd";
+import { siteOpenGraphImage } from "@/lib/seo/siteOpenGraph";
 
 import "./globals.css";
 
@@ -20,7 +21,7 @@ export const viewport: Viewport = {
 export const metadata = {
   title: "Konative | Internet & Network Connectivity Brokerage",
   description:
-    "Nearby fiber is not deliverable fiber. Konative is a Native-owned, vendor-neutral connectivity brokerage — an AVANT partner — for data centers under construction and Tribal enterprises. Site-specific briefs. Suppliers pay us.",
+    "Nearby fiber is not deliverable fiber. Konative is a Native-owned, vendor-neutral connectivity brokerage — domestic and international, any market — for data centers and Tribal enterprises. Site-specific briefs. Suppliers pay us.",
   metadataBase: new URL("https://konative.com"),
   icons: {
     icon: "/favicon.svg",
@@ -29,6 +30,8 @@ export const metadata = {
     siteName: "Konative",
     type: "website" as const,
     locale: "en_US",
+    url: "https://konative.com",
+    images: [siteOpenGraphImage()],
   },
   twitter: {
     card: "summary_large_image" as const,
