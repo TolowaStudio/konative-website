@@ -29,50 +29,21 @@ export default function TermsPage() {
         <h1 style={{ fontFamily: '"Barlow Condensed", sans-serif', fontSize: 48, fontWeight: 800, marginBottom: 24 }}>
           Terms of use
         </h1>
-        <p style={{ fontSize: 15, lineHeight: 1.75, color: MUTED, marginBottom: 32 }}>
-          Effective November 23, 2026 · Konative is a trade name of Tolowa Pacific LLC.
+        <p style={{ fontSize: 15, lineHeight: 1.75, color: MUTED, marginBottom: 24 }}>
+          This is a short placeholder page. Full terms of use may be published here later.
         </p>
-
-        <Section title="Informational content">
-          Market maps, indices, news archives, and program summaries on this site are for general information only. They are
-          not legal, financial, or investment advice. Confirm eligibility, pricing, and serviceability with suppliers and
-          your advisors before acting.
-        </Section>
-        <Section title="Brokerage relationship">
-          Konative is a vendor-neutral connectivity broker. Carriers and suppliers contract directly with buyers. Konative is
-          compensated by suppliers when a buyer selects a quoted service, unless otherwise disclosed in writing.
-        </Section>
-        <Section title="No grant-writing">
-          Konative does not write grant applications for fees and does not administer federal award programs. Free navigators
-          and education on this site are separate from commercial brokerage.
-        </Section>
-        <Section title="Acceptable use">
-          Do not attempt to access non-public admin areas (/cms, /studio, /dashboard), scrape the site in ways that impair
-          service, or misrepresent affiliation with Konative or Tolowa Pacific LLC.
-        </Section>
-        <Section title="Limitation of liability">
-          To the fullest extent permitted by law, Tolowa Pacific LLC and Konative are not liable for indirect or consequential
-          damages arising from use of this website or reliance on its content.
-        </Section>
-        <Section title="Contact">
-          Questions about these terms:{" "}
+        <p style={{ fontSize: 15, lineHeight: 1.75, color: MUTED, margin: 0 }}>
+          For questions, use{" "}
           <Link href="/contact" style={{ color: "#C8001F" }}>
             konative.com/contact
-          </Link>
+          </Link>{" "}
+          or email{" "}
+          <a href="mailto:deals@konative.com" style={{ color: "#C8001F" }}>
+            deals@konative.com
+          </a>
           .
-        </Section>
+        </p>
       </div>
     </main>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section style={{ marginBottom: 32 }}>
-      <h2 style={{ fontFamily: '"Barlow Condensed", sans-serif', fontSize: 26, fontWeight: 700, marginBottom: 12 }}>
-        {title}
-      </h2>
-      <p style={{ fontSize: 15, lineHeight: 1.75, color: MUTED, margin: 0 }}>{children}</p>
-    </section>
   );
 }

@@ -39,6 +39,7 @@
     "stash:remember-architecture": "node scripts/stash-remember-fleet-architecture.mjs",
     "notion:update-architecture": "node scripts/update-notion-fleet-architecture.mjs",
     "test": "vitest run",
+    "test:smoke": "KONATIVE_NEXT_DEV_SMOKE=1 vitest run src/lib/__tests__/smoke",
     "test:watch": "vitest",
     "tiles:sync": "node -e \"const{cpSync}=require('fs');cpSync('../tiles/v1','public/tiles/v1',{recursive:true,force:true});console.log('tiles synced');\"",
     "news:cleanup": "tsx --env-file=.env.local scripts/news-desk-cleanup.ts",

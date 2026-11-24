@@ -2,6 +2,8 @@ import { type ChildProcess, spawn } from "node:child_process";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { SITE_OG_IMAGE_PATH } from "@/lib/seo/siteOpenGraph";
 
+const runSmoke = process.env.KONATIVE_NEXT_DEV_SMOKE === "1";
+
 const DEV_PORT = 31_500 + Math.floor(Math.random() * 500);
 const BASE_URL = `http://127.0.0.1:${DEV_PORT}`;
 
@@ -42,7 +44,7 @@ async function waitForNextReady(child: ChildProcess): Promise<void> {
   });
 }
 
-describe("Next dev static routes (TS-4169)", () => {
+describe.skipIf(!runSmoke)("Next dev smoke routes (TS-4169)", () => {
   let child: ChildProcess;
 
   beforeAll(async () => {
