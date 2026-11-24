@@ -60,7 +60,7 @@ const sections = [
     href: "/governors",
     label: "Stalled-Project Tracker",
     eyebrow: "Proprietary Tracker",
-    headline: "Stalled & blocked data-center projects — live map",
+    headline: "Stalled & blocked data-center projects — research map",
     summary: "Governor-level context for stalled, canceled, paused, and blocked data-center projects in NV, WV, FL, and OK. Konative's proprietary signal layer for where demand is locked up.",
   },
   {

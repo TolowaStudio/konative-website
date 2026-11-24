@@ -57,46 +57,36 @@ describe("formatNewsDeskStatusLine", () => {
         totalPages: 2,
         activeFilterCount: 0,
       }),
-    ).toBe("Last 10 days · 12 on page 1 of 2");
+    ).toContain("Last 7 days");
   });
 
-  it("describes latest-published fallback without claiming recency", () => {
+  it("describes an empty desk without surfacing archive dates", () => {
     expect(
       formatNewsDeskStatusLine({
         isDataUnavailable: false,
-        isShowingLatestFallback: true,
-        docsCount: 24,
+        isShowingLatestFallback: false,
+        docsCount: 0,
         page: 1,
-        totalPages: 6,
+        totalPages: 1,
         activeFilterCount: 0,
-        newestPublishedAt: "2026-07-16T12:00:00.000Z",
       }),
-    ).toBe(
-      "No stories in the last 10 days — showing the latest published instead (newest: Jul 16, 2026) · 24 on page 1 of 6",
-    );
+    ).toContain("No on-desk stories in the last 7 days");
   });
 });
 
 describe("fetchNewsPageData", () => {
-  it("falls back to latest published when the window is empty", async () => {
-    const fallbackDocs: NewsDoc[] = [
+  it("does not surface archive stories when the live window is empty", async () => {
+    const staleOffDesk: NewsDoc[] = [
       {
         id: "news-1",
-        title: "Older story",
+        title: "Pickleball courts reshape office leasing",
+        summary: "Commercial Observer office survey",
         publishedAt: "2026-07-16T12:00:00.000Z",
       },
     ];
 
     const client = {
-      fetch: async <T>(query: string): Promise<T> => {
-        if (query.startsWith("count")) {
-          return 0 as T;
-        }
-        if (query.includes("[0...8]")) {
-          return [] as T;
-        }
-        return fallbackDocs as T;
-      },
+      fetch: async <T>(_query: string): Promise<T> => staleOffDesk as T,
     };
 
     const result = await fetchNewsPageData(client, {
@@ -106,19 +96,13 @@ describe("fetchNewsPageData", () => {
       since: "2026-08-09T00:00:00.000Z",
     });
 
-    expect(result.isShowingLatestFallback).toBe(true);
-    expect(result.docs).toEqual(fallbackDocs);
-    expect(result.newestPublishedAt).toBe("2026-07-16T12:00:00.000Z");
+    expect(result.isShowingLatestFallback).toBe(false);
+    expect(result.docs).toEqual([]);
   });
 
-  it("keeps the empty state when fallback filters also match nothing", async () => {
+  it("keeps the empty state when filters match nothing", async () => {
     const client = {
-      fetch: async <T>(query: string): Promise<T> => {
-        if (query.startsWith("count")) {
-          return 0 as T;
-        }
-        return [] as T;
-      },
+      fetch: async <T>(_query: string): Promise<T> => [] as T,
     };
 
     const result = await fetchNewsPageData(client, {
@@ -132,16 +116,18 @@ describe("fetchNewsPageData", () => {
     expect(result.docs).toEqual([]);
   });
 
-  it("uses the curation window when it has matches", async () => {
-    const windowDocs: NewsDoc[] = [{ id: "news-fresh", title: "Fresh story" }];
-    const calls: string[] = [];
+  it("filters default desk to on-topic stories", async () => {
+    const windowDocs: NewsDoc[] = [
+      {
+        id: "news-fresh",
+        title: "Hyperscaler expands tribal data center fiber route",
+        summary: "NTIA TBCP-backed backbone supports interconnection queue.",
+        topics: ["tribal-broadband"],
+      },
+    ];
 
     const client = {
       fetch: async <T>(query: string): Promise<T> => {
-        calls.push(query);
-        if (query.startsWith("count")) {
-          return 1 as T;
-        }
         if (query.includes("[0...8]")) {
           return [] as T;
         }
@@ -158,6 +144,5 @@ describe("fetchNewsPageData", () => {
 
     expect(result.isShowingLatestFallback).toBe(false);
     expect(result.docs).toEqual(windowDocs);
-    expect(calls.some((query) => query.includes("publishedAt >= $since"))).toBe(true);
   });
 });

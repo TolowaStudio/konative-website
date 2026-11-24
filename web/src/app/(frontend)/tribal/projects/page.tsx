@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { JsonLd, breadcrumbSchema, SITE_URL } from "@/components/seo/JsonLd";
-import { fetchTribalProjects } from "@/lib/tribalProjects";
+import { AsOfLabel } from "@/components/AsOfLabel";
+import { isFreshTimestamp, formatAsOfLabel } from "@/lib/contentFreshness";
+import { fetchTribalProjects, fetchTribalProjectsDatasetMeta } from "@/lib/tribalProjects";
 
 import ProjectsGridClient from "./ProjectsGridClient";
 
@@ -26,8 +28,13 @@ export const metadata: Metadata = {
 };
 
 export default async function TribalProjectsPage() {
-  let projects = await fetchTribalProjects().catch(() => []);
+  const [projects, datasetMeta] = await Promise.all([
+    fetchTribalProjects().catch(() => []),
+    fetchTribalProjectsDatasetMeta(),
+  ]);
   const isDataUnavailable = projects.length === 0;
+  const asOfLabel = formatAsOfLabel(datasetMeta?.updatedAt);
+  const showLiveCounts = isFreshTimestamp(datasetMeta?.updatedAt) && projects.length > 0;
 
   const usCount = projects.filter((p) => p.country === "US").length;
   const caCount = projects.filter((p) => p.country === "CA").length;
@@ -125,40 +132,56 @@ export default async function TribalProjectsPage() {
               Tribal news feed →
             </Link>
           </p>
-          <div style={{ display: "flex", gap: 48, flexWrap: "wrap" }}>
-            {[
-              { label: "Projects tracked", value: projects.length.toString() },
-              { label: "United States", value: usCount.toString() },
-              { label: "Canada", value: caCount.toString() },
-              { label: "Operating", value: operatingCount.toString() },
-            ].map((s) => (
-              <div key={s.label}>
-                <div
-                  style={{
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontWeight: 600,
-                    fontSize: 28,
-                    color: RED,
-                    lineHeight: 1,
-                  }}
-                >
-                  {s.value}
+          {showLiveCounts ? (
+            <div style={{ display: "flex", gap: 48, flexWrap: "wrap" }}>
+              {[
+                { label: "Projects tracked", value: projects.length.toString() },
+                { label: "United States", value: usCount.toString() },
+                { label: "Canada", value: caCount.toString() },
+                { label: "Operating", value: operatingCount.toString() },
+              ].map((s) => (
+                <div key={s.label}>
+                  <div
+                    style={{
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontWeight: 600,
+                      fontSize: 28,
+                      color: RED,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {s.value}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: BODY,
+                      fontSize: 11,
+                      color: "rgba(255,255,255,0.4)",
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      marginTop: 4,
+                    }}
+                  >
+                    {s.label}
+                  </div>
                 </div>
-                <div
-                  style={{
-                    fontFamily: BODY,
-                    fontSize: 11,
-                    color: "rgba(255,255,255,0.4)",
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    marginTop: 4,
-                  }}
-                >
-                  {s.label}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p
+              style={{
+                fontFamily: BODY,
+                fontSize: 13,
+                color: "rgba(255,255,255,0.55)",
+                maxWidth: 560,
+                lineHeight: 1.6,
+                margin: 0,
+              }}
+            >
+              Project counts are hidden until the registry refresh is current. Browse the grid below for curated records.
+            </p>
+          )}
+          {asOfLabel && showLiveCounts ? <AsOfLabel label={asOfLabel} /> : null}
         </div>
       </section>
 

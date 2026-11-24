@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@sanity/client'
 import HeroBackdrop from '@/components/marketing/HeroBackdrop'
+import { AsOfLabel } from '@/components/AsOfLabel'
+import { formatAsOfLabel, isFreshTimestamp } from '@/lib/contentFreshness'
 
 export const revalidate = 3600;
 
@@ -130,9 +132,10 @@ async function getLiveStats() {
       "operational": count(*[_type == "dataCenterProject" && country == "CA" && status == "operational"]),
       "pipeline": count(*[_type == "dataCenterProject" && country == "CA" && status in ["announced","construction"]]),
       "stalled": count(*[_type == "dataCenterProject" && country == "CA" && status in ["stalled","blocked","paused","canceled"]]),
-      "totalMw": math::sum(*[_type == "dataCenterProject" && country == "CA" && defined(capacityMw)].capacityMw)
+      "totalMw": math::sum(*[_type == "dataCenterProject" && country == "CA" && defined(capacityMw)].capacityMw),
+      "updatedAt": max(*[_type == "dataCenterProject" && country == "CA"]._updatedAt)
     }`)
-    return stats as { operational: number; pipeline: number; stalled: number; totalMw: number }
+    return stats as { operational: number; pipeline: number; stalled: number; totalMw: number; updatedAt?: string }
   } catch {
     return null
   }
@@ -140,15 +143,21 @@ async function getLiveStats() {
 
 export default async function CanadaPage() {
   const live = await getLiveStats()
-  const headlineStats = [
-    {
-      v: live?.totalMw ? `${Math.round(live.totalMw).toLocaleString()} MW` : '~10 GW',
-      l: 'Tracked Canadian DC capacity (MW sum)',
-    },
-    {
-      v: live ? `${live.operational} / ${live.pipeline}` : '117 / 30+',
-      l: 'Operational / pipeline (live dataset)',
-    },
+  const liveFresh = live && isFreshTimestamp(live.updatedAt)
+  const asOfLabel = formatAsOfLabel(live?.updatedAt)
+  const headlineStats = liveFresh
+    ? [
+        {
+          v: live.totalMw ? `${Math.round(live.totalMw).toLocaleString()} MW` : '—',
+          l: 'Tracked Canadian DC capacity (MW sum)',
+        },
+        {
+          v: `${live.operational} / ${live.pipeline}`,
+          l: 'Operational / pipeline (live dataset)',
+        },
+      ]
+    : []
+  const staticStats = [
     { v: 'C$2B', l: 'Federal Sovereign AI Compute Strategy' },
     { v: '650 MW', l: 'Largest Indigenous-led project (Woodland Cree)' },
   ]
@@ -174,8 +183,18 @@ export default async function CanadaPage() {
               CANADA: 10 GW PIPELINE, FOUR DIFFERENT MARKETS
             </h1>
             <p style={{ color: '#c3cbdb', maxWidth: 640, lineHeight: 1.65, margin: '0 0 1.5rem', fontSize: '1.0625rem' }}>
-              Canada has {live?.operational ?? 117} operational data centres tracked, {live?.pipeline ?? '30+'} in the pipeline, and {live?.stalled ?? 'multiple'} with stalled or blocked status in our research dataset. The four major markets (Quebec, Ontario, Alberta, BC) operate under structurally different power regimes — and the federal Sovereign AI Compute Strategy is committing C$2B with explicit preference for Indigenous-partnered projects.
+              {liveFresh ? (
+                <>
+                  Canada has {live.operational} operational data centres tracked, {live.pipeline} in the pipeline, and {live.stalled} with stalled or blocked status in our research dataset.
+                </>
+              ) : (
+                <>
+                  Live operational/pipeline counts are hidden until the Canadian project dataset refresh is current.
+                </>
+              )}{' '}
+              The four major markets (Quebec, Ontario, Alberta, BC) operate under structurally different power regimes — and the federal Sovereign AI Compute Strategy is committing C$2B with explicit preference for Indigenous-partnered projects.
             </p>
+            {asOfLabel && liveFresh ? <AsOfLabel label={asOfLabel} style={{ color: 'rgba(255,255,255,0.45)' }} /> : null}
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
               <Link href="/map" style={{ background: '#C8001F', color: '#fff', padding: '0.75rem 1.5rem', borderRadius: 6, textDecoration: 'none', fontWeight: 600, fontSize: '0.875rem' }}>
                 Explore Canada on the Map →
@@ -196,6 +215,7 @@ export default async function CanadaPage() {
         <div style={{ maxWidth: 960, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
           {[
             ...headlineStats,
+            ...staticStats,
           ].map(s => (
             <div key={s.l} style={{ background: '#0f1728', border: '1px solid #1e293b', borderRadius: 8, padding: '1.25rem' }}>
               <div style={{ fontSize: '1.875rem', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, color: '#C8001F', lineHeight: 1, marginBottom: '0.4rem' }}>{s.v}</div>

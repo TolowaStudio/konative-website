@@ -141,11 +141,17 @@ function mapRow(row: {
 
 export default async function TBCPAwardsPage() {
   const awards = await getAwards();
+  const asOfLabel = new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(new Date());
 
   return (
     <>
       <JsonLd data={[breadcrumbJsonLd, datasetJsonLd, collectionPageJsonLd]} />
-      <AwardsClient awards={awards} />
+      <AwardsClient awards={awards} datasetAsOf={asOfLabel} />
     </>
   );
 }

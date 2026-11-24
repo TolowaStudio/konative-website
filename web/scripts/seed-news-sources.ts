@@ -112,7 +112,7 @@ const sources: NewsSourceSeed[] = [
     slug: "bisnow-datacenter",
     feedUrl: "https://www.bisnow.com/rss",
     sourceType: "rss",
-    active: true,
+    active: false, // Broad CRE feed — off-topic without per-item filtering (TS-4182)
     category: "real-estate",
   },
   {
@@ -121,7 +121,7 @@ const sources: NewsSourceSeed[] = [
     slug: "commercial-observer",
     feedUrl: "https://commercialobserver.com/feed/",
     sourceType: "rss",
-    active: true,
+    active: false, // Broad CRE feed — off-topic without per-item filtering (TS-4182)
     category: "real-estate",
   },
   {
