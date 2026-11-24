@@ -324,7 +324,7 @@ export default function FirstNationsPage() {
             </Link>
           </div>
           <p style={{ color: '#475569', fontSize: '0.75rem', marginTop: '2rem' }}>
-            Konative is led by Jeramey James, who carries direct experience with tribal enterprise infrastructure operations and Indigenous economic development. <Link href="/about" style={{ color: '#94a3b8', textDecoration: 'underline' }}>Meet the founder →</Link>
+            Konative is led by Jeramey James, who carries direct experience with tribal enterprise infrastructure operations and Indigenous economic development. <Link href="/about" style={{ color: '#94a3b8', textDecoration: 'underline' }}>Meet the team →</Link>
           </p>
         </div>
       </section>

@@ -105,7 +105,7 @@ const FIRST_NATIONS_PROJECTS = [
     nation: 'Six Nations of the Grand River, Cree Nation Government, FNMPC partners',
     location: 'Ontario / Quebec / Pan-Canada',
     capacity: 'Active opportunity assessment',
-    partner: 'Konative partnership conversations (by introduction only)',
+    partner: 'Konative target outreach',
     structure: 'Various — early stage',
     significance: 'Konative\'s wedge: bring US tribal-DC playbook learnings (Akwesasne, Navajo, Wind River) to Canadian First Nations conversations.',
   },

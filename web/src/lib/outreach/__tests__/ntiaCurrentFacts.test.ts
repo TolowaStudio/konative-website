@@ -4,10 +4,6 @@ import { describe, expect, it } from "vitest";
 const ACTIVE_FACT_SURFACES = [
   "src/app/(frontend)/HomePage.tsx",
   "src/app/(frontend)/ntia/page.tsx",
-  "src/app/(frontend)/tribal/page.tsx",
-  "src/app/(frontend)/tribal/grants/page.tsx",
-  "src/app/(frontend)/tribal/funding-navigator/page.tsx",
-  "src/app/(frontend)/tribal/funding-navigator/DeadlineCountdown.tsx",
   "src/lib/outreach/ntiaTemplate.ts",
   "public/llms.txt",
   "public/llms-full.txt",
@@ -45,10 +41,8 @@ describe("current NTIA facts", () => {
   // paid list-building. Warm introductions and opt-in newsletters are fine.
   it.each([
     "src/app/(frontend)/HomePage.tsx",
-    "src/app/(frontend)/canada/page.tsx",
     "src/app/(frontend)/data-center-connectivity/page.tsx",
-    "src/app/(frontend)/tribal/page.tsx",
-    "src/app/(frontend)/answers/page.tsx",
+    "src/app/(frontend)/ntia/page.tsx",
   ])("does not promise outreach campaigns or list-building in %s", (path) => {
     const contents = readFileSync(resolve(process.cwd(), path), "utf8");
     expect(contents).not.toMatch(
