@@ -138,6 +138,10 @@ describe("campaign-ready public surface (TS-4169)", () => {
     );
     expect(dc).toMatch(/Native American–owned, vendor-neutral/i);
     expect(dc).toMatch(/domestic and international/i);
+    expect(dc).toMatch(/any connectivity package/i);
+    expect(dc).toMatch(
+      /No SBA 8\(a\), NMSDC, or other certification claims beyond ownership/i,
+    );
     expect(dc).not.toMatch(/(?:NMSDC|SBA 8\(a\)).*certified|certified.*(?:NMSDC|SBA 8\(a\))/i);
   });
 });

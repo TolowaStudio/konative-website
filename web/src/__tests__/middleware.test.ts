@@ -35,6 +35,11 @@ describe("admin middleware (TS-4169)", () => {
     }
   });
 
+  it("allows admin paths in development when ADMIN_ACCESS_TOKEN is unset", () => {
+    process.env.NODE_ENV = "development";
+    expect(middleware(new NextRequest("https://konative.com/studio")).status).toBe(200);
+  });
+
   it("returns 401 when token is set but credentials are missing", () => {
     process.env.ADMIN_ACCESS_TOKEN = adminToken;
     expect(middleware(new NextRequest("https://konative.com/studio")).status).toBe(401);
