@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { createElement } from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { FeatureCollection } from "geojson";
 import type { LayerManifestEntry } from "@/types/map-layers";
@@ -196,5 +196,109 @@ describe("DataCenterMap PMTiles HEAD probe wiring", () => {
     expect(
       screen.queryByTestId(`map-source-infra-${PMTILES_LAYER_ID}`),
     ).toBeNull();
+  });
+
+  it("does not add banner error when category disabled before slow HEAD 403 resolves", async () => {
+    let releaseHead403: (() => void) | undefined;
+    const headDeferred = new Promise<Response>((resolve) => {
+      releaseHead403 = () => resolve(new Response(null, { status: 403 }));
+    });
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input);
+        const method =
+          init?.method ??
+          (input instanceof Request ? input.method : "GET");
+
+        if (url.includes("/api/v1/layer-manifest")) {
+          return new Response(
+            JSON.stringify({
+              version: 1,
+              generatedAt: "2026-01-01T00:00:00.000Z",
+              layers: [PMTILES_LAYER],
+            }),
+          );
+        }
+
+        if (url.includes("/api/v1/map-data")) {
+          const empty = { type: "FeatureCollection", features: [] };
+          return new Response(
+            JSON.stringify({
+              layers: {
+                projects: empty,
+                facilities: empty,
+                network: empty,
+                power: empty,
+              },
+              counts: {
+                projects: 1,
+                facilities: 0,
+                network: 0,
+                power: 0,
+                total: 1,
+              },
+            }),
+          );
+        }
+
+        if (method === "HEAD" && url.includes(".pmtiles")) {
+          return headDeferred;
+        }
+
+        return new Response("{}");
+      }),
+    );
+
+    const DataCenterMap = (await import("../DataCenterMap")).default;
+
+    render(
+      createElement(DataCenterMap, {
+        layerData: {
+          projects: MOCK_PROJECTS,
+          facilities: { type: "FeatureCollection", features: [] },
+          network: { type: "FeatureCollection", features: [] },
+          power: { type: "FeatureCollection", features: [] },
+        },
+        counts: {
+          projects: 1,
+          facilities: 0,
+          network: 0,
+          power: 0,
+          total: 1,
+        },
+        initialInfraEnabled: { power: true },
+      }),
+    );
+
+    await waitFor(() => {
+      expect(vi.mocked(fetch)).toHaveBeenCalledWith(
+        expect.stringContaining("ca_nrcan_transmission_lines.pmtiles"),
+        expect.objectContaining({ method: "HEAD" }),
+      );
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Overlay Layers")).toBeTruthy();
+    });
+
+    const hideToggle = await waitFor(() => {
+      const toggles = screen
+        .getAllByTitle("Hide layer")
+        .filter((el) => !(el as HTMLButtonElement).disabled);
+      expect(toggles.length).toBeGreaterThan(0);
+      return toggles[0] as HTMLButtonElement;
+    });
+    fireEvent.click(hideToggle);
+
+    releaseHead403!();
+
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId("pmtiles-infra-error-banner")).toBeNull();
+      },
+      { timeout: 2000 },
+    );
   });
 });

@@ -224,6 +224,11 @@ export default function DataCenterMap({
     () => new Set(),
   )
   const [tileOrigin, setTileOrigin] = useState('')
+  const effectiveInfraEnabledRef = useRef(effectiveInfraEnabled)
+
+  useEffect(() => {
+    effectiveInfraEnabledRef.current = effectiveInfraEnabled
+  }, [effectiveInfraEnabled])
 
   useEffect(() => { ensurePMTilesProtocol() }, [])
   useEffect(() => { setTileOrigin(window.location.origin) }, [])
@@ -312,12 +317,16 @@ export default function DataCenterMap({
 
       setPmtilesProbePending((prev) => new Set(prev).add(layer.id))
 
+      const layerCategory = layer.category
       void runPmtilesHeadProbe(probeUrl).then((result) => {
         setPmtilesProbePending((prev) => {
           const next = new Set(prev)
           next.delete(layer.id)
           return next
         })
+        if (!effectiveInfraEnabledRef.current[layerCategory]) {
+          return
+        }
         setPmtilesLayerErrors((prev) =>
           mergePmtilesHeadProbeResult(prev, layer.id, result),
         )
