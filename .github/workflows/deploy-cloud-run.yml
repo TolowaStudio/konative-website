@@ -165,3 +165,14 @@ jobs:
           else
             echo "DATABASE_URI secret not set — health 503 acceptable until Supabase DATABASE_URI is configured"
           fi
+          tile_head_code="000"
+          for attempt in 1 2 3; do
+            tile_head_code=$(curl -sS -o /dev/null -I -w '%{http_code}' \
+              "${URL}/api/v1/tiles/tiles/v1/ca_nrcan_transmission_lines.pmtiles" || echo "000")
+            echo "PMTiles HEAD attempt ${attempt}: ${tile_head_code}"
+            if [ "${tile_head_code}" = "200" ]; then
+              break
+            fi
+            sleep 2
+          done
+          test "${tile_head_code}" = "200"
