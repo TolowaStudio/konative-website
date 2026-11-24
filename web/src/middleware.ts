@@ -26,9 +26,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Token unset in production: leave /cms and /studio public until konative-ADMIN_ACCESS_TOKEN exists.
+  // Token unset in production: fail closed — admin surfaces must not be world-readable.
   if (access === "disabled") {
-    return NextResponse.next();
+    return new NextResponse("Admin access is not configured", {
+      status: 503,
+      headers: { "Cache-Control": "no-store" },
+    });
   }
 
   return new NextResponse("Authentication required", {

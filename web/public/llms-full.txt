@@ -1,10 +1,10 @@
 # Konative — Full Reference
 
 > Konative (konative.com) is a Native-owned, vendor-neutral connectivity brokerage — an Avant
-> sub-agent — for data centers under construction and Tribal enterprises across the US and Canada.
+> sub-agent — for data centers under construction and Tribal enterprises, domestic and international, any market.
 > Core claim: nearby fiber is not deliverable fiber. Primary offer is a one-page site-specific
-> Market Connectivity Brief. Suppliers pay Konative's fee; buyers pay nothing. Grant help
-> (TBCP/NEGP navigator) is free and separate from brokerage — federal money never flows through Konative.
+> Market Connectivity Brief. Suppliers pay Konative's fee; buyers pay nothing. The TBCP/NEGP
+> funding navigator is a free reference, separate from brokerage — federal money never flows through Konative.
 
 ## Services brokered
 
@@ -15,21 +15,22 @@ wireless, and colocation access — sourced through Avant's portfolio of 100+ su
 
 Buyer segments (priority): data-center operators and developers mid-build; Tribal gaming and
 multi-site enterprise ops; Tribal governments, healthcare, and education with a commercial
-connectivity trigger. Grant applicants use the free funding navigator — that is not a
-brokerage sales motion.
+connectivity trigger. TBCP/NEGP awardees moving into operations need carrier-grade
+connectivity sourced — Konative brokers that, $0 to the Tribe. The free funding navigator is a
+reference, not a brokerage sales motion.
 
 ## Tribal Broadband Funding Navigator (/tribal/funding-navigator)
 
 Free resource, no signup. Verified against NTIA primary sources.
 
 On June 17, 2026, NTIA opened two funding opportunities for Tribal Nations. TBCP Round 3
-(2026-NTIA-TBCP) and NEGP (2026-NTIA-NEGP) both close November 17, 2026 at 11:59 p.m. ET
-under the current NTIA notices. Applications are submitted through the NTIA grants portal.
-Awards roll out on a rolling basis beginning Spring 2027.
+(2026-NTIA-TBCP) and NEGP (2026-NTIA-NEGP) both closed November 17, 2026 at 11:59 p.m. ET
+under the NTIA notices. Applications were submitted through the NTIA grants portal.
+NTIA expects to make awards on a rolling basis beginning Spring 2027.
 
 ### TBCP Round 3 (Tribal Broadband Connectivity Program)
 - Total: $540 million. Run by NTIA BroadbandUSA.
-- Application deadline: November 17, 2026 at 11:59 p.m. ET (2026-NTIA-TBCP).
+- Application window: closed November 17, 2026 at 11:59 p.m. ET (2026-NTIA-TBCP).
 - Eligible entities: Tribal governments, Tribal organizations, Tribal colleges and
   universities, the Department of Hawaiian Home Lands, and Alaska Native entities.
 - Eligible uses: broadband infrastructure deployment AND broadband use/adoption projects,
@@ -39,7 +40,7 @@ Awards roll out on a rolling basis beginning Spring 2027.
 
 ### NEGP (Native Entities Grant Program)
 - Total: $250 million, under the Digital Equity Act.
-- Application deadline: November 17, 2026 at 11:59 p.m. ET (2026-NTIA-NEGP; amended July 30, 2026).
+- Application window: closed November 17, 2026 at 11:59 p.m. ET (2026-NTIA-NEGP; amended July 30, 2026).
 - Awards: $500,000 to $2.5 million each.
 - Match: 10%, waivable.
 - Purpose: Native entities' digital equity and inclusion activities.
@@ -58,9 +59,9 @@ Awards roll out on a rolling basis beginning Spring 2027.
 
 ### Konative's role
 Konative doesn't write grants — and the money never flows through Konative. It is a
-vendor-neutral connectivity brokerage that helps Tribes scope the network an application
-promises, pressure-test carrier costs in the budget, and — post-award — make carriers compete
-for the build and the circuits. Grant writers and Native-owned advisors (AMERIND Critical
+vendor-neutral connectivity brokerage. For awardees moving into operations, it turns the
+network an application promised into procurable service: it pressure-tests carrier costs
+against the budget and makes carriers compete for the build and the circuits. Grant writers and Native-owned advisors (AMERIND Critical
 Infrastructure, Tribal Ready, MuralNet) are partners Konative works alongside, not against.
 
 ## Sovereignty Commitment (/tribal/sovereignty)

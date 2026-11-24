@@ -1,7 +1,7 @@
 # Konative brokerage launch plan
 
 **Decision date:** 2026-06-18  
-**Operating company:** Total Pacific LLC, doing business as Konative  
+**Operating company:** Tolowa Pacific LLC, doing business as Konative  
 **Channel model:** Vendor-neutral technology advisor and Avant sub-agent  
 **Primary objective:** Build a durable book of monthly recurring connectivity revenue.
 

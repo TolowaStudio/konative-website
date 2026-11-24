@@ -166,6 +166,14 @@ jobs:
             echo "DATABASE_URI secret not set — health 503 acceptable until Supabase DATABASE_URI is configured"
           fi
 
+  pmtiles-post-deploy-warn:
+    runs-on: ubuntu-latest
+    if: vars.GCP_WORKLOAD_IDENTITY_PROVIDER == '' || vars.GCP_SERVICE_ACCOUNT == ''
+    steps:
+      - name: PMTiles acceptance check not run (WIF unset)
+        run: |
+          echo "::warning::Post-deploy PMTiles tile HEAD check skipped — same WIF gate as deploy job (vars.GCP_WORKLOAD_IDENTITY_PROVIDER / GCP_SERVICE_ACCOUNT)."
+
   pmtiles-post-deploy:
     runs-on: ubuntu-latest
     needs: deploy
