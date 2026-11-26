@@ -1,13 +1,13 @@
 name: Refresh static PMTiles
 
-# DISABLED (TOL-316): Cloudflare R2 is off (403 / NotEntitled). Scheduled runs were
-# failing and burning Actions minutes. Re-enable after GCS bucket + workflow migration.
-# See docs/konative-leftover-compute.md.
+# TOL-316 / TS-4170: PMTiles live in GCS (gs://konative-tiles). R2 is retired.
+# Scheduled cron stays off until Fleet Ops signs off on quarterly spend; use workflow_dispatch.
+# See docs/konative-leftover-compute.md and scripts/upload-tiles-gcs.sh.
 #
 # Legacy cadence (UTC) — do not restore until GCS path exists:
 #   CWFIS – monthly May–Oct · NRCAN – quarterly · CPCAD/CIRNAC – Nov · BCER – monthly
 #
-# Archived R2 secrets (retired): R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_URL
+# Retired R2 secrets — do not restore.
 
 on:
   workflow_dispatch:
@@ -32,9 +32,9 @@ permissions:
 
 # ── Shared env ────────────────────────────────────────────────────────────────
 env:
-  R2_BUCKET: ${{ secrets.R2_BUCKET_NAME }}
-  R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
-  TILES_PREFIX: tiles/v1   # key prefix inside the R2 bucket
+  GCS_TILES_BUCKET: konative-tiles
+  GCP_PROJECT: tolowa-studio
+  TILES_PREFIX: tiles/v1
 
 # ── Helper: returns true when this job should run ─────────────────────────────
 # GitHub exposes github.event.schedule with the cron string that fired.
@@ -43,14 +43,13 @@ env:
 jobs:
 
   gate:
-    name: Blocked — R2 retired (TOL-316)
+    name: Blocked — legacy R2 upload jobs (TOL-316)
     runs-on: ubuntu-latest
     steps:
-      - name: Fail fast
+      - name: Fail fast — do not run R2 upload jobs
         run: |
-          echo "::error::refresh-tiles.yml is disabled. R2 konative-tiles/konative-data are off."
-          echo "::error::Provision GCS + migrate workflow per docs/konative-leftover-compute.md."
-          echo "::error::Do not re-enable R2 or restore schedule triggers until GCS is live."
+          echo "::error::refresh-tiles.yml downstream jobs still upload to retired R2. Gate must fail until each job is migrated to GCS (see scripts/upload-tiles-gcs.sh)."
+          echo "::error::Do not re-enable R2 secrets (R2_BUCKET_NAME, R2_PUBLIC_URL) or restore R2 upload steps."
           exit 1
 
   # ── 1. CWFIS fire weather zones ─────────────────────────────────────────────
