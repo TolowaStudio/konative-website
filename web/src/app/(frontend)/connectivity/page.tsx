@@ -226,7 +226,7 @@ export default function ConnectivityPage() {
           { text: "ONE BROKER.", tone: "white" },
           { text: "EVERY NETWORK.", tone: "rust" },
         ]}
-        subhead="Konative is a vendor-neutral connectivity broker — a certified Avant sub-agent that sources, designs, and manages internet, fiber, transport, cloud on-ramps, colocation, and interconnection from 100+ suppliers across the United States and Canada. We work for you, not the carrier, and because suppliers pay our fee, it costs you nothing."
+        subhead="Konative is a vendor-neutral connectivity broker — an Avant sub-agent that sources, designs, and manages internet, fiber, transport, cloud on-ramps, colocation, and interconnection from 100+ suppliers across the United States and Canada. We work for you, not the carrier, and because suppliers pay our fee, it costs you nothing."
         primaryCta={{ label: "Book a Discovery Call →", href: "/call" }}
         secondaryCta={{ label: "Contact Us →", href: "/contact" }}
         heroImage={{

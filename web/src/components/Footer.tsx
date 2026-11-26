@@ -1,5 +1,6 @@
 "use client";
 
+import { bookingUrl } from "@/lib/booking";
 import Link from "next/link";
 
 const RED = "#C8001F";
@@ -58,7 +59,7 @@ export default function Footer() {
               ["Privacy", "/privacy"],
               ["Terms", "/terms"],
               ["Data Sources", "/licenses"],
-              ["Book a call", "https://cal.com/jeramey-james/15min"],
+              ["Book a call", bookingUrl("components-footer")],
             ]}
           />
         </div>

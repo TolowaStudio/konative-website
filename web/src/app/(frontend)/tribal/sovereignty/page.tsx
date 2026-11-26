@@ -1,3 +1,4 @@
+import { bookingUrl } from "@/lib/booking";
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 import Link from "next/link";
@@ -35,7 +36,7 @@ const TEXT = "#111111";
 const MUTED = "#6B7280";
 const DIVIDER = "#E5E7EB";
 
-const CAL_LINK = "https://cal.com/jeramey-james/15min";
+const CAL_LINK = bookingUrl("tribal-sovereignty");
 
 // --- JSON-LD ---
 

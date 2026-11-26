@@ -134,10 +134,10 @@ matters most. Fiber cable lead times run 20 weeks to a year (mid-2026).
 - /map — Interactive infrastructure map
 - /markets — Per-state market pages
 - /intelligence, /answers, /dispatch — Intelligence and knowledge base
-- /call — Book a call (https://cal.com/jeramey-james/15min)
+- /call — Book a call (https://cal.com/jeramey-james?utm_source=konative.com&utm_medium=llms&utm_campaign=booking&utm_content=llms-txt)
 - /contact — Contact form
 
 ## Contact
 
-- Discovery call (15 min): https://cal.com/jeramey-james/15min
+- Discovery call (15 min): https://cal.com/jeramey-james?utm_source=konative.com&utm_medium=llms&utm_campaign=booking&utm_content=llms-txt
 - Contact form: https://konative.com/contact

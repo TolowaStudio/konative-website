@@ -1,3 +1,4 @@
+import { TRIBAL_OFFER } from "@/content/offers";
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 import Link from "next/link";
@@ -47,7 +48,7 @@ const FAQ_ITEMS = [
   {
     question: "What is the NTIA Tribal Broadband Connectivity Program (TBCP)?",
     answer:
-      "NTIA's Tribal Broadband Connectivity Program (TBCP) is a $3 billion federal grant program (funded by the Infrastructure Investment and Jobs Act and the Consolidated Appropriations Act of 2021) for broadband infrastructure deployment, adoption, and capacity-building on Tribal lands. Prior rounds awarded approximately $2.2 billion across 275 projects serving 400+ Tribes. NTIA has now opened TBCP Round 3 together with the Native Entities Grant Program (NEGP), making ~$790 million available — both current application windows close November 17, 2026 at 11:59 p.m. ET, with rolling awards expected beginning Spring 2027. Konative does not administer TBCP awards, but we help Tribal connectivity buyers align carrier-grade service requirements with funded project scopes. Always confirm eligibility and program terms with your NTIA program officer.",
+      "NTIA's Tribal Broadband Connectivity Program (TBCP) is a $3 billion federal grant program (funded by the Infrastructure Investment and Jobs Act and the Consolidated Appropriations Act of 2021) for broadband infrastructure deployment, adoption, and capacity-building on Tribal lands. Prior rounds awarded approximately $2.2 billion across 275 projects serving 400+ Tribes. TBCP Round 3 and the Native Entities Grant Program (NEGP) made ~$790 million available; both application windows closed November 17, 2026 at 11:59 p.m. ET, and NTIA expects rolling awards beginning Spring 2027. Konative does not write grants or administer TBCP awards; we broker the carrier-grade connectivity that awardees need as funded projects move into operations. Always confirm eligibility and program terms with your NTIA program officer.",
   },
   {
     question: "Why does sovereignty matter in connectivity procurement?",
@@ -75,9 +76,9 @@ const FAQ_ITEMS = [
       "Book a 15-minute discovery call at konative.com/call or fill out the contact form at konative.com/contact. Konative will ask about your locations, current services, bandwidth and resilience requirements, and any funding context (TBCP awards, other federal programs). From there we run the supplier market and return a structured comparison — usually within a few business days for straightforward requirements.",
   },
   {
-    question: "Are you applying for NTIA TBCP Round 3 funding — should you engage Konative before award?",
+    question: "Did you apply for NTIA TBCP Round 3 or NEGP — when should you engage Konative?",
     answer:
-      "Grant application help is a free trust resource — use the Funding Navigator — and is separate from Konative’s commercial brokerage. TBCP Round 3 and NEGP fund infrastructure; they are not a commissionable sales motion. Engage Konative brokerage when you have a named enterprise property with a commercial connectivity question (renewal, multi-site WAN, DIA, failover) — including prior-round awardees moving into operations. Do not wait for a grant award to fix casino or enterprise uptime.",
+      "Konative does not write grants. The Funding Navigator is a free reference, separate from Konative’s commercial brokerage. TBCP Round 3 and NEGP (both closed November 17, 2026) fund infrastructure; they are not a commissionable sales motion. Engage Konative brokerage when you have a named enterprise property with a commercial connectivity question (renewal, multi-site WAN, DIA, failover) — including awardees moving into operations. Do not wait for a grant award to fix casino or enterprise uptime.",
   },
 ];
 
@@ -201,8 +202,8 @@ export default function TribalPage() {
           { text: "MAKE CARRIERS", tone: "dim" },
           { text: "COMPETE.", tone: "rust" },
         ]}
-        subhead="Native-owned, vendor-neutral connectivity brokerage for tribal gaming and multi-site ops — WAN, DIA, SD-WAN, voice, and security. Suppliers pay us; you own the contracts and the data. Written sovereignty commitment. Grant help is free and separate."
-        primaryCta={{ label: "Request a Continuity Snapshot →", href: "/contact?projectType=tribal_enterprise#request" }}
+        subhead="Native-owned, vendor-neutral connectivity brokerage for tribal gaming and multi-site ops — WAN, DIA, SD-WAN, voice, and security. Suppliers pay us; you own the contracts and the data. Written sovereignty commitment. We do not write grants."
+        primaryCta={{ label: `Request a ${TRIBAL_OFFER} →`, href: "/contact?projectType=tribal_enterprise#request" }}
         secondaryCta={{ label: "Sovereignty Commitment →", href: "/tribal/sovereignty" }}
         heroImage={{
           src: "https://images.unsplash.com/photo-1771179909412-813719cfca69?auto=format&fit=crop&w=2000&q=70",
@@ -211,7 +212,7 @@ export default function TribalPage() {
         }}
         ctaHeadlineTop="ONE SITE OR MANY."
         ctaHeadlineBottom="NO DISRUPTION PATH."
-        ctaSub="Tell us the properties, renewal windows, and failover gaps. We return a continuity snapshot — then run a competitive market without ripping out what works."
+        ctaSub="Tell us the properties, renewal windows, and failover gaps. We return a Continuity Snapshot — then run a competitive market without ripping out what works."
       >
         {/* Funding Navigator promo band */}
         <section style={{ background: "#08142D", borderTop: `3px solid ${RED}`, padding: "44px 0" }}>
@@ -243,7 +244,7 @@ export default function TribalPage() {
                 }}
               >
                 <span style={{ display: "block", width: 28, height: 2, background: RED }} />
-                Free Help · Not a Brokerage Pitch
+                Free Reference · Not a Brokerage Pitch
               </div>
               <div
                 style={{
@@ -256,11 +257,12 @@ export default function TribalPage() {
                   marginBottom: 10,
                 }}
               >
-                $790M applications due <span style={{ color: "#FF526B" }}>Nov 17, 2026</span>
+                TBCP 3 + NEGP closed <span style={{ color: "#FF526B" }}>Awards from Spring 2027</span>
               </div>
               <p style={{ fontFamily: BODY, fontSize: 14, lineHeight: 1.7, color: "rgba(255,255,255,0.6)", margin: 0, maxWidth: 620 }}>
-                Free TBCP Round 3 + NEGP navigator for the application window. Grant help is separate
-                from Konative brokerage — we do not farm awards into commission pitches. When you have
+                Both $790M application windows closed Nov 17, 2026. The free navigator keeps the program
+                facts and sources in one place. Konative does not write grants or farm awards into
+                commission pitches. When you have
                 a named enterprise site with a commercial connectivity question, use the continuity snapshot instead.
               </p>
             </div>
@@ -352,8 +354,8 @@ export default function TribalPage() {
               },
               {
                 num: "08",
-                title: "TBCP / Federal Funding Navigation",
-                body: "NTIA has opened TBCP Round 3 alongside the Native Entities Grant Program (NEGP), making ~$790 million available for broadband on Tribal lands. Both current application windows close November 17, 2026 at 11:59 p.m. ET — awards are expected on a rolling basis beginning Spring 2027. Konative does not administer grants, but we help Tribal connectivity teams structure carrier-grade service requirements that are defensible and program-aligned.",
+                title: "Connectivity for TBCP / NEGP Awardees",
+                body: "TBCP Round 3 and the Native Entities Grant Program (NEGP) made ~$790 million available for broadband on Tribal lands. Both application windows closed November 17, 2026 at 11:59 p.m. ET, and awards are expected on a rolling basis beginning Spring 2027. Konative does not write or administer grants; we broker the carrier-grade connectivity awardees need as funded projects move into operations.",
               },
             ].map((item) => (
               <div key={item.num} style={cardStyle}>
@@ -453,7 +455,7 @@ export default function TribalPage() {
               <h3 style={proofTitleStyle}>Tribal Connectivity Index</h3>
               <p style={proofDescStyle}>
                 The Tribal Connectivity Index is a searchable intelligence layer tracking public TBCP award
-                records and funding activity for Tribal connectivity planning. It gives outreach and planning
+                records and funding activity for Tribal connectivity planning. It gives Tribal planning
                 conversations a shared public reference point before the supplier-market review begins.
               </p>
               <Link href="/tribal/index" style={proofCtaStyle}>
@@ -558,7 +560,7 @@ export default function TribalPage() {
                 display: "inline-block",
               }}
             >
-              Request a Continuity Snapshot →
+              Request a {TRIBAL_OFFER} →
             </Link>
           </div>
         </PitchSection>

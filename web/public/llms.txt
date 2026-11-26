@@ -38,10 +38,10 @@
 - /markets — Secondary-market connectivity procurement briefs
 - /map — Interactive infrastructure map
 - /answers — Brokerage pricing, contracts, and process
-- /call — 15-minute discovery (https://cal.com/jeramey-james/15min)
+- /call — 15-minute discovery (https://cal.com/jeramey-james?utm_source=konative.com&utm_medium=llms&utm_campaign=booking&utm_content=llms-txt)
 - /contact — Contact form / site brief request
 
 ## Contact
 
-- Book a call: https://cal.com/jeramey-james/15min
+- Book a call: https://cal.com/jeramey-james?utm_source=konative.com&utm_medium=llms&utm_campaign=booking&utm_content=llms-txt
 - Site: https://konative.com/contact

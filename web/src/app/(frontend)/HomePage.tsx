@@ -23,7 +23,7 @@ export default function HomePage() {
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 72% 28%, rgba(200,0,31,.18), transparent 36%), linear-gradient(90deg,#08111F 0%,#0B1424 60%,#101A2C 100%)" }} />
         <div className="home-hero-grid" style={{ position: "relative", maxWidth: 1320, margin: "0 auto", padding: "116px 32px 72px", display: "grid", gridTemplateColumns: "minmax(0, .95fr) minmax(440px, .9fr)", gap: 42, alignItems: "center" }}>
           <div>
-            <p style={eyebrow}>Indigenous-owned connectivity brokerage · AVANT partner</p>
+            <p style={eyebrow}>Native-owned connectivity brokerage · AVANT partner</p>
             <h1 className="home-hero-title" style={{ fontFamily: DISPLAY, fontSize: "clamp(54px,7.4vw,108px)", lineHeight: .86, letterSpacing: "-.025em", textTransform: "uppercase", color: "#fff", maxWidth: 840, margin: "0 0 28px" }}>
               Source the network behind <span style={{ color: RED }}>critical infrastructure.</span>
             </h1>
