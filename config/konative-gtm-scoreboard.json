@@ -16,7 +16,7 @@
   },
   "metrics": [
     { "key": "visitors", "label": "Site visitors (unique, last 7 days)", "target": null, "due": "2027-02-13", "source": { "kind": "posthog", "field": "visitors_7d" } },
-    { "key": "signups", "label": "Signups (with express consent recorded)", "target": null, "due": "2027-02-13", "source": { "kind": "manual" } },
+    { "key": "signups", "label": "Signups (manual count; consent not recorded here)", "target": null, "due": "2027-02-13", "source": { "kind": "manual" } },
     { "key": "warm_contacts", "label": "Warm contacts with relationship evidence", "target": 40, "due": "2026-12-05", "source": { "kind": "manual" } },
     { "key": "warm_asks", "label": "Warm asks made", "target": 40, "due": "2027-01-15", "source": { "kind": "manual" } },
     { "key": "intros", "label": "Intros received", "target": 16, "due": "2027-01-15", "source": { "kind": "manual" } },

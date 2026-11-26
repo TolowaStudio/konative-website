@@ -171,7 +171,7 @@ export function renderMarkdown(board) {
   if (board.posthog) {
     lines.push('', '**Site (PostHog, last 7 days)**');
     if (board.posthog.error) lines.push(`- unavailable: ${board.posthog.error}`);
-    else lines.push(`- pageviews: ${board.posthog.pageviews_7d}, /contact pageviews: ${board.posthog.contact_pageviews_7d}, visitors: ${board.posthog.visitors_7d}`);
+    else lines.push(`- pageviews: ${board.posthog.pageviews_7d}, /contact pageviews: ${board.posthog.contact_pageviews_7d}, visitors: ${board.posthog.visitors_7d ?? '?'}`);
   }
   if (board.twenty.unmapped_stages?.length) {
     lines.push('', `Unmapped Twenty stages (check config): ${board.twenty.unmapped_stages.join(', ')}`);
@@ -224,6 +224,7 @@ export async function fetchPosthog({ cfg, key, fetchImpl = fetch }) {
   if (!response.ok) throw new Error(`PostHog HTTP ${response.status}`);
   const row = (await response.json()).results?.[0];
   if (!Array.isArray(row)) throw new Error('PostHog returned no result row');
+  if (row.length < 3 || row.slice(0, 3).some((v) => !Number.isFinite(Number(v)))) throw new Error('PostHog returned an unexpected row shape');
   return { pageviews_7d: Number(row[0]), contact_pageviews_7d: Number(row[1]), visitors_7d: Number(row[2]) };
 }
 

@@ -189,3 +189,21 @@ test('visitors come from PostHog, signups from manual, and neither is zero when 
   const err = buildScoreboard({ config: realConfig, posthog: { error: 'boom' }, now: '2026-12-01T00:00:00Z' });
   assert.equal(metric(err, 'visitors').status, 'ERROR');
 });
+
+test('the rendered board lists every metric the ticket names, each with a value or an explicit ? and status', () => {
+  const md = renderMarkdown(buildScoreboard({ config: realConfig, now: '2026-12-01T00:00:00Z' }));
+  for (const key of ['visitors', 'signups', 'inbound_requests', 'meetings', 'registrations', 'proposals', 'mrc_signed_usd']) {
+    const m = realConfig.metrics.find((x) => x.key === key);
+    assert.ok(m, key);
+    const row = md.split('\n').find((l) => l.startsWith(`| ${m.label} |`));
+    assert.ok(row, key);
+    assert.match(row, /\| \? \| .* \| (NO_SOURCE|SCOPE_UNSET) \|$/);
+  }
+  assert.doesNotMatch(realConfig.metrics.find((m) => m.key === 'signups').label, /consent recorded\)/);
+});
+
+test('a short or malformed PostHog row is an error, not a NaN metric', async () => {
+  for (const row of [[1, 2], [1, 2, 'x']]) {
+    await assert.rejects(fetchPosthog({ cfg: realConfig.posthog, key: 'k', fetchImpl: async () => ({ ok: true, json: async () => ({ results: [row] }) }) }), /unexpected row shape/);
+  }
+});
