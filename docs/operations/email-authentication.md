@@ -9,8 +9,10 @@ node scripts/konative-email-auth-check.mjs
 ```
 
 "DNS ready" means the records are published. Only a delivered message's
-`Authentication-Results` header proves a sender passes. The script exits 1 while
-Ghost has no proven `@konative.com` sender; remove its `blocker` once it does.
+`Authentication-Results` header proves a sender passes. Exit codes: 0 all
+ready, 1 a DNS fault, 2 a lookup failed, 3 DNS is fine but a sender is blocked.
+It exits 3 while Ghost has no proven `@konative.com` sender; remove Ghost's
+`blocker` in the script once it does.
 
 ## Senders
 

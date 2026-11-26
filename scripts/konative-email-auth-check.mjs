@@ -4,7 +4,8 @@
 //
 //   node scripts/konative-email-auth-check.mjs
 //
-// Exit 0: every sender's DNS is ready. 1: at least one is not. 2: a lookup failed.
+// Exit 0: every sender is ready. 1: a DNS fault. 2: a lookup failed.
+// 3: DNS is fine, but a sender has a known blocker DNS cannot fix.
 // Exit 0 does NOT mean mail is aligned: DNS cannot show which domain a provider
 // signs with. Only a delivered message's Authentication-Results header does.
 
@@ -70,7 +71,7 @@ async function checkSender(sender, lookup) {
     if (spf.length !== 1) problems.push(`${host} has ${spf.length} SPF records, needs exactly 1`);
     else if (!spf[0].split(/\s+/).includes(`include:${include}`)) problems.push(`SPF at ${host} lacks include:${include}`);
   }
-  return { name: sender.name, ready: problems.length === 0, proof: sender.proof ?? null, problems };
+  return { name: sender.name, ready: problems.length === 0, blocked: Boolean(sender.blocker), proof: sender.proof ?? null, problems };
 }
 
 export async function checkEmailAuth(lookup, expected = SENDERS) {
@@ -91,8 +92,11 @@ export async function checkEmailAuth(lookup, expected = SENDERS) {
     }
   }
 
-  return { senders, dmarc, leftovers, ready: dmarc.policy !== null && senders.every((s) => s.ready) };
+  const dnsReady = dmarc.policy !== null && senders.every((s) => s.ready || s.blocked);
+  return { senders, dmarc, leftovers, dnsReady, ready: dnsReady && senders.every((s) => s.ready) };
 }
+
+export const exitCode = ({ ready, dnsReady }) => (ready ? 0 : dnsReady ? 3 : 1);
 
 export function render({ senders, dmarc, leftovers }) {
   const lines = senders.map((s) => {
@@ -109,7 +113,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   try {
     const result = await checkEmailAuth(systemLookup());
     console.log(render(result));
-    process.exitCode = result.ready ? 0 : 1;
+    process.exitCode = exitCode(result);
   } catch (err) {
     console.error(`lookup failed, no verdict: ${err.message}`);
     process.exitCode = 2;

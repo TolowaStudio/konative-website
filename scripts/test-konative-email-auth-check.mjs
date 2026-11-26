@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { SENDERS, checkEmailAuth, render, systemLookup } from './konative-email-auth-check.mjs';
+import { SENDERS, checkEmailAuth, exitCode, render, systemLookup } from './konative-email-auth-check.mjs';
 
 const KEY = 'k=rsa; p=MIGfMA0GCSq';
 const healthy = () => ({
@@ -15,7 +15,7 @@ const healthy = () => ({
   'TXT brevo2._domainkey.konative.com': [KEY],
   'TXT cka._domainkey.konative.com': [KEY],
   'TXT cka2._domainkey.konative.com': [KEY],
-  'TXT _dmarc.konative.com': ['v=DMARC1; p=none; rua=mailto:reports@konative.com'],
+  'TXT _dmarc.konative.com': ['v=DMARC1; p=none; rua=mailto:dmarc@konative.com'],
 });
 const run = (zone, senders) => checkEmailAuth(async (host, type) => zone[`${type} ${host}`] ?? [], senders);
 // Ghost is always blocked, which would make `ready` false whatever DNS says.
@@ -76,6 +76,15 @@ test('published DNS is never reported as proven delivery', async () => {
     assert.ok(out.includes(`DNS READY  ${name} (delivery unproven)`), name);
   }
   assert.ok(out.includes('DNS READY  Resend (delivery proven 2026-11-24)'));
+});
+
+test('the exit code separates a known blocker from a DNS fault', async () => {
+  assert.equal(exitCode(await runDns(healthy())), 0);
+  assert.equal(exitCode(await run(healthy())), 3);
+  assert.equal(exitCode(await run({ ...healthy(), 'TXT resend._domainkey.konative.com': [] })), 1);
+  const noDmarc = healthy();
+  delete noDmarc['TXT _dmarc.konative.com'];
+  assert.equal(exitCode(await run(noDmarc)), 1);
 });
 
 test('a failed lookup throws instead of reading as "no record"', async () => {
