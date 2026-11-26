@@ -9,7 +9,8 @@ node scripts/konative-email-auth-check.mjs
 ```
 
 "DNS ready" means the records are published. Only a delivered message's
-`Authentication-Results` header proves a sender passes.
+`Authentication-Results` header proves a sender passes. The script exits 1 while
+Ghost has no proven `@konative.com` sender; remove its `blocker` once it does.
 
 ## Senders
 
@@ -58,7 +59,8 @@ left in Mailgun:
 The parked outreach code still defaults to `outreach@mg.konative.com`
 (`web/src/lib/outreach/mailgun.ts`); it cannot send from that domain any more.
 
-**2. Remove the Cloudflare mail leftovers:**
+**2. Remove the Cloudflare mail leftovers**, after confirming that Cloudflare
+Email Routing and sending are off and nothing still receives at `cf-bounce`:
 
 | Name | Type | Value to delete |
 |---|---|---|

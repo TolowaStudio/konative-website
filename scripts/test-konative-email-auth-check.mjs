@@ -20,9 +20,12 @@ const healthy = () => ({
 const run = (zone) => checkEmailAuth(async (host, type) => zone[`${type} ${host}`] ?? []);
 const sender = (result, name) => result.senders.find((s) => s.name === name);
 
+const dnsSenders = (result) => result.senders.filter((s) => s.name !== 'Ghost (Konative Dispatch)');
+const dnsReady = (result) => dnsSenders(result).every((s) => s.ready);
+
 test('a complete zone is DNS ready with no leftovers', async () => {
   const result = await run(healthy());
-  assert.equal(result.ready, true);
+  assert.equal(dnsReady(result), true);
   assert.equal(result.dmarc.policy, 'none');
   assert.deepEqual(result.leftovers, []);
 });
@@ -56,8 +59,23 @@ test('no DMARC record is not ready', async () => {
 
 test('records left from a departed sender are listed without failing the senders', async () => {
   const result = await run({ ...healthy(), 'MX mg.konative.com': ['10 mxa.mailgun.org'] });
-  assert.equal(result.ready, true);
+  assert.equal(dnsReady(result), true);
   assert.deepEqual(result.leftovers, [{ host: 'mg.konative.com', type: 'MX', why: 'Mailgun' }]);
+});
+
+test('Ghost is reported and keeps the run not ready even when all DNS is present', async () => {
+  const result = await run(healthy());
+  assert.equal(sender(result, 'Ghost (Konative Dispatch)').ready, false);
+  assert.equal(result.ready, false);
+  assert.match(render(result), /NOT READY {2}Ghost \(Konative Dispatch\)\n +- no sender with an @konative\.com From/);
+});
+
+test('published DNS is never reported as proven delivery', async () => {
+  const out = render(await run(healthy()));
+  for (const name of ['Microsoft 365 mailbox', 'Brevo', 'Kit']) {
+    assert.ok(out.includes(`DNS READY  ${name} (delivery unproven)`), name);
+  }
+  assert.ok(out.includes('DNS READY  Resend (delivery proven 2026-11-24)'));
 });
 
 test('a failed lookup throws instead of reading as "no record"', async () => {

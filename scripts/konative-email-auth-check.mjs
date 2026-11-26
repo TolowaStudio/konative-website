@@ -5,8 +5,8 @@
 //   node scripts/konative-email-auth-check.mjs
 //
 // Exit 0: every sender's DNS is ready. 1: at least one is not. 2: a lookup failed.
-// "Ready" is a statement about DNS. Only a delivered message's
-// Authentication-Results header proves that a sender actually passes.
+// Exit 0 does NOT mean mail is aligned: DNS cannot show which domain a provider
+// signs with. Only a delivered message's Authentication-Results header does.
 
 import { Resolver } from 'node:dns/promises';
 import { pathToFileURL } from 'node:url';
@@ -17,11 +17,14 @@ export const DOMAIN = 'konative.com';
 // a subdomain of it, which relaxed alignment accepts).
 // `spf`: the host used as the envelope sender, and the include it must carry.
 // Brevo is DKIM-only here: its shared return path is on Brevo's own domain.
+// `proof`: date of a delivered message seen passing DMARC. Absent means unproven.
+// `blocker`: why a sender cannot pass whatever DNS says. Remove it only once fixed.
 export const SENDERS = [
   { name: 'Microsoft 365 mailbox', dkim: ['selector1', 'selector2'], spf: { host: DOMAIN, include: 'spf.protection.outlook.com' } },
-  { name: 'Resend', dkim: ['resend'], spf: { host: `send.${DOMAIN}`, include: 'amazonses.com' } },
+  { name: 'Resend', proof: '2026-11-24', dkim: ['resend'], spf: { host: `send.${DOMAIN}`, include: 'amazonses.com' } },
   { name: 'Brevo', dkim: ['brevo1', 'brevo2'] },
   { name: 'Kit', dkim: ['cka', 'cka2'], spf: { host: `ckespa.${DOMAIN}`, include: 'spf.kit.com' } },
+  { name: 'Ghost (Konative Dispatch)', dkim: [], blocker: `no sender with an @${DOMAIN} From has been chosen and proven` },
 ];
 
 // Records that only served a sender which is gone.
@@ -56,7 +59,7 @@ export function systemLookup(resolver = new Resolver({ timeout: 5000, tries: 3 }
 const hasDkimKey = (records) => records.some((r) => /(^|;)\s*p=[A-Za-z0-9+/]/.test(r));
 
 async function checkSender(sender, lookup) {
-  const problems = [];
+  const problems = sender.blocker ? [sender.blocker] : [];
   for (const selector of sender.dkim) {
     const host = `${selector}._domainkey.${DOMAIN}`;
     if (!hasDkimKey(await lookup(host, 'TXT'))) problems.push(`no DKIM public key at ${host}`);
@@ -67,7 +70,7 @@ async function checkSender(sender, lookup) {
     if (spf.length !== 1) problems.push(`${host} has ${spf.length} SPF records, needs exactly 1`);
     else if (!spf[0].split(/\s+/).includes(`include:${include}`)) problems.push(`SPF at ${host} lacks include:${include}`);
   }
-  return { name: sender.name, ready: problems.length === 0, problems };
+  return { name: sender.name, ready: problems.length === 0, proof: sender.proof ?? null, problems };
 }
 
 export async function checkEmailAuth(lookup) {
@@ -92,7 +95,11 @@ export async function checkEmailAuth(lookup) {
 }
 
 export function render({ senders, dmarc, leftovers }) {
-  const lines = senders.map((s) => `${s.ready ? 'DNS READY' : 'NOT READY'}  ${s.name}${s.problems.map((p) => `\n           - ${p}`).join('')}`);
+  const lines = senders.map((s) => {
+    const delivery = s.proof ? `delivery proven ${s.proof}` : 'delivery unproven';
+    const status = s.ready ? `DNS READY  ${s.name} (${delivery})` : `NOT READY  ${s.name}`;
+    return `${status}${s.problems.map((p) => `\n           - ${p}`).join('')}`;
+  });
   lines.push(`DMARC      ${dmarc.record ?? 'MISSING or duplicated'}`);
   for (const l of leftovers) lines.push(`LEFTOVER   ${l.type} ${l.host} (${l.why})`);
   return lines.join('\n');
