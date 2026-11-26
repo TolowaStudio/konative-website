@@ -97,6 +97,8 @@ export async function ghostContentFetch(
 //     posts have `newsletter: null`. Tag is set at publish time and persists.
 export const KONATIVE_NEWSLETTER_ID =
   process.env.KONATIVE_NEWSLETTER_ID || "6a1115c22d98680001cb1028";
+export const KONATIVE_NEWSLETTER_NAME =
+  process.env.KONATIVE_NEWSLETTER_NAME || "Konative Dispatch";
 export const KONATIVE_NEWSLETTER_SLUG =
   process.env.KONATIVE_NEWSLETTER_SLUG || "konative-dispatch";
 export const KONATIVE_TAG_SLUG =
