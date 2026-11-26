@@ -10,9 +10,12 @@ vi.mock("@/sanity/writeClient", () => ({
     }),
   }),
 }));
+const pending: Promise<unknown>[] = [];
 vi.mock("next/server", async (orig) => ({
   ...(await orig<typeof import("next/server")>()),
-  after: (fn: () => unknown) => fn(),
+  after: (fn: () => unknown) => {
+    pending.push(Promise.resolve(fn()));
+  },
 }));
 
 const mockFetch = vi.fn().mockResolvedValue({ ok: true, text: async () => "" });
@@ -20,6 +23,12 @@ vi.stubGlobal("fetch", mockFetch);
 
 const { POST } = await import("@/app/(frontend)/api/newsletter/subscribe/route");
 const { CONSENT_WORDING, CONSENT_VERSION, postalAddress } = await import("@/lib/newsletter/consent");
+
+const post = async (r: import("next/server").NextRequest) => {
+  const res = await POST(r);
+  await Promise.all(pending.splice(0));
+  return res;
+};
 
 const req = (body: unknown) =>
   new Request("http://localhost/api/newsletter/subscribe", {
@@ -50,13 +59,13 @@ describe("newsletter signup consent", () => {
     mockFetch.mock.calls.filter(([u]) => String(u).startsWith("https://ghost.example.com"));
 
   it("rejects a signup without consent and stores nothing", async () => {
-    const res = await POST(req({ email: "a@b.com", source: "blog" }));
+    const res = await post(req({ email: "a@b.com", source: "blog" }));
     expect(res.status).toBe(400);
     expect(mockCreate).not.toHaveBeenCalled();
   });
 
   it("rejects consent:false", async () => {
-    const res = await POST(req({ email: "a@b.com", consent: false }));
+    const res = await post(req({ email: "a@b.com", consent: false }));
     expect(res.status).toBe(400);
     expect(mockCreate).not.toHaveBeenCalled();
   });
@@ -78,7 +87,7 @@ describe("newsletter signup consent", () => {
   });
 
   it("double opt-in: asks Ghost for a confirmation link, never creates a member via Admin API", async () => {
-    await POST(req({ email: "a@b.com", source: "blog", consent: true }));
+    await post(req({ email: "a@b.com", source: "blog", consent: true }));
     const calls = ghostCalls();
     expect(calls).toHaveLength(1);
     expect(String(calls[0][0])).toContain("/members/api/send-magic-link/");
@@ -93,7 +102,7 @@ describe("newsletter signup consent", () => {
         ? { ok: true, json: async () => ({ data: { people: [{ doNotContact: true }] } }) }
         : { ok: true, text: async () => "" },
     );
-    const res = await POST(req({ email: "gone@b.com", source: "blog", consent: true }));
+    const res = await post(req({ email: "gone@b.com", source: "blog", consent: true }));
     expect(res.status).toBe(200);
     expect(mockCreate).toHaveBeenCalledTimes(1);
     expect(ghostCalls()).toHaveLength(0);
@@ -104,7 +113,7 @@ describe("newsletter signup consent", () => {
       if (String(u).startsWith("https://twenty.example.com")) throw new Error("down");
       return { ok: true, text: async () => "" };
     });
-    await POST(req({ email: "a@b.com", source: "blog", consent: true }));
+    await post(req({ email: "a@b.com", source: "blog", consent: true }));
     expect(ghostCalls()).toHaveLength(0);
   });
 
