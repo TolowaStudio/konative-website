@@ -118,9 +118,10 @@ person against:
 3. Ghost: members who unsubscribed.
 4. Any earlier reply asking not to be contacted.
 
-**needs:jeramey:** confirm sources 1–4. The repo has no suppression list
-today; `web/src/lib/jev/sendSafetyGate.ts` only takes a yes/no flag, which is
-moot while there is no sending tool.
+**needs:jeramey:** confirm sources 1–4. `web/src/lib/outreach/suppression.ts` (TS-4376) reads Twenty `doNotContact` and
+`outreachStatus` DNC/OPTED_OUT/BOUNCED and is called by `sendOutreachEmail`, so
+every send path is checked; it fails closed. Mailgun and Ghost exports must be
+marked in Twenty first.
 
 ## 4. Eligibility — PASS
 

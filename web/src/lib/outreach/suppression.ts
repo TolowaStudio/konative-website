@@ -35,7 +35,7 @@ function peopleQuery(emails: string[]): string {
 
 export interface TwentySuppressionDeps {
   fetchImpl?: typeof fetch;
-  env?: NodeJS.ProcessEnv;
+  env?: Record<string, string | undefined>;
 }
 
 /** Pure: is this Twenty person node suppressed? */

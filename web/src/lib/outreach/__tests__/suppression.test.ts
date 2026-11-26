@@ -7,7 +7,7 @@ import {
 } from "@/lib/outreach/suppression";
 import { sendOutreachEmail } from "@/lib/outreach/mailgun";
 
-const env = { TWENTY_API_TOKEN: "t", TWENTY_API_URL: "https://twenty.test" } as NodeJS.ProcessEnv;
+const env = { TWENTY_API_TOKEN: "t", TWENTY_API_URL: "https://twenty.test" };
 
 function twentyReturning(nodes: unknown[]) {
   return vi.fn(async () =>
@@ -43,7 +43,7 @@ describe("suppression", () => {
   });
 
   it("fails closed when Twenty is unconfigured, down, or errors", async () => {
-    const none = createTwentySuppressionChecker({ env: {} as NodeJS.ProcessEnv });
+    const none = createTwentySuppressionChecker({ env: {} });
     expect((await assertNotSuppressed("a@b.com", none)).ok).toBe(false);
     const down = createTwentySuppressionChecker({ fetchImpl: vi.fn(async () => { throw new Error("x"); }), env });
     expect(await assertNotSuppressed("a@b.com", down)).toEqual({ ok: false, reason: "suppression-source-unreachable" });
