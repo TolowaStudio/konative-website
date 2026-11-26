@@ -29,6 +29,12 @@ export function normalizeEmail(value: string): string {
  * cannot filter inside `additionalEmails`, and matching locally on primary AND
  * additional addresses means a suppressed secondary address still blocks.
  */
+/** Split a recipient value (string or array, possibly comma/semicolon-joined) into addresses. */
+export function splitRecipients(to: string | string[]): string[] {
+  const parts = (Array.isArray(to) ? to : [to]).flatMap((v) => v.split(/[,;]/));
+  return parts.map(normalizeEmail).filter(Boolean);
+}
+
 function suppressedPeopleQuery(after: string | null): string {
   const statuses = SUPPRESSED_OUTREACH_STATUSES.map((s) => JSON.stringify(s)).join(",");
   const cursor = after ? `, after: ${JSON.stringify(after)}` : "";
@@ -65,7 +71,7 @@ export function createTwentySuppressionChecker(deps: TwentySuppressionDeps = {})
     const base = (env.TWENTY_API_URL || "").trim().replace(/\/+$/, "");
     if (!token || !base) return { ok: false, reason: "suppression-source-not-configured" };
 
-    const wanted = [...new Set(emails.map(normalizeEmail).filter(Boolean))];
+    const wanted = [...new Set(emails.flatMap((e) => splitRecipients(e)))];
     if (wanted.length === 0) return { ok: true, blocked: [] };
 
     const blocked = new Set<string>();
@@ -102,6 +108,7 @@ export function createTwentySuppressionChecker(deps: TwentySuppressionDeps = {})
         return { ok: false, reason: "suppression-source-error" };
       }
       for (const edge of body.data.people.edges ?? []) {
+        if (!edge?.node) continue;
         const node = edge.node as {
           emails?: { primaryEmail?: string; additionalEmails?: string[] };
           doNotContact?: unknown;
@@ -125,7 +132,7 @@ export async function assertNotSuppressed(
   to: string | string[],
   checker: SuppressionChecker = createTwentySuppressionChecker(),
 ): Promise<{ ok: true } | { ok: false; reason: string; blocked?: string[] }> {
-  const emails = (Array.isArray(to) ? to : [to]).map(normalizeEmail).filter(Boolean);
+  const emails = splitRecipients(to);
   if (emails.length === 0) return { ok: false, reason: "no-recipients" };
   const result = await checker(emails);
   if (!result.ok) return { ok: false, reason: result.reason };

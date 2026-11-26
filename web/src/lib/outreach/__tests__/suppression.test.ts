@@ -57,6 +57,15 @@ describe("suppression", () => {
     const r = await assertNotSuppressed(["b@x.com"], checker);
     expect(r).toEqual({ ok: false, reason: "suppressed", blocked: ["b@x.com"] });
     expect(fetchImpl).toHaveBeenCalledTimes(2);
+    const secondBody = JSON.parse((fetchImpl.mock.calls[1] as unknown as [string, { body: string }])[1].body);
+    expect(secondBody.query).toContain('after: "c1"');
+  });
+
+  it("blocks a suppressed address hidden in a comma-joined recipient string", async () => {
+    const fetchImpl = twentyReturning([{ emails: { primaryEmail: "dnc@example.com" }, doNotContact: true }]);
+    const checker = createTwentySuppressionChecker({ fetchImpl, env });
+    const r = await assertNotSuppressed("ok@example.com, Dnc <dnc@example.com>", checker);
+    expect(r).toEqual({ ok: false, reason: "suppressed", blocked: ["dnc@example.com"] });
   });
 
   it("clears addresses that are not suppressed", async () => {
