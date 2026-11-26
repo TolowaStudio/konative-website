@@ -29,7 +29,9 @@ const BODY_FONT = "Inter, sans-serif";
 
 // Canonical Cal.com booking link for Jeramey James (Tolowa Studio / Konative).
 // The prior `konative/discovery` slug never existed as a real Cal.com event.
-const CAL_EMBED_URL = bookingUrl("call");
+// Link target for the "Scheduling powered by Cal.com" text only. The inline embed
+// below is configured separately (calLink: "jeramey-james/15min") and is unchanged.
+const CAL_BOOKING_LINK = bookingUrl("call");
 
 const WHAT_HAPPENS = [
   {
@@ -212,7 +214,7 @@ export default function CallPage() {
             >
               Scheduling powered by{" "}
               <a
-                href={CAL_EMBED_URL}
+                href={CAL_BOOKING_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: ORANGE, textDecoration: "none" }}
