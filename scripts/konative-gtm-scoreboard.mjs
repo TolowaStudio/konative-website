@@ -72,6 +72,11 @@ export function measureMetric(metric, config, inputs) {
     return { ...base, status: 'OK', value: manual, via: 'manual' };
   }
   const source = metric.source ?? { kind: 'manual' };
+  if (source.kind === 'posthog') {
+    const value = inputs.posthog?.[source.field];
+    if (typeof value === 'number' && Number.isFinite(value)) return { ...base, status: 'OK', value, via: 'posthog' };
+    return { ...base, status: inputs.posthog?.error ? 'ERROR' : 'NO_SOURCE', value: null, detail: inputs.posthog?.error ?? 'PostHog was not read; run live' };
+  }
   if (source.kind === 'opportunity_stage') {
     if (inputs.opportunitiesError) return { ...base, status: 'ERROR', value: null, detail: inputs.opportunitiesError };
     const scoped = scopeOpportunities(inputs.opportunities ?? [], config.twenty?.opportunity_scope);
@@ -116,7 +121,7 @@ export function evaluateKillChecks(config, metricsByKey, today) {
 
 export function buildScoreboard({ config, opportunities = null, opportunitiesError = null, peopleTotal = null, posthog = null, manual = {}, now }) {
   const today = now.slice(0, 10);
-  const inputs = { opportunities, opportunitiesError, manual };
+  const inputs = { opportunities, opportunitiesError, manual, posthog };
   const metrics = config.metrics.map((metric) => {
     const measured = measureMetric(metric, config, inputs);
     return { ...measured, pace: paceFor(measured, today, config) };
@@ -166,7 +171,7 @@ export function renderMarkdown(board) {
   if (board.posthog) {
     lines.push('', '**Site (PostHog, last 7 days)**');
     if (board.posthog.error) lines.push(`- unavailable: ${board.posthog.error}`);
-    else lines.push(`- pageviews: ${board.posthog.pageviews_7d}, /contact pageviews: ${board.posthog.contact_pageviews_7d}`);
+    else lines.push(`- pageviews: ${board.posthog.pageviews_7d}, /contact pageviews: ${board.posthog.contact_pageviews_7d}, visitors: ${board.posthog.visitors_7d ?? '?'}`);
   }
   if (board.twenty.unmapped_stages?.length) {
     lines.push('', `Unmapped Twenty stages (check config): ${board.twenty.unmapped_stages.join(', ')}`);
@@ -207,7 +212,7 @@ export async function fetchOpportunities({ baseUrl, token, scope, fetchImpl = fe
 export function posthogQuery(site, env) {
   const s = site.replace(/'/g, '');
   const e = env.replace(/'/g, '');
-  return `SELECT count() AS pageviews, countIf(properties.$pathname = '/contact') AS contact_pageviews FROM events WHERE event = '$pageview' AND timestamp >= now() - INTERVAL 7 DAY AND properties.site = '${s}' AND properties.env = '${e}'`;
+  return `SELECT count() AS pageviews, countIf(properties.$pathname = '/contact') AS contact_pageviews, count(DISTINCT person_id) AS visitors FROM events WHERE event = '$pageview' AND timestamp >= now() - INTERVAL 7 DAY AND properties.site = '${s}' AND properties.env = '${e}'`;
 }
 
 export async function fetchPosthog({ cfg, key, fetchImpl = fetch }) {
@@ -219,7 +224,8 @@ export async function fetchPosthog({ cfg, key, fetchImpl = fetch }) {
   if (!response.ok) throw new Error(`PostHog HTTP ${response.status}`);
   const row = (await response.json()).results?.[0];
   if (!Array.isArray(row)) throw new Error('PostHog returned no result row');
-  return { pageviews_7d: Number(row[0]), contact_pageviews_7d: Number(row[1]) };
+  if (row.length < 3 || row.slice(0, 3).some((v) => !Number.isFinite(Number(v)))) throw new Error('PostHog returned an unexpected row shape');
+  return { pageviews_7d: Number(row[0]), contact_pageviews_7d: Number(row[1]), visitors_7d: Number(row[2]) };
 }
 
 function parseArgs(argv) {
