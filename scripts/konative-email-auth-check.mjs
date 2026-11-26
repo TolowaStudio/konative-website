@@ -73,9 +73,9 @@ async function checkSender(sender, lookup) {
   return { name: sender.name, ready: problems.length === 0, proof: sender.proof ?? null, problems };
 }
 
-export async function checkEmailAuth(lookup) {
+export async function checkEmailAuth(lookup, expected = SENDERS) {
   const senders = [];
-  for (const sender of SENDERS) senders.push(await checkSender(sender, lookup));
+  for (const sender of expected) senders.push(await checkSender(sender, lookup));
 
   const dmarcRecords = (await lookup(`_dmarc.${DOMAIN}`, 'TXT')).filter((r) => r.startsWith('v=DMARC1'));
   const record = dmarcRecords.length === 1 ? dmarcRecords[0] : null;

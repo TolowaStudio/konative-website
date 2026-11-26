@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { checkEmailAuth, render, systemLookup } from './konative-email-auth-check.mjs';
+import { SENDERS, checkEmailAuth, render, systemLookup } from './konative-email-auth-check.mjs';
 
 const KEY = 'k=rsa; p=MIGfMA0GCSq';
 const healthy = () => ({
@@ -17,22 +17,22 @@ const healthy = () => ({
   'TXT cka2._domainkey.konative.com': [KEY],
   'TXT _dmarc.konative.com': ['v=DMARC1; p=none; rua=mailto:reports@konative.com'],
 });
-const run = (zone) => checkEmailAuth(async (host, type) => zone[`${type} ${host}`] ?? []);
+const run = (zone, senders) => checkEmailAuth(async (host, type) => zone[`${type} ${host}`] ?? [], senders);
+// Ghost is always blocked, which would make `ready` false whatever DNS says.
+// Tests of the DNS gates leave it out so each one can fail on its own.
+const runDns = (zone) => run(zone, SENDERS.filter((s) => !s.blocker));
 const sender = (result, name) => result.senders.find((s) => s.name === name);
 
-const dnsSenders = (result) => result.senders.filter((s) => s.name !== 'Ghost (Konative Dispatch)');
-const dnsReady = (result) => dnsSenders(result).every((s) => s.ready);
-
 test('a complete zone is DNS ready with no leftovers', async () => {
-  const result = await run(healthy());
-  assert.equal(dnsReady(result), true);
+  const result = await runDns(healthy());
+  assert.equal(result.ready, true);
   assert.equal(result.dmarc.policy, 'none');
   assert.deepEqual(result.leftovers, []);
 });
 
 test('a missing or revoked DKIM key fails only that sender', async () => {
   for (const value of [[], ['v=DKIM1; k=rsa; p=']]) {
-    const result = await run({ ...healthy(), 'TXT resend._domainkey.konative.com': value });
+    const result = await runDns({ ...healthy(), 'TXT resend._domainkey.konative.com': value });
     assert.equal(result.ready, false);
     assert.equal(sender(result, 'Resend').ready, false);
     assert.equal(sender(result, 'Brevo').ready, true);
@@ -44,7 +44,7 @@ test('SPF must exist once and carry the provider include', async () => {
     ['v=spf1 include:_spf.mx.cloudflare.net ~all'],
     ['v=spf1 include:spf.protection.outlook.com ~all', 'v=spf1 -all'],
   ]) {
-    const result = await run({ ...healthy(), 'TXT konative.com': value });
+    const result = await runDns({ ...healthy(), 'TXT konative.com': value });
     assert.equal(sender(result, 'Microsoft 365 mailbox').ready, false);
   }
 });
@@ -52,14 +52,14 @@ test('SPF must exist once and carry the provider include', async () => {
 test('no DMARC record is not ready', async () => {
   const zone = healthy();
   delete zone['TXT _dmarc.konative.com'];
-  const result = await run(zone);
+  const result = await runDns(zone);
   assert.equal(result.ready, false);
   assert.match(render(result), /DMARC {6}MISSING/);
 });
 
 test('records left from a departed sender are listed without failing the senders', async () => {
-  const result = await run({ ...healthy(), 'MX mg.konative.com': ['10 mxa.mailgun.org'] });
-  assert.equal(dnsReady(result), true);
+  const result = await runDns({ ...healthy(), 'MX mg.konative.com': ['10 mxa.mailgun.org'] });
+  assert.equal(result.ready, true);
   assert.deepEqual(result.leftovers, [{ host: 'mg.konative.com', type: 'MX', why: 'Mailgun' }]);
 });
 
