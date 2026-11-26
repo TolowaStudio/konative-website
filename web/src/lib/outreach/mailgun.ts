@@ -23,6 +23,8 @@
  * It requires the key + a canary send before it can be considered working.
  */
 
+import { assertNotSuppressed, type SuppressionChecker } from "@/lib/outreach/suppression";
+
 export interface OutreachEmail {
   to: string | string[];
   subject: string;
@@ -39,6 +41,8 @@ export interface OutreachResult {
   id?: string;
   /** Present when ok:false — short reason for logs. */
   reason?: string;
+  /** Present when reason is "suppressed": the recipients that were blocked. */
+  blocked?: string[];
   /** True when the send was skipped because dryRun was set. */
   dryRun?: boolean;
 }
@@ -118,13 +122,23 @@ export function buildMessageBody(
  * network/HTTP error, and NEVER rejects. With `dryRun:true` it logs the built
  * request and returns `{ ok:true, dryRun:true }` without sending.
  */
-export async function sendOutreachEmail(email: OutreachEmail): Promise<OutreachResult> {
+export async function sendOutreachEmail(
+  email: OutreachEmail,
+  deps: { suppression?: SuppressionChecker } = {},
+): Promise<OutreachResult> {
   const cfg = getMailgunConfig();
   if (!cfg) {
     console.warn(
       "[mailgun] MAILGUN_API_KEY / MAILGUN_DOMAIN not set — skipping outreach send",
     );
     return { ok: false, reason: "not-configured" };
+  }
+
+  // K-09: one suppression check for every send path (fail-closed, applies to dry runs too).
+  const cleared = await assertNotSuppressed(email.to, deps.suppression);
+  if (!cleared.ok) {
+    console.warn(`[mailgun] send blocked: ${cleared.reason}`);
+    return { ok: false, reason: cleared.reason, blocked: cleared.blocked };
   }
 
   const url = buildMessagesUrl(cfg.baseUrl, cfg.domain);
