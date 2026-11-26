@@ -3,7 +3,8 @@ import { createHash } from "node:crypto";
 import { XMLParser } from "fast-xml-parser";
 import type { SanityClient } from "@sanity/client";
 
-import { newsCurationSinceIso } from "./newsConstants";
+import { newsCurationSinceIso, type NewsTopicValue } from "./newsConstants";
+import { inferNewsTopicsFromText, isNewsDeskEligible } from "./newsTopicFilter";
 
 type SourceDoc = {
   _id: string;
@@ -236,6 +237,23 @@ async function ingestSource(sanity: SanityClient, source: SourceDoc): Promise<Pe
         continue;
       }
 
+      const sourceTopics = (source.topics?.length ? source.topics : ["construction"]) as NewsTopicValue[];
+      if (
+        !isNewsDeskEligible({
+          title: item.title,
+          summary: item.summary,
+          topics: sourceTopics,
+        })
+      ) {
+        skipped += 1;
+        continue;
+      }
+
+      const resolvedTopics = inferNewsTopicsFromText(
+        { title: item.title, summary: item.summary },
+        sourceTopics,
+      );
+
       const ingestFingerprint = fingerprintFor(source._id, item.rawFingerprint, item.publishedAt);
       const stableId = `newsitem.${ingestFingerprint}`;
 
@@ -283,7 +301,7 @@ async function ingestSource(sanity: SanityClient, source: SourceDoc): Promise<Pe
           publishedAt: item.publishedAt,
           discoveredAt: new Date().toISOString(),
           countries: source.countries?.length ? source.countries : ["us"],
-          topics: source.topics?.length ? source.topics : ["construction"],
+          topics: resolvedTopics,
           ingestFingerprint,
         });
         created += 1;

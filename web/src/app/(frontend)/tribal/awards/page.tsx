@@ -5,7 +5,12 @@ import {
   breadcrumbSchema,
   SITE_URL,
 } from "@/components/seo/JsonLd";
-import { queryTbcpAwardsList, readWithSupabaseFallback } from "@/lib/db";
+import {
+  queryTbcpAwardsDatasetMeta,
+  queryTbcpAwardsList,
+  readWithSupabaseFallback,
+} from "@/lib/db";
+import { buildTbcpAwardsDatasetView } from "@/lib/publicStatSurfaces";
 import AwardsClient from "./AwardsClient";
 
 export const revalidate = 3600;
@@ -83,6 +88,30 @@ function parseRawProperties(
   }
 }
 
+async function getAwardsDatasetMeta(): Promise<{ updatedAt?: string } | null> {
+  return readWithSupabaseFallback<{ updatedAt?: string } | null>(
+    "tribal/awards-meta",
+    async () => queryTbcpAwardsDatasetMeta(),
+    async () => {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey =
+        process.env.SUPABASE_SERVICE_ROLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (!supabaseUrl || !supabaseKey) return null;
+
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      const { data, error } = await supabase
+        .from("tbcp_awards")
+        .select("updated_at")
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error || !data?.updated_at) return null;
+      return { updatedAt: data.updated_at as string };
+    },
+  );
+}
+
 async function getAwards() {
   type Mapped = ReturnType<typeof mapRow>;
   return readWithSupabaseFallback<Mapped[]>(
@@ -140,12 +169,16 @@ function mapRow(row: {
 }
 
 export default async function TBCPAwardsPage() {
-  const awards = await getAwards();
+  const [awards, datasetMeta] = await Promise.all([getAwards(), getAwardsDatasetMeta()]);
+  const { datasetAsOf } = buildTbcpAwardsDatasetView(
+    awards.length,
+    datasetMeta?.updatedAt,
+  );
 
   return (
     <>
       <JsonLd data={[breadcrumbJsonLd, datasetJsonLd, collectionPageJsonLd]} />
-      <AwardsClient awards={awards} />
+      <AwardsClient awards={awards} datasetAsOf={datasetAsOf} />
     </>
   );
 }

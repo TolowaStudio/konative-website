@@ -46,7 +46,7 @@ Home · Connectivity · Datacenters · Intelligence · Markets · Map/coverage �
 
 | Item | Rule |
 |------|------|
-| News ingest | **Off** — do not turn on cron, workflows, or `/api/ingest-news` automation |
+| News ingest | **On** — `.github/workflows/ingest-news.yml` daily 06:00 UTC → `/api/ingest-news` (re-enabled TS-4182) |
 | Outreach campaign | **Wait for Claude** — no autonomous campaign sends |
 | Kit (ConvertKit) | **Not on Konative** — newsletter is Ghost only |
 | Public hostname cutover | Only after Cloud Run health verified on production URLs |

@@ -44,6 +44,25 @@ function slugFromId(id: string): string {
   return slugFromTribalProjectId(id);
 }
 
+export type TribalProjectsDatasetMeta = {
+  count: number;
+  updatedAt?: string;
+};
+
+export async function fetchTribalProjectsDatasetMeta(): Promise<TribalProjectsDatasetMeta | null> {
+  try {
+    const client = getSanityReadClient();
+    return await client.fetch<TribalProjectsDatasetMeta>(
+      `{
+        "count": count(*[_type == "tribalProject" && defined(location)]),
+        "updatedAt": max(*[_type == "tribalProject" && defined(location)]._updatedAt)
+      }`,
+    );
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchTribalProjects(): Promise<TribalProjectRow[]> {
   const client = getSanityReadClient();
   const rows = await client.fetch<

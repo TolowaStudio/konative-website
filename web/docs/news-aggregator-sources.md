@@ -41,6 +41,16 @@ This document defines the first ingestion set for the Konative datacenter intell
 - Ingest active feeds:
   - `npm run ingest:news`
 
+## Scheduled ingest (production)
+
+GitHub Actions workflow `.github/workflows/ingest-news.yml`:
+
+- **Schedule:** `0 6 * * *` (daily 06:00 UTC)
+- **Target:** `GET https://konative.com/api/ingest-news`
+- **Auth:** Bearer token fetched at runtime from GCP Secret Manager (`konative-NEWS_INGEST_TOKEN` or `konative-CRON_SECRET`) via the repo WIF service account — not stored in GitHub secrets.
+
+Manual local run: `npm run ingest-news` (requires `SANITY_API_TOKEN` in `.env.local`).
+
 ## Cron-ready API endpoint
 - Endpoint: `GET` or `POST` `/api/ingest-news`
 - Auth: pass token in either:

@@ -4,8 +4,12 @@ import {
   TRIBAL_NEWS_TOPIC_VALUES,
   type NewsTopicValue,
 } from "./newsConstants";
+import { isNewsDeskEligible } from "./newsTopicFilter";
 
 export const NEWS_ITEMS_PER_PAGE = 24;
+
+/** Scan cap when applying desk topic filter after fetch (Sanity has no regex filter). */
+export const NEWS_DESK_SCAN_LIMIT = 400;
 
 export type NewsDoc = {
   id: string;
@@ -118,13 +122,25 @@ export function formatNewsDeskStatusLine(params: {
     params.activeFilterCount > 0 ? " with filters" : ""
   }`;
 
-  if (params.isShowingLatestFallback) {
-    const newest = formatNewsDate(params.newestPublishedAt);
-    const newestSuffix = newest ? ` (newest: ${newest})` : "";
-    return `No stories in the last ${NEWS_CURATION_WINDOW_DAYS} days — showing the latest published instead${newestSuffix}${pageSuffix}`;
+  if (params.docsCount === 0 && params.activeFilterCount === 0) {
+    return `No on-desk stories in the last ${NEWS_CURATION_WINDOW_DAYS} days. Daily ingest runs at 06:00 UTC.${pageSuffix}`;
   }
 
-  return `Last ${NEWS_CURATION_WINDOW_DAYS} days${pageSuffix}`;
+  return `Last ${NEWS_CURATION_WINDOW_DAYS} days · infrastructure desk filter${pageSuffix}`;
+}
+
+export function filterNewsDocsForDesk(
+  docs: NewsDoc[],
+  options: { applyDeskTopicFilter: boolean },
+): NewsDoc[] {
+  if (!options.applyDeskTopicFilter) return docs;
+  return docs.filter((doc) =>
+    isNewsDeskEligible({
+      title: doc.title,
+      summary: doc.summary,
+      topics: doc.topics,
+    }),
+  );
 }
 
 export function topicLabel(topics?: string[]): string {
@@ -137,42 +153,35 @@ export async function fetchNewsPageData(
   client: SanityFetchClient,
   filters: NewsPageFilters,
 ): Promise<NewsPageData> {
-  const windowFilter = buildNewsListFilter({
+  const applyDeskTopicFilter = filters.topic === "all";
+  const listFilter = buildNewsListFilter({
     country: filters.country,
     topic: filters.topic,
     withWindow: true,
   });
 
-  const windowTotal = await client.fetch<number>(`count(*[${windowFilter}])`, {
-    since: filters.since,
-  });
-
-  const useFallback = windowTotal === 0;
-  const listFilter = useFallback
-    ? buildNewsListFilter({ country: filters.country, topic: filters.topic, withWindow: false })
-    : windowFilter;
-
-  const queryParams = useFallback ? {} : { since: filters.since };
-  const total = useFallback
-    ? await client.fetch<number>(`count(*[${listFilter}])`, queryParams)
-    : windowTotal;
-
-  const totalPages = Math.max(1, Math.ceil(total / NEWS_ITEMS_PER_PAGE));
-  const safePage = Math.min(filters.currentPage, totalPages);
-  const safeStart = (safePage - 1) * NEWS_ITEMS_PER_PAGE;
-  const safeEnd = safeStart + NEWS_ITEMS_PER_PAGE;
-
-  const docs = await client.fetch<NewsDoc[]>(
-    `*[${listFilter}] | order(publishedAt desc)[${safeStart}...${safeEnd}]${newsDocProjection}`,
+  const queryParams = { since: filters.since };
+  const windowBatch = await client.fetch<NewsDoc[]>(
+    `*[${listFilter}] | order(publishedAt desc)[0...${NEWS_DESK_SCAN_LIMIT}]${newsDocProjection}`,
     queryParams,
   );
 
+  const eligible = filterNewsDocsForDesk(windowBatch, { applyDeskTopicFilter });
+  const total = eligible.length;
+  const totalPages = Math.max(1, Math.ceil(total / NEWS_ITEMS_PER_PAGE));
+  const safePage = Math.min(filters.currentPage, totalPages);
+  const safeStart = (safePage - 1) * NEWS_ITEMS_PER_PAGE;
+  const docs = eligible.slice(safeStart, safeStart + NEWS_ITEMS_PER_PAGE);
+
   const featured =
     filters.topic === "all" && safePage === 1 && docs.length > 0
-      ? await client.fetch<NewsDoc[]>(
-          `*[${buildFeaturedNewsFilter({ country: filters.country, withWindow: !useFallback })}] | order(publishedAt desc)[0...8]${newsDocProjection}`,
-          useFallback ? {} : { since: filters.since },
-        )
+      ? filterNewsDocsForDesk(
+          await client.fetch<NewsDoc[]>(
+            `*[${buildFeaturedNewsFilter({ country: filters.country, withWindow: true })}] | order(publishedAt desc)[0...24]${newsDocProjection}`,
+            queryParams,
+          ),
+          { applyDeskTopicFilter: true },
+        ).slice(0, 8)
       : [];
 
   return {
@@ -180,7 +189,7 @@ export async function fetchNewsPageData(
     featured,
     page: safePage,
     totalPages,
-    isShowingLatestFallback: useFallback && docs.length > 0,
-    newestPublishedAt: useFallback ? docs[0]?.publishedAt : undefined,
+    isShowingLatestFallback: false,
+    newestPublishedAt: undefined,
   };
 }

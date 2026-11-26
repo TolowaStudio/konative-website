@@ -23,6 +23,7 @@ interface Award {
 
 interface AwardsClientProps {
   awards: Award[];
+  datasetAsOf?: string;
 }
 
 function fmt(n: number | null) {
@@ -37,7 +38,7 @@ const PROJECT_TYPE_LABELS: Record<string, string> = {
   "A": "Adoption",
 };
 
-export default function AwardsClient({ awards: initialAwards }: AwardsClientProps) {
+export default function AwardsClient({ awards: initialAwards, datasetAsOf }: AwardsClientProps) {
   const [awards] = useState<Award[]>(initialAwards);
   const [search, setSearch] = useState("");
   const [filterNofo, setFilterNofo] = useState("");
@@ -100,6 +101,21 @@ export default function AwardsClient({ awards: initialAwards }: AwardsClientProp
               </div>
             ))}
           </div>
+          {datasetAsOf ? (
+            <p
+              style={{
+                fontFamily: BODY,
+                fontSize: 11,
+                fontWeight: 600,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.4)",
+                margin: "16px 0 0",
+              }}
+            >
+              NTIA public records · loaded {datasetAsOf}
+            </p>
+          ) : null}
         </div>
       </section>
 
