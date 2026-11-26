@@ -143,6 +143,8 @@ describe("getMailgunConfig", () => {
   });
 });
 
+const ALLOW = { suppression: async () => ({ ok: true as const, blocked: [] }) };
+
 describe("sendOutreachEmail", () => {
   beforeEach(() => {
     delete process.env.MAILGUN_API_KEY;
@@ -176,7 +178,7 @@ describe("sendOutreachEmail", () => {
       subject: "Test",
       html: "<p>Hi</p>",
       dryRun: true,
-    });
+    }, ALLOW);
 
     expect(result).toEqual({ ok: true, dryRun: true });
     expect(fetchSpy).not.toHaveBeenCalled();
@@ -199,7 +201,7 @@ describe("sendOutreachEmail", () => {
       to: "lead@example.com",
       subject: "Test",
       html: "<p>Hi</p>",
-    });
+    }, ALLOW);
 
     expect(result.ok).toBe(false);
     expect(result.reason).toBe("http-401");
@@ -218,7 +220,7 @@ describe("sendOutreachEmail", () => {
       to: "lead@example.com",
       subject: "Test",
       html: "<p>Hi</p>",
-    });
+    }, ALLOW);
 
     expect(result).toEqual({ ok: false, reason: "network-error" });
     vi.unstubAllGlobals();
@@ -240,7 +242,7 @@ describe("sendOutreachEmail", () => {
       to: "lead@example.com",
       subject: "Test",
       html: "<p>Hi</p>",
-    });
+    }, ALLOW);
 
     expect(result).toEqual({ ok: true, id: "<mailgun-id@mg.konative.com>" });
     vi.unstubAllGlobals();
