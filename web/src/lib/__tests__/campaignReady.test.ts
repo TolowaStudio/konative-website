@@ -147,6 +147,21 @@ describe("campaign-ready public surface (TS-4169)", () => {
     expect(offenders).toEqual([]);
   });
 
+  it("gives the shared hero H1 room (line-height >= 1, spacing above and below) on /tribal and /data-center-connectivity", () => {
+    const layout = readFileSync(resolve(webRoot, "src/components/marketing/PitchLayout.tsx"), "utf8");
+    const h1 = layout.slice(layout.indexOf("<h1"), layout.indexOf("</h1>"));
+    const lh = Number(/lineHeight:\s*([\d.]+)/.exec(h1)?.[1]);
+    const mb = Number(/marginBottom:\s*(\d+)/.exec(h1)?.[1]);
+    expect(lh).toBeGreaterThanOrEqual(1);
+    expect(mb).toBeGreaterThanOrEqual(32);
+    for (const path of [
+      "src/app/(frontend)/tribal/page.tsx",
+      "src/app/(frontend)/data-center-connectivity/page.tsx",
+    ]) {
+      expect(readFileSync(resolve(webRoot, path), "utf8"), path).toContain("<PitchLayout");
+    }
+  });
+
   it("uses one offer name per lane from content/offers.ts", () => {
     const read = (p: string) => readFileSync(resolve(webRoot, p), "utf8");
     const tribal = read("src/app/(frontend)/tribal/page.tsx");
