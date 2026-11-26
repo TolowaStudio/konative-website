@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 
+import { footerIntelligenceLinks } from "@/lib/siteNavigation";
+
 const RED = "#C8001F";
 const TEXT = "#111111";
 const STEEL = "#374151";
@@ -35,21 +37,7 @@ export default function Footer() {
               ["I'm an enterprise / multi-site", "/connectivity"],
             ]}
           />
-          <FooterGroup
-            title="Intelligence"
-            links={[
-              ["Intelligence Hub", "/intelligence"],
-              ["News Archive", "/news"],
-              ["Tribal DC Tracker", "/tribal/projects"],
-              ["Market Coverage", "/markets"],
-              ["TBCP 3 / NEGP Awardees", "/tribal/grants"],
-              ["Voice-to-Scope", "/tribal/scope"],
-              ["TBCP Awards", "/tribal/awards"],
-              ["Connectivity Map", "/map"],
-              ["Stalled Projects", "/governors"],
-              ["Dispatch", "/dispatch"],
-            ]}
-          />
+          <FooterGroup title="Intelligence" links={footerIntelligenceLinks} />
           <FooterGroup
             title="Company"
             links={[

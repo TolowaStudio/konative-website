@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import NewsletterSignup from "@/components/NewsletterSignup";
 import {
   ghostContentFetch,
   ghostContentKey,
@@ -95,10 +94,9 @@ export default async function BlogIndex() {
           <div className="blog__empty">
             <h2>Coming Soon</h2>
             <p>
-              We&apos;re preparing our first articles. Subscribe to be the first
-              to know when we publish.
+              We&apos;re preparing our first articles. Check back soon or{" "}
+              <Link href="/contact">contact us</Link> for project updates.
             </p>
-            <NewsletterSignup variant="inline" source="blog" />
           </div>
         ) : (
           <div className="blog__grid">

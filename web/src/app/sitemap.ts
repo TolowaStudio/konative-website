@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+import { DISPATCH_PUBLICLY_VISIBLE } from '@/lib/dispatchVisibility'
 import { MARKETS } from './(frontend)/markets/[state]/page'
 
 // Sitemap regenerates hourly so newly-published Ghost posts (Konative Dispatch
@@ -73,7 +74,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/news`,               lastModified: now, changeFrequency: 'daily',   priority: 0.7 },
     { url: `${BASE}/intelligence`,       lastModified: now, changeFrequency: 'weekly',  priority: 0.6 },
     { url: `${BASE}/answers`,            lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${BASE}/dispatch`,           lastModified: now, changeFrequency: 'daily',   priority: 0.5 },
 
     // Tertiary/supporting pages
     { url: `${BASE}/markets`,            lastModified: now, changeFrequency: 'weekly',  priority: 0.6 },
@@ -95,18 +95,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // --- intelligence sub-pages (if any canonical deep-links exist) ---------------
   const intelligenceRoutes: MetadataRoute.Sitemap = []
 
-  // --- Ghost-backed dynamic posts (Konative Dispatch only) -------------------
-  // For connectivity-first, include /dispatch/* dynamically. Do NOT include /blog/*
-  // in canonical sitemap.
-  const ghostPosts = await fetchGhostPosts()
   const dispatchRoutes: MetadataRoute.Sitemap = []
-  for (const p of ghostPosts) {
-    if (!p.slug || p.primary_tag?.slug !== 'konative-dispatch') continue
-    const lm = p.updated_at ? new Date(p.updated_at) : now
-    dispatchRoutes.push({
-      url: `${BASE}/dispatch/${p.slug}`,
-      lastModified: lm,
-      changeFrequency: 'monthly' as const,
+  if (DISPATCH_PUBLICLY_VISIBLE) {
+    const ghostPosts = await fetchGhostPosts()
+    for (const p of ghostPosts) {
+      if (!p.slug || p.primary_tag?.slug !== 'konative-dispatch') continue
+      const lm = p.updated_at ? new Date(p.updated_at) : now
+      dispatchRoutes.push({
+        url: `${BASE}/dispatch/${p.slug}`,
+        lastModified: lm,
+        changeFrequency: 'monthly' as const,
+        priority: 0.5,
+      })
+    }
+    dispatchRoutes.unshift({
+      url: `${BASE}/dispatch`,
+      lastModified: now,
+      changeFrequency: 'daily',
       priority: 0.5,
     })
   }

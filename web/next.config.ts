@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { DISPATCH_REDIRECTS } from "./src/lib/dispatchVisibility";
+
 const webDir = path.dirname(fileURLToPath(import.meta.url));
 
 const nextConfig: NextConfig = {
@@ -26,6 +28,7 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      ...DISPATCH_REDIRECTS,
       { source: "/powered-land", destination: "/data-center-connectivity", permanent: true },
       { source: "/readiness-audit", destination: "/contact?projectType=data_center", permanent: true },
       { source: "/land/:path*", destination: "/data-center-connectivity", permanent: true },

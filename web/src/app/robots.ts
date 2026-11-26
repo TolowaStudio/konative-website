@@ -11,6 +11,7 @@ export default function robots(): MetadataRoute.Robots {
           '/studio/',
           '/cms/',
           '/dashboard/',
+          '/dispatch/',
         ],
       },
     ],
