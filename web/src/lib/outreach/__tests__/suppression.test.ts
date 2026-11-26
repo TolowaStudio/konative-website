@@ -37,6 +37,28 @@ describe("suppression", () => {
     expect(r).toEqual({ ok: false, reason: "suppressed", blocked: ["bounced@example.com"] });
   });
 
+  it("blocks an address that is suppressed only via additionalEmails", async () => {
+    const fetchImpl = twentyReturning([
+      { emails: { primaryEmail: "ok@example.com", additionalEmails: ["Dnc@Example.com"] }, doNotContact: true },
+    ]);
+    const checker = createTwentySuppressionChecker({ fetchImpl, env });
+    const r = await assertNotSuppressed("dnc@example.com", checker);
+    expect(r).toEqual({ ok: false, reason: "suppressed", blocked: ["dnc@example.com"] });
+  });
+
+  it("follows pagination", async () => {
+    const page = (node: unknown, next: string | null) =>
+      new Response(JSON.stringify({ data: { people: { edges: [{ node }], pageInfo: { hasNextPage: !!next, endCursor: next } } } }));
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(page({ emails: { primaryEmail: "a@x.com" }, doNotContact: true }, "c1"))
+      .mockResolvedValueOnce(page({ emails: { primaryEmail: "b@x.com" }, doNotContact: true }, null));
+    const checker = createTwentySuppressionChecker({ fetchImpl, env });
+    const r = await assertNotSuppressed(["b@x.com"], checker);
+    expect(r).toEqual({ ok: false, reason: "suppressed", blocked: ["b@x.com"] });
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+  });
+
   it("clears addresses that are not suppressed", async () => {
     const checker = createTwentySuppressionChecker({ fetchImpl: twentyReturning([]), env });
     expect(await assertNotSuppressed("ok@example.com", checker)).toEqual({ ok: true });

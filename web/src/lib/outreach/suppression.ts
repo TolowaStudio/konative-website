@@ -24,14 +24,24 @@ export function normalizeEmail(value: string): string {
   return (m ? m[1] : raw).trim().toLowerCase();
 }
 
-function peopleQuery(emails: string[]): string {
-  const list = emails.map((e) => JSON.stringify(e)).join(",");
+/**
+ * Fetch every suppressed person (not "people matching these emails"): Twenty
+ * cannot filter inside `additionalEmails`, and matching locally on primary AND
+ * additional addresses means a suppressed secondary address still blocks.
+ */
+function suppressedPeopleQuery(after: string | null): string {
   const statuses = SUPPRESSED_OUTREACH_STATUSES.map((s) => JSON.stringify(s)).join(",");
-  return `{ people(first: 200, filter: { emails: { primaryEmail: { in: [${list}] } } }) {
+  const cursor = after ? `, after: ${JSON.stringify(after)}` : "";
+  return `{ people(first: 200${cursor}, filter: { or: [
+    { doNotContact: { eq: true } },
+    { outreachStatus: { in: [${statuses}] } }
+  ] }) {
+    pageInfo { hasNextPage endCursor }
     edges { node { emails { primaryEmail additionalEmails } doNotContact outreachStatus } }
-  } }
-  # suppressed statuses: ${statuses}`;
+  } }`;
 }
+
+const MAX_PAGES = 100;
 
 export interface TwentySuppressionDeps {
   fetchImpl?: typeof fetch;
@@ -60,22 +70,27 @@ export function createTwentySuppressionChecker(deps: TwentySuppressionDeps = {})
 
     const blocked = new Set<string>();
     const fetchImpl = deps.fetchImpl ?? fetch;
-    // Twenty stores addresses as typed; query lower-case and as-given variants.
-    for (let i = 0; i < wanted.length; i += 100) {
-      const chunk = wanted.slice(i, i + 100);
+    let after: string | null = null;
+    for (let page = 0; ; page++) {
+      if (page >= MAX_PAGES) return { ok: false, reason: "suppression-source-too-large" };
       let res: Response;
       try {
         res = await fetchImpl(`${base}/graphql`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ query: peopleQuery(chunk) }),
+          body: JSON.stringify({ query: suppressedPeopleQuery(after) }),
         });
       } catch {
         return { ok: false, reason: "suppression-source-unreachable" };
       }
       if (!res.ok) return { ok: false, reason: `suppression-source-http-${res.status}` };
       let body: {
-        data?: { people?: { edges?: { node: Record<string, unknown> }[] } };
+        data?: {
+          people?: {
+            edges?: { node: Record<string, unknown> }[];
+            pageInfo?: { hasNextPage?: boolean; endCursor?: string | null };
+          };
+        };
         errors?: unknown[];
       };
       try {
@@ -96,6 +111,10 @@ export function createTwentySuppressionChecker(deps: TwentySuppressionDeps = {})
         const addrs = [node.emails?.primaryEmail, ...(node.emails?.additionalEmails ?? [])];
         for (const a of addrs) if (a) blocked.add(normalizeEmail(a));
       }
+      const info = body.data.people.pageInfo;
+      if (!info?.hasNextPage) break;
+      if (!info.endCursor) return { ok: false, reason: "suppression-source-error" };
+      after = info.endCursor;
     }
     return { ok: true, blocked: wanted.filter((e) => blocked.has(e)) };
   };
