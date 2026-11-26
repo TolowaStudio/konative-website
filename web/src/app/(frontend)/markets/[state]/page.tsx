@@ -240,6 +240,7 @@ export async function generateMetadata({ params }: { params: Promise<{ state: st
   return {
     title: `${market.name} Data Center Market | Konative`,
     description: `Data center availability intelligence for ${market.name}. Projects, power pipeline, network infrastructure, and market activity — updated automatically.`,
+    alternates: { canonical: `/markets/${state}` },
     openGraph: {
       title: `${market.name} Data Center Market Intelligence`,
       description: market.subheadline,

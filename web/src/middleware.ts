@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminProtectedPath, verifyAdminAccess } from "@/lib/adminAccess";
 
+const CANONICAL_HOST = "konative.com";
+
 export function middleware(request: NextRequest) {
+  const host = request.headers.get("host")?.split(":")[0]?.toLowerCase();
+  if (host === `www.${CANONICAL_HOST}`) {
+    const url = request.nextUrl.clone();
+    url.host = CANONICAL_HOST;
+    url.protocol = "https:";
+    return NextResponse.redirect(url, 308);
+  }
+
   const { pathname } = request.nextUrl;
   if (!isAdminProtectedPath(pathname)) {
     return NextResponse.next();
@@ -31,5 +41,11 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/cms/:path*", "/studio/:path*", "/dashboard/:path*"],
+  // Admin paths + page routes (www→apex). Exclude /api so tile proxy and JSON APIs skip edge middleware.
+  matcher: [
+    "/cms/:path*",
+    "/studio/:path*",
+    "/dashboard/:path*",
+    "/((?!_next/static|_next/image|api/|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+  ],
 };
