@@ -1,3 +1,4 @@
+import { DATA_CENTER_OFFER } from "@/content/offers";
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 import Link from "next/link";
@@ -322,7 +323,7 @@ export default function DataCenterConnectivityPage() {
           { text: "FIBER.", tone: "white" },
         ]}
         subhead="Konative is a Native-owned, vendor-neutral connectivity broker. We put together any connectivity package — domestic and international, any market — and map which carriers can actually reach your mid-build site before the schedule slips. No SBA 8(a), NMSDC, or other certification claims beyond ownership. Suppliers pay us; you get a One-Page Site Brief, then a competitive quote set."
-        primaryCta={{ label: "Get a One-Page Site Brief →", href: "/contact?projectType=data_center#request" }}
+        primaryCta={{ label: `Get a ${DATA_CENTER_OFFER} →`, href: "/contact?projectType=data_center#request" }}
         secondaryCta={{ label: "Lateral Cost Estimator →", href: "/tools/lateral-estimator" }}
         heroImage={{
           src: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=2000&q=70",
@@ -729,7 +730,7 @@ export default function DataCenterConnectivityPage() {
                 display: "inline-block",
               }}
             >
-              Get a One-Page Site Brief →
+              Get a {DATA_CENTER_OFFER} →
             </Link>
           </div>
         </PitchSection>

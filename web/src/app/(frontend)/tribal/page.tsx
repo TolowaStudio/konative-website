@@ -1,3 +1,4 @@
+import { TRIBAL_OFFER } from "@/content/offers";
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 import Link from "next/link";
@@ -202,7 +203,7 @@ export default function TribalPage() {
           { text: "COMPETE.", tone: "rust" },
         ]}
         subhead="Native-owned, vendor-neutral connectivity brokerage for tribal gaming and multi-site ops — WAN, DIA, SD-WAN, voice, and security. Suppliers pay us; you own the contracts and the data. Written sovereignty commitment. We do not write grants."
-        primaryCta={{ label: "Request a Continuity Snapshot →", href: "/contact?projectType=tribal_enterprise#request" }}
+        primaryCta={{ label: `Request a ${TRIBAL_OFFER} →`, href: "/contact?projectType=tribal_enterprise#request" }}
         secondaryCta={{ label: "Sovereignty Commitment →", href: "/tribal/sovereignty" }}
         heroImage={{
           src: "https://images.unsplash.com/photo-1771179909412-813719cfca69?auto=format&fit=crop&w=2000&q=70",
@@ -559,7 +560,7 @@ export default function TribalPage() {
                 display: "inline-block",
               }}
             >
-              Request a Continuity Snapshot →
+              Request a {TRIBAL_OFFER} →
             </Link>
           </div>
         </PitchSection>

@@ -7,6 +7,7 @@
  * site renders the correct brokerage messaging even before Sanity is seeded.
  * This same object is used to seed the Sanity document.
  */
+import { DATA_CENTER_OFFER } from "./offers";
 
 export type Tone = "white" | "rust" | "dim";
 
@@ -86,7 +87,7 @@ export const HOME_CONNECTIVITY_DEFAULT: HomeConnectivityContent = {
   ],
   heroSubhead:
     "Konative maps which carriers can actually reach your mid-build data-center site — laterals, waves, DIA, diversity — before the schedule slips. Native-owned, vendor-neutral AVANT sub-agent for Tribal enterprises and the data-center buildout. Suppliers pay us; you get the whole market.",
-  heroPrimaryCta: { label: "Get a One-Page Site Brief →", href: "/contact?projectType=data_center#request" },
+  heroPrimaryCta: { label: `Get a ${DATA_CENTER_OFFER} →`, href: "/contact?projectType=data_center#request" },
   heroSecondaryCtas: [
     { label: "Tribal Enterprise →", href: "/tribal" },
     { label: "Data Center Connectivity →", href: "/data-center-connectivity" },
@@ -125,7 +126,7 @@ export const HOME_CONNECTIVITY_DEFAULT: HomeConnectivityContent = {
       title: "Nearby ≠\ndeliverable.",
       desc:
         "Prove which carriers can actually deliver multi-path connectivity to a named mid-build site — laterals, waves, DIA, DCI, diversity — without betting the schedule on a single carrier’s map. One-page site briefs, published benchmarks, free lateral estimator.",
-      cta: "Get a One-Page Site Brief →",
+      cta: `Get a ${DATA_CENTER_OFFER} →`,
       href: "/data-center-connectivity",
       primary: true,
     },

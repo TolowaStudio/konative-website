@@ -1,4 +1,3 @@
-import { execSync } from "node:child_process";
 import {
   existsSync,
   readFileSync,
@@ -7,6 +6,7 @@ import {
 } from "node:fs";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { DATA_CENTER_OFFER, TRIBAL_OFFER } from "@/content/offers";
 import { bookingUrl } from "@/lib/booking";
 import { SITE_OG_IMAGE_PATH } from "@/lib/seo/siteOpenGraph";
 
@@ -131,12 +131,35 @@ describe("campaign-ready public surface (TS-4169)", () => {
     );
   });
 
-  it("has no hard-coded booking URL in page components", () => {
-    const out = execSync("grep -rlE 'cal\\.com/jeramey-james' src --include=*.tsx || true", {
-      cwd: webRoot,
-      encoding: "utf8",
-    });
-    expect(out.split("\n").filter(Boolean)).toEqual([]);
+  it("has no hard-coded booking URL in any source file (.ts or .tsx)", () => {
+    const offenders = walkSourceFiles(resolve(webRoot, "src"))
+      .filter((f) => !f.endsWith(join("lib", "booking.ts")))
+      .filter((f) =>
+        readFileSync(f, "utf8")
+          .split("\n")
+          .some(
+            (l) =>
+              !/^\s*(\*|\/\/|\/\*)/.test(l) &&
+              /cal\.com\/jeramey-james/.test(l) &&
+              !/>cal\.com\/jeramey-james</.test(l),
+          ),
+      );
+    expect(offenders).toEqual([]);
+  });
+
+  it("uses one offer name per lane from content/offers.ts", () => {
+    const read = (p: string) => readFileSync(resolve(webRoot, p), "utf8");
+    const tribal = read("src/app/(frontend)/tribal/page.tsx");
+    const dc = read("src/app/(frontend)/data-center-connectivity/page.tsx");
+    const home = read("src/content/homeConnectivity.ts");
+    expect(TRIBAL_OFFER).toBe("Continuity Snapshot");
+    expect(DATA_CENTER_OFFER).toBe("One-Page Site Brief");
+    expect(tribal).toContain("TRIBAL_OFFER");
+    expect(dc).toContain("DATA_CENTER_OFFER");
+    expect(home).toContain("DATA_CENTER_OFFER");
+    for (const c of [tribal, dc, home]) {
+      expect(c).not.toMatch(/Get a Site Brief|Continuity Brief|Connectivity Snapshot/i);
+    }
   });
 
   it("describes international as global brokerage on public copy surfaces", () => {
