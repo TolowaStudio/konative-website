@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { postalAddress } from "@/lib/newsletter/consent";
 
 const RED = "#C8001F";
 const TEXT = "#111111";
@@ -64,7 +65,7 @@ export default function Footer() {
         </div>
 
         <div style={{ borderTop: `1px solid ${DIVIDER}`, paddingTop: 24, display: "flex", justifyContent: "space-between", gap: 20, flexWrap: "wrap", fontFamily: "Inter, sans-serif", fontSize: 11, color: MUTED }}>
-          <span>© 2026 Konative · a trade name of Tolowa Pacific LLC</span>
+          <span>© 2026 Konative · a trade name of Tolowa Pacific LLC · {postalAddress()}</span>
           <span style={{ color: STEEL, fontWeight: 700 }}>Connectivity brokerage · Market intelligence · Avant partner</span>
         </div>
       </div>

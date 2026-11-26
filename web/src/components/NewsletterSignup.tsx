@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
+import { CONSENT_WORDING } from "@/lib/newsletter/consent";
 
 interface NewsletterSignupProps {
   variant: "inline" | "banner" | "modal";
@@ -12,24 +14,26 @@ export default function NewsletterSignup({
   source,
 }: NewsletterSignupProps) {
   const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || !consent) return;
     setStatus("loading");
     try {
       const res = await fetch("/api/newsletter/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source }),
+        body: JSON.stringify({ email, source, consent }),
       });
       const data = await res.json();
       if (res.ok) {
         setStatus("success");
         setMessage(data.message || "Subscribed!");
         setEmail("");
+        setConsent(false);
       } else {
         setStatus("error");
         setMessage(data.error || "Something went wrong.");
@@ -39,6 +43,24 @@ export default function NewsletterSignup({
       setMessage("Network error. Please try again.");
     }
   };
+
+
+  const consentBox = (
+    <label className="newsletter-signup__consent" style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 12, lineHeight: 1.5, marginTop: 8 }}>
+      <input
+        type="checkbox"
+        checked={consent}
+        onChange={(e) => setConsent(e.target.checked)}
+        required
+        style={{ marginTop: 3 }}
+      />
+      <span>
+        {CONSENT_WORDING.split("Privacy Policy")[0]}
+        <Link href="/privacy">Privacy Policy</Link>
+        {CONSENT_WORDING.split("Privacy Policy")[1]}
+      </span>
+    </label>
+  );
 
   if (variant === "banner") {
     return (
@@ -68,6 +90,7 @@ export default function NewsletterSignup({
               >
                 {status === "loading" ? "Subscribing..." : "Subscribe"}
               </button>
+              {consentBox}
             </form>
           )}
           {status === "error" && (
@@ -99,6 +122,7 @@ export default function NewsletterSignup({
           >
             {status === "loading" ? "..." : "Subscribe"}
           </button>
+          {consentBox}
         </form>
       )}
       {status === "error" && (
