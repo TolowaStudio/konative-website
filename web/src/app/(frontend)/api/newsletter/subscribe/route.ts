@@ -3,6 +3,7 @@ import { submitForm } from "@/lib/forms/submit";
 import { submitFormResponse } from "@/lib/forms/formResponse";
 import { newsletterRecordSchema, newsletterSchema } from "@/lib/forms/schemas/newsletter";
 import { buildConsentRecord } from "@/lib/newsletter/consent";
+import { checkTwentySuppression } from "@/lib/newsletter/suppression";
 import { ghostUrl, KONATIVE_NEWSLETTER_NAME } from "@/lib/ghost";
 
 // Newsletter signup → consent record in CMS + Ghost double opt-in (TS-4378).
@@ -11,7 +12,7 @@ import { ghostUrl, KONATIVE_NEWSLETTER_NAME } from "@/lib/ghost";
 //   2. submitForm stores a `newsletterSubscriber` record with the consent
 //      record (time, form id, EXACT wording shown, wording version). The
 //      wording is stamped server-side from lib/newsletter/consent.ts.
-//   3. Ghost's public Members API sends the signup confirmation (magic link).
+//   3. After a fail-closed Twenty suppression check, Ghost's public Members API sends the signup confirmation (magic link).
 //      The member is only created and subscribed to Konative Dispatch when
 //      they click it — that is the double opt-in. We never create a member
 //      through the Admin API here (that would subscribe without confirmation).
@@ -62,6 +63,12 @@ export async function POST(request: NextRequest) {
   if (base) {
     after(async () => {
       try {
+        // G5: never email a do-not-contact (or unverifiable) address.
+        const sup = await checkTwentySuppression(email);
+        if (sup.suppressed) {
+          console.warn(`[newsletter] confirmation not sent (${sup.reason})`);
+          return;
+        }
         const res = await fetch(`${base}/members/api/send-magic-link/`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Origin: base },

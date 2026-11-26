@@ -36,7 +36,18 @@ describe("newsletter signup consent", () => {
     process.env.RESEND_FROM = "Konative <a@example.com>";
     process.env.RESEND_TO = "o@example.com";
     process.env.GHOST_URL = "https://ghost.example.com";
+    process.env.TWENTY_API_URL = "https://twenty.example.com";
+    process.env.TWENTY_API_KEY = "tk";
+    delete process.env.TWENTY_SUPPRESSION_FIELD;
+    mockFetch.mockImplementation(async (u: string) =>
+      String(u).startsWith("https://twenty.example.com")
+        ? { ok: true, json: async () => ({ data: { people: [] } }), text: async () => "" }
+        : { ok: true, text: async () => "" },
+    );
   });
+
+  const ghostCalls = () =>
+    mockFetch.mock.calls.filter(([u]) => String(u).startsWith("https://ghost.example.com"));
 
   it("rejects a signup without consent and stores nothing", async () => {
     const res = await POST(req({ email: "a@b.com", source: "blog" }));
@@ -68,11 +79,33 @@ describe("newsletter signup consent", () => {
 
   it("double opt-in: asks Ghost for a confirmation link, never creates a member via Admin API", async () => {
     await POST(req({ email: "a@b.com", source: "blog", consent: true }));
-    const ghostCalls = mockFetch.mock.calls.filter(([u]) => String(u).startsWith("https://ghost.example.com"));
-    expect(ghostCalls).toHaveLength(1);
-    expect(String(ghostCalls[0][0])).toContain("/members/api/send-magic-link/");
-    expect(JSON.parse(ghostCalls[0][1].body).emailType).toBe("signup");
-    expect(ghostCalls.some(([u]) => String(u).includes("/admin/"))).toBe(false);
+    const calls = ghostCalls();
+    expect(calls).toHaveLength(1);
+    expect(String(calls[0][0])).toContain("/members/api/send-magic-link/");
+    expect(JSON.parse(calls[0][1].body).emailType).toBe("signup");
+    expect(JSON.parse(calls[0][1].body).newsletters).toEqual([{ name: "Konative Dispatch" }]);
+    expect(calls.some(([u]) => String(u).includes("/admin/"))).toBe(false);
+  });
+
+  it("G5: a do-not-contact address stores the record but gets no confirmation email", async () => {
+    mockFetch.mockImplementation(async (u: string) =>
+      String(u).startsWith("https://twenty.example.com")
+        ? { ok: true, json: async () => ({ data: { people: [{ doNotContact: true }] } }) }
+        : { ok: true, text: async () => "" },
+    );
+    const res = await POST(req({ email: "gone@b.com", source: "blog", consent: true }));
+    expect(res.status).toBe(200);
+    expect(mockCreate).toHaveBeenCalledTimes(1);
+    expect(ghostCalls()).toHaveLength(0);
+  });
+
+  it("G5 fail-closed: Twenty unreachable means no confirmation email", async () => {
+    mockFetch.mockImplementation(async (u: string) => {
+      if (String(u).startsWith("https://twenty.example.com")) throw new Error("down");
+      return { ok: true, text: async () => "" };
+    });
+    await POST(req({ email: "a@b.com", source: "blog", consent: true }));
+    expect(ghostCalls()).toHaveLength(0);
   });
 
   it("footer postal address falls back to the placeholder", () => {
