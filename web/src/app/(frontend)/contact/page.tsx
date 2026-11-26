@@ -31,7 +31,7 @@ export default function ContactPage() {
     const form = e.currentTarget;
     const data = Object.fromEntries(new FormData(form));
     const params = new URLSearchParams(window.location.search);
-    for (const key of ["context", "campaign", "segment", "awardSlug", "lane", "source"]) {
+    for (const key of ["context", "campaign", "segment", "awardSlug", "lane", "source", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]) {
       const value = params.get(key);
       if (value && !data[key]) data[key] = value;
     }
