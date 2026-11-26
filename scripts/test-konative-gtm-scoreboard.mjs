@@ -149,9 +149,9 @@ test('PostHog query is scoped to konative.com prod and cannot be broken out of',
   const fetchImpl = async (url, init) => {
     assert.equal(url, 'https://us.posthog.com/api/projects/620985/query/');
     assert.equal(init.headers.authorization, 'Bearer k');
-    return { ok: true, json: async () => ({ results: [[120, 7]] }) };
+    return { ok: true, json: async () => ({ results: [[120, 7, 45]] }) };
   };
-  assert.deepEqual(await fetchPosthog({ cfg: realConfig.posthog, key: 'k', fetchImpl }), { pageviews_7d: 120, contact_pageviews_7d: 7 });
+  assert.deepEqual(await fetchPosthog({ cfg: realConfig.posthog, key: 'k', fetchImpl }), { pageviews_7d: 120, contact_pageviews_7d: 7, visitors_7d: 45 });
   await assert.rejects(fetchPosthog({ cfg: realConfig.posthog, key: 'k', fetchImpl: async () => ({ ok: true, json: async () => ({ results: [] }) }) }), /no result row/);
 });
 
@@ -177,4 +177,15 @@ test('main with --skip-live writes private aggregate files and prints the markdo
 test('live mode without a Twenty token fails closed', async () => {
   const { main } = await import('./konative-gtm-scoreboard.mjs');
   await assert.rejects(main([], {}), /TWENTY_API_TOKEN is required/);
+});
+
+test('visitors come from PostHog, signups from manual, and neither is zero when unmeasured', () => {
+  const live = buildScoreboard({ config: realConfig, posthog: { pageviews_7d: 9, contact_pageviews_7d: 1, visitors_7d: 4 }, manual: { signups: 3 }, now: '2026-12-01T00:00:00Z' });
+  assert.equal(metric(live, 'visitors').value, 4);
+  assert.equal(metric(live, 'signups').value, 3);
+  const off = buildScoreboard({ config: realConfig, now: '2026-12-01T00:00:00Z' });
+  assert.equal(metric(off, 'visitors').status, 'NO_SOURCE');
+  assert.equal(metric(off, 'signups').value, null);
+  const err = buildScoreboard({ config: realConfig, posthog: { error: 'boom' }, now: '2026-12-01T00:00:00Z' });
+  assert.equal(metric(err, 'visitors').status, 'ERROR');
 });

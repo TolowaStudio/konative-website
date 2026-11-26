@@ -44,6 +44,8 @@ manual value wins over a derived one for the same key.
 |---|---|---|
 | meetings, proposals, orders | Twenty opportunity stage, scoped to Konative | needs `opportunity_scope` (step 1) |
 | warm contacts, asks, intros, snapshots, inbound requests, registrations, MRC | manual file | no system of record until W3b/W3c (TOL-3555, TOL-3556) land fields in Twenty |
+| visitors (unique, 7 days) | PostHog | wired |
+| signups | manual file (`signups`) | no system of record yet |
 | site traffic (pageviews, `/contact` pageviews, 7 days) | PostHog project 620985, `site=konative.com`, `env=prod` | wired; shows `error` until the key is supplied |
 
 ## Left to make it live (not done by this PR)
