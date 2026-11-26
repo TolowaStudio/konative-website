@@ -83,6 +83,7 @@ export default function NewsletterSignup({
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
+              {consentBox}
               <button
                 type="submit"
                 className="newsletter-signup__button newsletter-signup__button--banner"
@@ -90,7 +91,6 @@ export default function NewsletterSignup({
               >
                 {status === "loading" ? "Subscribing..." : "Subscribe"}
               </button>
-              {consentBox}
             </form>
           )}
           {status === "error" && (
