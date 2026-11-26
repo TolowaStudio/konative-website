@@ -1,3 +1,4 @@
+import { bookingUrl } from "@/lib/booking";
 import type { Metadata } from "next";
 import { JsonLd, serviceSchema, SITE_URL } from "@/components/seo/JsonLd";
 import { siteOpenGraphImage } from "@/lib/seo/siteOpenGraph";
@@ -28,7 +29,7 @@ const BODY_FONT = "Inter, sans-serif";
 
 // Canonical Cal.com booking link for Jeramey James (Tolowa Studio / Konative).
 // The prior `konative/discovery` slug never existed as a real Cal.com event.
-const CAL_EMBED_URL = "https://cal.com/jeramey-james/15min";
+const CAL_EMBED_URL = bookingUrl("call");
 
 const WHAT_HAPPENS = [
   {

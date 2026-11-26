@@ -211,7 +211,7 @@ export default function TribalPage() {
         }}
         ctaHeadlineTop="ONE SITE OR MANY."
         ctaHeadlineBottom="NO DISRUPTION PATH."
-        ctaSub="Tell us the properties, renewal windows, and failover gaps. We return a continuity snapshot — then run a competitive market without ripping out what works."
+        ctaSub="Tell us the properties, renewal windows, and failover gaps. We return a Continuity Snapshot — then run a competitive market without ripping out what works."
       >
         {/* Funding Navigator promo band */}
         <section style={{ background: "#08142D", borderTop: `3px solid ${RED}`, padding: "44px 0" }}>

@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import {
   existsSync,
   readFileSync,
@@ -6,10 +7,11 @@ import {
 } from "node:fs";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { bookingUrl } from "@/lib/booking";
 import { SITE_OG_IMAGE_PATH } from "@/lib/seo/siteOpenGraph";
 
 const webRoot = process.cwd();
-const CAL_URL = "https://cal.com/jeramey-james/15min";
+const CAL_URL = "https://cal.com/jeramey-james?utm_source=konative.com";
 
 const CANONICAL_ROUTE_FILES: Array<{ path: string; canonical: string }> = [
   { path: "src/app/(frontend)/page.tsx", canonical: "/" },
@@ -113,16 +115,28 @@ describe("campaign-ready public surface (TS-4169)", () => {
     expect(page).not.toMatch(/export const metadata/);
   });
 
-  it("preserves the canonical Cal.com 15-minute booking link on surfaces that use it", () => {
+  it("uses the one canonical Cal.com booking link with UTMs on every surface", () => {
+    for (const path of ["public/llms.txt", "public/llms-full.txt"]) {
+      expect(readFileSync(resolve(webRoot, path), "utf8"), path).toContain(CAL_URL);
+    }
     for (const path of [
       "src/components/Footer.tsx",
       "src/app/(frontend)/call/page.tsx",
-      "public/llms.txt",
-      "public/llms-full.txt",
+      "src/app/(frontend)/contact/page.tsx",
     ]) {
-      const contents = readFileSync(resolve(webRoot, path), "utf8");
-      expect(contents, path).toContain(CAL_URL);
+      expect(readFileSync(resolve(webRoot, path), "utf8"), path).toContain("bookingUrl(");
     }
+    expect(bookingUrl("footer")).toBe(
+      "https://cal.com/jeramey-james?utm_source=konative.com&utm_medium=site&utm_campaign=booking&utm_content=footer",
+    );
+  });
+
+  it("has no hard-coded booking URL in page components", () => {
+    const out = execSync("grep -rlE 'cal\\.com/jeramey-james' src --include=*.tsx || true", {
+      cwd: webRoot,
+      encoding: "utf8",
+    });
+    expect(out.split("\n").filter(Boolean)).toEqual([]);
   });
 
   it("describes international as global brokerage on public copy surfaces", () => {
@@ -136,12 +150,31 @@ describe("campaign-ready public surface (TS-4169)", () => {
       resolve(webRoot, "src/app/(frontend)/data-center-connectivity/page.tsx"),
       "utf8",
     );
-    expect(dc).toMatch(/Native American–owned, vendor-neutral/i);
+    expect(dc).toMatch(/Native-owned, vendor-neutral/i);
     expect(dc).toMatch(/domestic and international/i);
     expect(dc).toMatch(/any connectivity package/i);
     expect(dc).toMatch(
       /No SBA 8\(a\), NMSDC, or other certification claims beyond ownership/i,
     );
     expect(dc).not.toMatch(/(?:NMSDC|SBA 8\(a\)).*certified|certified.*(?:NMSDC|SBA 8\(a\))/i);
+  });
+});
+describe("TS-4371 site fixes", () => {
+  it("lists /privacy and /terms in the sitemap", () => {
+    const src = readFileSync(resolve(webRoot, "src/app/sitemap.ts"), "utf8");
+    expect(src).toContain("${BASE}/privacy");
+    expect(src).toContain("${BASE}/terms");
+  });
+
+  it("uses 'Native-owned' only (G9) and no leftover jargon", () => {
+    for (const path of [
+      "src/app/(frontend)/HomePage.tsx",
+      "src/app/(frontend)/data-center-connectivity/page.tsx",
+      "src/app/(frontend)/connectivity/page.tsx",
+    ]) {
+      const contents = readFileSync(resolve(webRoot, path), "utf8");
+      expect(contents, path).not.toMatch(/Indigenous-owned|Native American[–-]owned|certified Avant/i);
+    }
+    expect(readFileSync(resolve(webRoot, "src/components/forms/ContactHoneypot.tsx"), "utf8")).not.toMatch(/Mesh ledger/i);
   });
 });

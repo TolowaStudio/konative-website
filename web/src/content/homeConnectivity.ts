@@ -125,7 +125,7 @@ export const HOME_CONNECTIVITY_DEFAULT: HomeConnectivityContent = {
       title: "Nearby ≠\ndeliverable.",
       desc:
         "Prove which carriers can actually deliver multi-path connectivity to a named mid-build site — laterals, waves, DIA, DCI, diversity — without betting the schedule on a single carrier’s map. One-page site briefs, published benchmarks, free lateral estimator.",
-      cta: "Get a Site Brief →",
+      cta: "Get a One-Page Site Brief →",
       href: "/data-center-connectivity",
       primary: true,
     },

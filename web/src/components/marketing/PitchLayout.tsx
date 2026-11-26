@@ -102,7 +102,7 @@ export default function PitchLayout({
             display: "flex", alignItems: "center", gap: 12,
             fontFamily: BODY, fontWeight: 600,
             fontSize: 10, letterSpacing: "0.24em", textTransform: "uppercase",
-            color: onImage ? "#FF526B" : RED, marginBottom: 28,
+            color: onImage ? "#FF526B" : RED, marginBottom: 32,
           }}>
             <span style={{ display: "block", width: 36, height: 2, background: RED }} />
             {eyebrow}
@@ -110,9 +110,9 @@ export default function PitchLayout({
           <h1 style={{
             position: "relative",
             fontFamily: DISPLAY, fontWeight: 800,
-            fontSize: "clamp(48px, 6.5vw, 92px)", lineHeight: 0.9,
+            fontSize: "clamp(48px, 6.5vw, 92px)", lineHeight: 1.02,
             textTransform: "uppercase", letterSpacing: "0.01em", color: onImage ? "#fff" : TEXT,
-            marginBottom: 28, maxWidth: 900,
+            marginBottom: 36, maxWidth: 900,
           }}>
             {titleLines.map((line, i) => (
               <span key={i} style={{ color: toneColor(line.tone, onImage), display: "block" }}>{line.text}</span>
