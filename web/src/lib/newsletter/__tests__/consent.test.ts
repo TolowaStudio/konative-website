@@ -47,10 +47,14 @@ describe("newsletter signup consent", () => {
     process.env.GHOST_URL = "https://ghost.example.com";
     process.env.TWENTY_API_URL = "https://twenty.example.com";
     process.env.TWENTY_API_KEY = "tk";
-    delete process.env.TWENTY_SUPPRESSION_FIELD;
     mockFetch.mockImplementation(async (u: string) =>
-      String(u).startsWith("https://twenty.example.com")
-        ? { ok: true, json: async () => ({ data: { people: [] } }), text: async () => "" }
+      String(u).includes("/graphql")
+        ? {
+            ok: true,
+            json: async () => ({
+              data: { people: { edges: [], pageInfo: { hasNextPage: false, endCursor: null } } },
+            }),
+          }
         : { ok: true, text: async () => "" },
     );
   });
@@ -98,8 +102,25 @@ describe("newsletter signup consent", () => {
 
   it("G5: a do-not-contact address stores the record but gets no confirmation email", async () => {
     mockFetch.mockImplementation(async (u: string) =>
-      String(u).startsWith("https://twenty.example.com")
-        ? { ok: true, json: async () => ({ data: { people: [{ doNotContact: true }] } }) }
+      String(u).includes("/graphql")
+        ? {
+            ok: true,
+            json: async () => ({
+              data: {
+                people: {
+                  edges: [
+                    {
+                      node: {
+                        emails: { primaryEmail: "gone@b.com", additionalEmails: [] },
+                        doNotContact: true,
+                      },
+                    },
+                  ],
+                  pageInfo: { hasNextPage: false },
+                },
+              },
+            }),
+          }
         : { ok: true, text: async () => "" },
     );
     const res = await post(req({ email: "gone@b.com", source: "blog", consent: true }));
@@ -108,9 +129,37 @@ describe("newsletter signup consent", () => {
     expect(ghostCalls()).toHaveLength(0);
   });
 
+  it("G5: OPTED_OUT outreachStatus suppresses the confirmation email", async () => {
+    mockFetch.mockImplementation(async (u: string) =>
+      String(u).includes("/graphql")
+        ? {
+            ok: true,
+            json: async () => ({
+              data: {
+                people: {
+                  edges: [
+                    {
+                      node: {
+                        emails: { primaryEmail: "gone@b.com", additionalEmails: [] },
+                        doNotContact: false,
+                        outreachStatus: "OPTED_OUT",
+                      },
+                    },
+                  ],
+                  pageInfo: { hasNextPage: false },
+                },
+              },
+            }),
+          }
+        : { ok: true, text: async () => "" },
+    );
+    await post(req({ email: "gone@b.com", source: "blog", consent: true }));
+    expect(ghostCalls()).toHaveLength(0);
+  });
+
   it("G5 fail-closed: Twenty unreachable means no confirmation email", async () => {
     mockFetch.mockImplementation(async (u: string) => {
-      if (String(u).startsWith("https://twenty.example.com")) throw new Error("down");
+      if (String(u).includes("/graphql")) throw new Error("down");
       return { ok: true, text: async () => "" };
     });
     await post(req({ email: "a@b.com", source: "blog", consent: true }));

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { NewsletterConsentCheckbox } from "@/components/NewsletterConsentCheckbox";
 
 interface Article {
   id: string;
@@ -28,6 +29,7 @@ export default function MarketIntelPage() {
   const [loading, setLoading] = useState(true);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
 
@@ -49,15 +51,15 @@ export default function MarketIntelPage() {
       : articles.filter((a) => a.category === activeCategory);
 
   async function handleSubscribe() {
-    if (!email || subscribing || subscribed) return;
+    if (!email || !consent || subscribing || subscribed) return;
     setSubscribing(true);
     try {
-      await fetch("/api/newsletter/subscribe", {
+      const res = await fetch("/api/newsletter/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source: "market_intel_page" }),
+        body: JSON.stringify({ email, source: "market_intel_page", consent: true }),
       });
-      setSubscribed(true);
+      if (res.ok) setSubscribed(true);
     } catch {
       // silently fail
     } finally {
@@ -290,16 +292,22 @@ export default function MarketIntelPage() {
                     boxSizing: "border-box", borderRadius: 0,
                   }}
                 />
+                <NewsletterConsentCheckbox
+                  checked={consent}
+                  onChange={setConsent}
+                  style={{ marginBottom: 10 }}
+                />
                 <button
+                  type="button"
                   onClick={handleSubscribe}
-                  disabled={subscribing}
+                  disabled={subscribing || !consent}
                   style={{
                     width: "100%", padding: 14, background: "#C8001F",
                     color: "#fff", border: "none",
                     fontFamily: "'Inter', sans-serif", fontWeight: 600,
                     fontSize: 12, textTransform: "uppercase", letterSpacing: "0.12em",
-                    cursor: subscribing ? "not-allowed" : "pointer",
-                    opacity: subscribing ? 0.7 : 1, borderRadius: 0,
+                    cursor: subscribing || !consent ? "not-allowed" : "pointer",
+                    opacity: subscribing || !consent ? 0.7 : 1, borderRadius: 0,
                   }}
                 >
                   SUBSCRIBE FREE

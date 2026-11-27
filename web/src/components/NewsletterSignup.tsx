@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
-import { CONSENT_WORDING } from "@/lib/newsletter/consent";
+import { NewsletterConsentCheckbox } from "@/components/NewsletterConsentCheckbox";
 
 interface NewsletterSignupProps {
   variant: "inline" | "banner" | "modal";
@@ -46,20 +45,12 @@ export default function NewsletterSignup({
 
 
   const consentBox = (
-    <label className="newsletter-signup__consent" style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 12, lineHeight: 1.5, marginTop: 8 }}>
-      <input
-        type="checkbox"
-        checked={consent}
-        onChange={(e) => setConsent(e.target.checked)}
-        required
-        style={{ marginTop: 3 }}
-      />
-      <span>
-        {CONSENT_WORDING.split("Privacy Policy")[0]}
-        <Link href="/privacy">Privacy Policy</Link>
-        {CONSENT_WORDING.split("Privacy Policy")[1]}
-      </span>
-    </label>
+    <NewsletterConsentCheckbox
+      className="newsletter-signup__consent"
+      checked={consent}
+      onChange={setConsent}
+      style={{ marginTop: 8 }}
+    />
   );
 
   if (variant === "banner") {

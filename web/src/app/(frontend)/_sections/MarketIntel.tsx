@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { NewsletterConsentCheckbox } from '@/components/NewsletterConsentCheckbox'
 
 interface Article {
   id: string
@@ -36,6 +37,7 @@ function cardBg(imageUrl?: string | null): string {
 
 export default function MarketIntel({ articles }: MarketIntelProps) {
   const [email, setEmail]         = useState('')
+  const [consent, setConsent]     = useState(false)
   const [submitted, setSubmitted]   = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
@@ -44,16 +46,16 @@ export default function MarketIntel({ articles }: MarketIntelProps) {
   const sidebarItems = rest.slice(2)
 
   const handleSubscribe = async () => {
-    if (!email || submitting) return
+    if (!email || !consent || submitting) return
     setSubmitting(true)
     try {
-      await fetch('/api/newsletter/subscribe', {
+      const res = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source: 'homepage_market_intel' }),
+        body: JSON.stringify({ email, source: 'homepage_market_intel', consent: true }),
       })
+      if (res.ok) setSubmitted(true)
     } catch { /* silent */ }
-    setSubmitted(true)
     setSubmitting(false)
   }
 
@@ -244,32 +246,42 @@ export default function MarketIntel({ articles }: MarketIntelProps) {
               Subscribed ✓
             </p>
           ) : (
-            <div style={{ display: 'flex', gap: 0 }}>
-              <input
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSubscribe()}
-                style={{
-                  padding: '14px 18px', width: 260,
-                  background: 'rgba(255,255,255,0.12)',
-                  border: '1px solid rgba(255,255,255,0.25)', borderRight: 'none',
-                  color: '#fff', fontFamily: 'Inter, sans-serif', fontSize: 14, outline: 'none',
-                }}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 420 }}>
+              <div style={{ display: 'flex', gap: 0 }}>
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && consent && handleSubscribe()}
+                  style={{
+                    padding: '14px 18px', width: 260,
+                    background: 'rgba(255,255,255,0.12)',
+                    border: '1px solid rgba(255,255,255,0.25)', borderRight: 'none',
+                    color: '#fff', fontFamily: 'Inter, sans-serif', fontSize: 14, outline: 'none',
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleSubscribe}
+                  disabled={submitting || !consent}
+                  style={{
+                    padding: '14px 24px', background: '#fff', color: '#1E4FBF',
+                    fontFamily: 'Inter, sans-serif', fontWeight: 700,
+                    fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase',
+                    border: 'none', cursor: consent ? 'pointer' : 'not-allowed', whiteSpace: 'nowrap',
+                    opacity: consent ? 1 : 0.6,
+                  }}
+                >
+                  Subscribe Free
+                </button>
+              </div>
+              <NewsletterConsentCheckbox
+                checked={consent}
+                onChange={setConsent}
+                labelStyle={{ color: 'rgba(255,255,255,0.85)' }}
+                linkStyle={{ color: '#fff', textDecoration: 'underline' }}
               />
-              <button
-                onClick={handleSubscribe}
-                disabled={submitting}
-                style={{
-                  padding: '14px 24px', background: '#fff', color: '#1E4FBF',
-                  fontFamily: 'Inter, sans-serif', fontWeight: 700,
-                  fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase',
-                  border: 'none', cursor: 'pointer', whiteSpace: 'nowrap',
-                }}
-              >
-                Subscribe Free
-              </button>
             </div>
           )}
         </div>

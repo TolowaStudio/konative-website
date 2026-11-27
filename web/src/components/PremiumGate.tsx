@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { NewsletterConsentCheckbox } from "@/components/NewsletterConsentCheckbox";
 
 interface PremiumGateProps {
   isPremium: boolean;
@@ -10,6 +11,7 @@ interface PremiumGateProps {
 export default function PremiumGate({ isPremium, children }: PremiumGateProps) {
   const [hasAccess, setHasAccess] = useState(false);
   const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
 
   useEffect(() => {
@@ -32,14 +34,18 @@ export default function PremiumGate({ isPremium, children }: PremiumGateProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || !consent) return;
     setStatus("loading");
     try {
-      await fetch("/api/newsletter/subscribe", {
+      const res = await fetch("/api/newsletter/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source: "premium-gate" }),
+        body: JSON.stringify({ email, source: "premium-gate", consent: true }),
       });
+      if (!res.ok) {
+        setStatus("idle");
+        return;
+      }
       localStorage.setItem(
         "konative_subscription",
         JSON.stringify({ email, status: "active" }),
@@ -66,7 +72,8 @@ export default function PremiumGate({ isPremium, children }: PremiumGateProps) {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-            <button type="submit" disabled={status === "loading"}>
+            <NewsletterConsentCheckbox checked={consent} onChange={setConsent} style={{ marginTop: 8 }} />
+            <button type="submit" disabled={status === "loading" || !consent}>
               {status === "loading" ? "..." : "Get Access"}
             </button>
           </form>
