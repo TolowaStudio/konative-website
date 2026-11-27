@@ -153,13 +153,18 @@ describe("submitForm", () => {
       });
 
     await send({ name: "A", email: "a@example.com", fundingProgram: "TBCP award", utm_source: "newsletter", utm_campaign: "k06" });
-    let crm = JSON.parse(mockFetch.mock.calls.find(c => c[0] === "https://crm.example.com/webhook")![1].body);
+    const crmCall = () => {
+      const call = mockFetch.mock.calls.find(c => c[0] === "https://crm.example.com/webhook");
+      expect(call, "CRM webhook was not called").toBeDefined();
+      return JSON.parse(call![1].body);
+    };
+    let crm = crmCall();
     expect(crm.attribution).toEqual({ utm_source: "newsletter", utm_campaign: "k06" });
     expect(crm.routing).toEqual({ owner: "jake", skipAutomation: true, reason: "funding-field-filled" });
 
     mockFetch.mockClear();
     await send({ name: "B", email: "b@example.com", fundingProgram: "   " });
-    crm = JSON.parse(mockFetch.mock.calls.find(c => c[0] === "https://crm.example.com/webhook")![1].body);
+    crm = crmCall();
     expect(crm.routing.skipAutomation).toBe(false);
   });
 

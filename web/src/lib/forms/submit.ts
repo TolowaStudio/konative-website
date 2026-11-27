@@ -65,11 +65,13 @@ export async function sendResendEmail(args: { to: string; from: string; subject:
  * G7 (2 CFR 200.318(c)): an inquiry with the funding field filled skips
  * automation and routes to Jake.
  */
+export const DEFAULT_CRM_OWNER = "default";
+
 export function crmRouting(data: Record<string, unknown>): { owner: string; skipAutomation: boolean; reason: string | null } {
   const funding = typeof data.fundingProgram === "string" ? data.fundingProgram.trim() : "";
   return funding
     ? { owner: "jake", skipAutomation: true, reason: "funding-field-filled" }
-    : { owner: "default", skipAutomation: false, reason: null };
+    : { owner: DEFAULT_CRM_OWNER, skipAutomation: false, reason: null };
 }
 
 const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"] as const;

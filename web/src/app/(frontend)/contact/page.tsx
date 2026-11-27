@@ -1,5 +1,6 @@
 "use client";
 
+import { mergeContactUrlParams } from "@/lib/forms/contactParams";
 import { bookingUrl } from "@/lib/booking";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
 import { useEffect, useState } from "react";
@@ -38,12 +39,10 @@ export default function ContactPage() {
     setErrorMsg("");
 
     const form = e.currentTarget;
-    const data = Object.fromEntries(new FormData(form));
-    const params = new URLSearchParams(window.location.search);
-    for (const key of ["context", "campaign", "segment", "awardSlug", "lane", "source", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]) {
-      const value = params.get(key);
-      if (value && !data[key]) data[key] = value;
-    }
+    const data = mergeContactUrlParams(
+      Object.fromEntries(new FormData(form)),
+      window.location.search,
+    );
 
     try {
       const res = await fetch("/api/contact", {
