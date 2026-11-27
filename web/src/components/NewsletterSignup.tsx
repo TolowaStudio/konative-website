@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { NewsletterConsentCheckbox } from "@/components/NewsletterConsentCheckbox";
 
 interface NewsletterSignupProps {
   variant: "inline" | "banner" | "modal";
@@ -12,24 +13,26 @@ export default function NewsletterSignup({
   source,
 }: NewsletterSignupProps) {
   const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || !consent) return;
     setStatus("loading");
     try {
       const res = await fetch("/api/newsletter/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source }),
+        body: JSON.stringify({ email, source, consent }),
       });
       const data = await res.json();
       if (res.ok) {
         setStatus("success");
         setMessage(data.message || "Subscribed!");
         setEmail("");
+        setConsent(false);
       } else {
         setStatus("error");
         setMessage(data.error || "Something went wrong.");
@@ -39,6 +42,16 @@ export default function NewsletterSignup({
       setMessage("Network error. Please try again.");
     }
   };
+
+
+  const consentBox = (
+    <NewsletterConsentCheckbox
+      className="newsletter-signup__consent"
+      checked={consent}
+      onChange={setConsent}
+      style={{ marginTop: 8 }}
+    />
+  );
 
   if (variant === "banner") {
     return (
@@ -61,6 +74,7 @@ export default function NewsletterSignup({
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
+              {consentBox}
               <button
                 type="submit"
                 className="newsletter-signup__button newsletter-signup__button--banner"
@@ -99,6 +113,7 @@ export default function NewsletterSignup({
           >
             {status === "loading" ? "..." : "Subscribe"}
           </button>
+          {consentBox}
         </form>
       )}
       {status === "error" && (

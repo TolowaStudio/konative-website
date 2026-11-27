@@ -12,6 +12,19 @@ export const newsletterSubscriber = defineType({
     defineField({ name: "utmSource", type: "string" }),
     defineField({ name: "utmMedium", type: "string" }),
     defineField({ name: "subscribedAt", type: "datetime" }),
+    // Express-consent record (G5): when, which form, and the exact wording shown.
+    defineField({ name: "consentGiven", type: "boolean", readOnly: true }),
+    defineField({ name: "consentAt", type: "datetime", readOnly: true }),
+    defineField({ name: "consentFormId", type: "string", readOnly: true }),
+    defineField({ name: "consentWording", type: "text", readOnly: true }),
+    defineField({ name: "consentVersion", type: "string", readOnly: true }),
+    defineField({ name: "optInMethod", type: "string", readOnly: true }),
+    defineField({
+      name: "optInStatus",
+      type: "string",
+      options: { list: ["pending_confirmation", "confirmed"] },
+      readOnly: true,
+    }),
   ],
   preview: {
     select: { email: "email", source: "source", status: "status" },

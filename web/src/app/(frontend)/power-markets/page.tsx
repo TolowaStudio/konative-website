@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { NewsletterConsentCheckbox } from '@/components/NewsletterConsentCheckbox'
 
 const ISO_REGIONS = [
   { name: 'PJM', full: 'Mid-Atlantic & Midwest', states: 'PA, OH, IL, NJ + 10 more', cap: '185 GW', status: 'MONITORING' },
@@ -17,20 +18,22 @@ const statusColor = (s: string) => s === 'MONITORING' ? '#4ade80' : '#ef4444'
 
 export default function PowerMarketsPage() {
   const [email, setEmail] = useState('')
+  const [consent, setConsent] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!consent) return
     try {
-      await fetch('/api/newsletter/subscribe', {
+      const res = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source: 'power_markets_early_access' }),
+        body: JSON.stringify({ email, source: 'power_markets_early_access', consent: true }),
       })
+      if (res.ok) setSubmitted(true)
     } catch (_) {
       // silent
     }
-    setSubmitted(true)
   }
 
   return (
@@ -380,49 +383,62 @@ export default function PowerMarketsPage() {
               You're on the list. We'll reach out when live data launches.
             </p>
           ) : (
-            <form onSubmit={handleSubmit} style={{
-              display: 'flex',
-              flexDirection: 'row',
-              gap: 0,
-              maxWidth: 480,
-              margin: '0 auto',
-            }}>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                style={{
-                  flex: 1,
-                  padding: '14px 16px',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  borderRight: 'none',
-                  backgroundColor: '#1A1A1A',
-                  color: '#FFFFFF',
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: 14,
-                  outline: 'none',
-                }}
+            <form
+              onSubmit={handleSubmit}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 12,
+                maxWidth: 480,
+                margin: '0 auto',
+              }}
+            >
+              <div style={{ display: 'flex', flexDirection: 'row', gap: 0 }}>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  style={{
+                    flex: 1,
+                    padding: '14px 16px',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    borderRight: 'none',
+                    backgroundColor: '#1A1A1A',
+                    color: '#FFFFFF',
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: 14,
+                    outline: 'none',
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={!consent}
+                  style={{
+                    padding: '14px 28px',
+                    backgroundColor: '#C8001F',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    fontFamily: "'Inter', sans-serif",
+                    fontWeight: 600,
+                    fontSize: 12,
+                    textTransform: 'uppercase',
+                    cursor: consent ? 'pointer' : 'not-allowed',
+                    letterSpacing: '0.08em',
+                    whiteSpace: 'nowrap',
+                    opacity: consent ? 1 : 0.6,
+                  }}
+                >
+                  GET EARLY ACCESS
+                </button>
+              </div>
+              <NewsletterConsentCheckbox
+                checked={consent}
+                onChange={setConsent}
+                labelStyle={{ color: 'rgba(255,255,255,0.75)' }}
+                linkStyle={{ color: '#fff', textDecoration: 'underline' }}
               />
-              <button
-                type="submit"
-                style={{
-                  padding: '14px 28px',
-                  backgroundColor: '#C8001F',
-                  color: '#FFFFFF',
-                  border: 'none',
-                  fontFamily: "'Inter', sans-serif",
-                  fontWeight: 600,
-                  fontSize: 12,
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  letterSpacing: '0.08em',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                GET EARLY ACCESS
-              </button>
             </form>
           )}
         </div>
