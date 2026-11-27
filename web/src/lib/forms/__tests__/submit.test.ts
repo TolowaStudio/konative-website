@@ -142,6 +142,32 @@ describe("submitForm", () => {
     expect(mockCreate).toHaveBeenCalledOnce();
   });
 
+  it("forwards UTM attribution and routes funding-field inquiries to Jake with automation skipped (G7)", async () => {
+    process.env.TWENTY_INTAKE_WEBHOOK_URL = "https://crm.example.com/webhook";
+    const send = (payload: Record<string, unknown>) =>
+      submitForm({
+        schemaType: "contactInquiry",
+        zodSchema: z.object({}).passthrough(),
+        payload,
+        emailSubject: "Test Contact",
+      });
+
+    await send({ name: "A", email: "a@example.com", fundingProgram: "TBCP award", utm_source: "newsletter", utm_campaign: "k06" });
+    const crmCall = () => {
+      const call = mockFetch.mock.calls.find(c => c[0] === "https://crm.example.com/webhook");
+      expect(call, "CRM webhook was not called").toBeDefined();
+      return JSON.parse(call![1].body);
+    };
+    let crm = crmCall();
+    expect(crm.attribution).toEqual({ utm_source: "newsletter", utm_campaign: "k06" });
+    expect(crm.routing).toEqual({ owner: "jake", skipAutomation: true, reason: "funding-field-filled" });
+
+    mockFetch.mockClear();
+    await send({ name: "B", email: "b@example.com", fundingProgram: "   " });
+    crm = crmCall();
+    expect(crm.routing.skipAutomation).toBe(false);
+  });
+
   it("returns ok:false when CRM_WEBHOOK_REQUIRED=true and webhook fails (fail-closed after persist)", async () => {
     process.env.CRM_WEBHOOK_REQUIRED = "true";
     process.env.TWENTY_INTAKE_WEBHOOK_URL = "https://crm.example.com/webhook";

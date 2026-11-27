@@ -11,7 +11,9 @@
  * fails closed: missing suppression checker, unresolved placeholder, bad email.
  */
 
-export const BOOKING_URL = "https://cal.com/jeramey-james";
+import { bookingUrl } from "@/lib/booking";
+
+export const BOOKING_URL = bookingUrl("auto-reply", "email");
 export const POSTAL_PLACEHOLDER = "{{POSTAL_ADDRESS}}";
 export const UNSUBSCRIBE_PLACEHOLDER = "{{UNSUBSCRIBE_URL}}";
 

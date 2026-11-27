@@ -61,6 +61,31 @@ export async function sendResendEmail(args: { to: string; from: string; subject:
   }
 }
 
+/**
+ * G7 (2 CFR 200.318(c)): an inquiry with the funding field filled skips
+ * automation and routes to Jake.
+ */
+export const DEFAULT_CRM_OWNER = "default";
+
+export function crmRouting(data: Record<string, unknown>): { owner: string; skipAutomation: boolean; reason: string | null } {
+  const funding = typeof data.fundingProgram === "string" ? data.fundingProgram.trim() : "";
+  return funding
+    ? { owner: "jake", skipAutomation: true, reason: "funding-field-filled" }
+    : { owner: DEFAULT_CRM_OWNER, skipAutomation: false, reason: null };
+}
+
+const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"] as const;
+
+/** Pull UTM params out of the form data so Twenty gets them as a separate block. */
+export function extractAttribution(data: Record<string, unknown>): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const key of UTM_KEYS) {
+    const v = data[key];
+    if (typeof v === "string" && v.trim()) out[key] = v.trim();
+  }
+  return out;
+}
+
 export async function forwardToCrm(args: {
   schemaType: string;
   docId: string;
@@ -98,6 +123,8 @@ export async function forwardToCrm(args: {
       sanityDocumentId: args.docId,
       submittedAt: new Date().toISOString(),
       data: args.data,
+      attribution: extractAttribution(args.data),
+      routing: crmRouting(args.data),
       triage: args.triage,
     }),
   });

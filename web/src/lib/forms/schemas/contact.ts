@@ -22,6 +22,11 @@ export const contactSchema = z.object({
   lane: z.string().optional(),
   source: z.string().optional(),
   approvalStatus: z.string().optional(),
+  utm_source: z.string().optional(),
+  utm_medium: z.string().optional(),
+  utm_campaign: z.string().optional(),
+  utm_term: z.string().optional(),
+  utm_content: z.string().optional(),
   scopeTool: z.string().optional(),
   scopeMarkdown: z.string().optional(),
   scopeAnswers: z
