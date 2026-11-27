@@ -14,10 +14,10 @@ export function ContactHoneypot() {
         overflow: "hidden",
       }}
     >
-      <label htmlFor="contact-mesh-ledger-slot">Mesh ledger slot</label>
+      <label htmlFor="contact-hp-field">Leave this field blank</label>
       <input
         type="text"
-        id="contact-mesh-ledger-slot"
+        id="contact-hp-field"
         name={CONTACT_HONEYPOT_FIELD}
         tabIndex={-1}
         autoComplete="new-password"

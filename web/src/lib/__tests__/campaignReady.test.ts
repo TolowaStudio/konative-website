@@ -6,10 +6,12 @@ import {
 } from "node:fs";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { DATA_CENTER_OFFER, TRIBAL_OFFER } from "@/content/offers";
+import { bookingUrl } from "@/lib/booking";
 import { SITE_OG_IMAGE_PATH } from "@/lib/seo/siteOpenGraph";
 
 const webRoot = process.cwd();
-const CAL_URL = "https://cal.com/jeramey-james/15min";
+const CAL_URL = "https://cal.com/jeramey-james?utm_source=konative.com";
 
 const CANONICAL_ROUTE_FILES: Array<{ path: string; canonical: string }> = [
   { path: "src/app/(frontend)/page.tsx", canonical: "/" },
@@ -113,15 +115,65 @@ describe("campaign-ready public surface (TS-4169)", () => {
     expect(page).not.toMatch(/export const metadata/);
   });
 
-  it("preserves the canonical Cal.com 15-minute booking link on surfaces that use it", () => {
+  it("uses the one canonical Cal.com booking link with UTMs on every surface", () => {
+    for (const path of ["public/llms.txt", "public/llms-full.txt"]) {
+      expect(readFileSync(resolve(webRoot, path), "utf8"), path).toContain(CAL_URL);
+    }
     for (const path of [
       "src/components/Footer.tsx",
       "src/app/(frontend)/call/page.tsx",
-      "public/llms.txt",
-      "public/llms-full.txt",
+      "src/app/(frontend)/contact/page.tsx",
     ]) {
-      const contents = readFileSync(resolve(webRoot, path), "utf8");
-      expect(contents, path).toContain(CAL_URL);
+      expect(readFileSync(resolve(webRoot, path), "utf8"), path).toContain("bookingUrl(");
+    }
+    expect(bookingUrl("footer")).toBe(
+      "https://cal.com/jeramey-james?utm_source=konative.com&utm_medium=site&utm_campaign=booking&utm_content=footer",
+    );
+  });
+
+  it("has no hard-coded booking URL in any source file (.ts or .tsx)", () => {
+    const offenders = walkSourceFiles(resolve(webRoot, "src"))
+      .filter((f) => !f.endsWith(join("lib", "booking.ts")))
+      .filter((f) =>
+        readFileSync(f, "utf8")
+          .split("\n")
+          .some(
+            (l) =>
+              !/^\s*(\*|\/\/|\/\*)/.test(l) &&
+              /cal\.com\/jeramey-james/.test(l) &&
+              !/>cal\.com\/jeramey-james</.test(l),
+          ),
+      );
+    expect(offenders).toEqual([]);
+  });
+
+  it("gives the shared hero H1 room (line-height >= 1, spacing above and below) on /tribal and /data-center-connectivity", () => {
+    const layout = readFileSync(resolve(webRoot, "src/components/marketing/PitchLayout.tsx"), "utf8");
+    const h1 = layout.slice(layout.indexOf("<h1"), layout.indexOf("</h1>"));
+    const lh = Number(/lineHeight:\s*([\d.]+)/.exec(h1)?.[1]);
+    const mb = Number(/marginBottom:\s*(\d+)/.exec(h1)?.[1]);
+    expect(lh).toBeGreaterThanOrEqual(1);
+    expect(mb).toBeGreaterThanOrEqual(32);
+    for (const path of [
+      "src/app/(frontend)/tribal/page.tsx",
+      "src/app/(frontend)/data-center-connectivity/page.tsx",
+    ]) {
+      expect(readFileSync(resolve(webRoot, path), "utf8"), path).toContain("<PitchLayout");
+    }
+  });
+
+  it("uses one offer name per lane from content/offers.ts", () => {
+    const read = (p: string) => readFileSync(resolve(webRoot, p), "utf8");
+    const tribal = read("src/app/(frontend)/tribal/page.tsx");
+    const dc = read("src/app/(frontend)/data-center-connectivity/page.tsx");
+    const home = read("src/content/homeConnectivity.ts");
+    expect(TRIBAL_OFFER).toBe("Continuity Snapshot");
+    expect(DATA_CENTER_OFFER).toBe("One-Page Site Brief");
+    expect(tribal).toContain("TRIBAL_OFFER");
+    expect(dc).toContain("DATA_CENTER_OFFER");
+    expect(home).toContain("DATA_CENTER_OFFER");
+    for (const c of [tribal, dc, home]) {
+      expect(c).not.toMatch(/Get a Site Brief|Continuity Brief|Connectivity Snapshot/i);
     }
   });
 
@@ -136,12 +188,31 @@ describe("campaign-ready public surface (TS-4169)", () => {
       resolve(webRoot, "src/app/(frontend)/data-center-connectivity/page.tsx"),
       "utf8",
     );
-    expect(dc).toMatch(/Native American–owned, vendor-neutral/i);
+    expect(dc).toMatch(/Native-owned, vendor-neutral/i);
     expect(dc).toMatch(/domestic and international/i);
     expect(dc).toMatch(/any connectivity package/i);
     expect(dc).toMatch(
       /No SBA 8\(a\), NMSDC, or other certification claims beyond ownership/i,
     );
     expect(dc).not.toMatch(/(?:NMSDC|SBA 8\(a\)).*certified|certified.*(?:NMSDC|SBA 8\(a\))/i);
+  });
+});
+describe("TS-4371 site fixes", () => {
+  it("lists /privacy and /terms in the sitemap", () => {
+    const src = readFileSync(resolve(webRoot, "src/app/sitemap.ts"), "utf8");
+    expect(src).toContain("${BASE}/privacy");
+    expect(src).toContain("${BASE}/terms");
+  });
+
+  it("uses 'Native-owned' only (G9) and no leftover jargon", () => {
+    for (const path of [
+      "src/app/(frontend)/HomePage.tsx",
+      "src/app/(frontend)/data-center-connectivity/page.tsx",
+      "src/app/(frontend)/connectivity/page.tsx",
+    ]) {
+      const contents = readFileSync(resolve(webRoot, path), "utf8");
+      expect(contents, path).not.toMatch(/Indigenous-owned|Native American[–-]owned|certified Avant/i);
+    }
+    expect(readFileSync(resolve(webRoot, "src/components/forms/ContactHoneypot.tsx"), "utf8")).not.toMatch(/Mesh ledger/i);
   });
 });

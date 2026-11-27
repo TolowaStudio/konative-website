@@ -1,7 +1,9 @@
 "use client";
 
+import { bookingUrl } from "@/lib/booking";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { CONTACT_PROJECT_TYPES, resolveProjectType } from "@/lib/forms/contactProjectTypes";
 import { ContactHoneypot } from "@/components/forms/ContactHoneypot";
 import HeroBackdrop from "@/components/marketing/HeroBackdrop";
 
@@ -22,6 +24,13 @@ export default function ContactPage() {
   const [formState, setFormState] = useState<FormState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [buttonHover, setButtonHover] = useState(false);
+  const [projectType, setProjectType] = useState("");
+
+  // Honor ?projectType=... (e.g. /contact?projectType=tribal_enterprise).
+  useEffect(() => {
+    const fromUrl = resolveProjectType(new URLSearchParams(window.location.search).get("projectType"));
+    if (fromUrl) setProjectType(fromUrl);
+  }, []);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -111,7 +120,7 @@ export default function ContactPage() {
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 32 }}>
             <a href="#request" style={primaryLinkStyle}>Get connectivity options</a>
-            <a href="https://cal.com/jeramey-james" target="_blank" rel="noopener noreferrer" style={darkOutlineLinkStyle}>Book a working session</a>
+            <a href={bookingUrl("contact")} target="_blank" rel="noopener noreferrer" style={darkOutlineLinkStyle}>Book a working session</a>
           </div>
         </div>
       </section>
@@ -138,16 +147,11 @@ export default function ContactPage() {
           </div>
 
           <Field label="Requirement type">
-            <select name="projectType" style={inputStyle}>
+            <select name="projectType" value={projectType} onChange={(e) => setProjectType(e.target.value)} style={inputStyle}>
               <option value="">Select...</option>
-              <option value="tribal_funded">Tribal or grant-funded project</option>
-              <option value="data_center">Data-center site connectivity</option>
-              <option value="dark_fiber_transport">Dark fiber, transport, or wavelengths</option>
-              <option value="business_connectivity">Enterprise internet, SD-WAN, or voice</option>
-              <option value="cloud_security">Cloud connectivity, UCaaS/CCaaS, or security</option>
-              <option value="market_intelligence">Market intelligence or brief request</option>
-              <option value="partnership">Partnership or referral</option>
-              <option value="other">Other</option>
+              {CONTACT_PROJECT_TYPES.map((t) => (
+                <option key={t.value} value={t.value}>{t.label}</option>
+              ))}
             </select>
           </Field>
 
@@ -239,7 +243,7 @@ export default function ContactPage() {
           <p style={{ fontFamily: BODY, color: "rgba(255,255,255,0.64)", fontSize: 16, lineHeight: 1.7, maxWidth: 620, margin: "0 auto 30px" }}>
             Book a working session when you already have a site, route, renewal, or procurement question that needs a decision.
           </p>
-          <a href="https://cal.com/jeramey-james" target="_blank" rel="noopener noreferrer" style={darkPrimaryLinkStyle}>
+          <a href={bookingUrl("contact")} target="_blank" rel="noopener noreferrer" style={darkPrimaryLinkStyle}>
             Book on Cal.com
           </a>
         </div>

@@ -22,14 +22,14 @@ const DARK = "#0A0F1E";
 const PAGE_URL = `${SITE_URL}/tribal/grants`;
 
 export const metadata: Metadata = {
-  title: "TBCP 3 & NEGP Broadband Funding Help for Tribal Nations | Konative",
+  title: "TBCP 3 & NEGP Awardees: From Award to Operating Connectivity | Konative",
   description:
-    "Konative helps Tribal nations and Native entities turn TBCP 3 and NEGP broadband funding into carrier-ready connectivity scopes, supplier comparisons, resilient network requirements, and procurement-ready next steps.",
+    "TBCP 3 and NEGP closed Nov 17, 2026; NTIA expects rolling awards from Spring 2027. Konative helps Tribal nations and Native entities turn awarded broadband funding into carrier-ready connectivity scopes, supplier comparisons, resilient network requirements, and procurement-ready next steps.",
   alternates: { canonical: "/tribal/grants" },
   openGraph: {
-    title: "TBCP 3 & NEGP Broadband Funding Help for Tribal Nations | Konative",
+    title: "TBCP 3 & NEGP Awardees: From Award to Operating Connectivity | Konative",
     description:
-      "A practical guide for Tribal connectivity teams preparing for TBCP 3 and NEGP funding: what to clarify, what Konative can help source, and how to move from funding opportunity to carrier-ready scope.",
+      "A practical guide for Tribal connectivity teams awaiting or holding TBCP 3 and NEGP awards: what to clarify, what Konative can help source, and how to move from award to carrier-ready scope.",
     url: PAGE_URL,
   },
 };
@@ -38,7 +38,7 @@ const FAQ_ITEMS = [
   {
     question: "What are TBCP 3 and NEGP?",
     answer:
-      "TBCP 3 is the 2026 round of NTIA's Tribal Broadband Connectivity Program (2026-NTIA-TBCP). NEGP is the Native Entities Grant Program (2026-NTIA-NEGP), the Native entity set-aside under the Digital Equity Act. Under the current NTIA notices, both application windows close November 17, 2026 at 11:59 p.m. ET. Together, the 2026 funding lane is intended to support broadband connectivity, infrastructure availability, adoption, and related activities for Tribal and Native communities. Konative is not NTIA and does not administer grant awards.",
+      "TBCP 3 is the 2026 round of NTIA's Tribal Broadband Connectivity Program (2026-NTIA-TBCP). NEGP is the Native Entities Grant Program (2026-NTIA-NEGP), the Native entity set-aside under the Digital Equity Act. Both application windows closed November 17, 2026 at 11:59 p.m. ET, and NTIA expects to make awards on a rolling basis beginning Spring 2027. Together, the 2026 funding lane is intended to support broadband connectivity, infrastructure availability, adoption, and related activities for Tribal and Native communities. Konative is not NTIA and does not administer grant awards.",
   },
   {
     question: "How can Konative help with TBCP 3 or NEGP?",
@@ -51,9 +51,9 @@ const FAQ_ITEMS = [
       "No. Konative's brokerage compensation is paid by the supplier that wins the business. Tribal buyers can use Konative to compare the supplier market at no cost and with no obligation to purchase.",
   },
   {
-    question: "Should we talk to Konative before or after applying?",
+    question: "When should we talk to Konative?",
     answer:
-      "Both can be useful. Before applying, Konative can help clarify service requirements and commercial assumptions. After an award or during procurement, Konative can help compare carrier options, resilience designs, service terms, and implementation paths.",
+      "Any time before you buy. While you wait on an award, Konative can help clarify service requirements and commercial assumptions so procurement is not rushed. After an award or during procurement, Konative can help compare carrier options, resilience designs, service terms, and implementation paths.",
   },
   {
     question: "Can Konative write the grant application?",
@@ -154,18 +154,18 @@ export default function TribalGrantsPage() {
       <JsonLd data={faqSchema(FAQ_ITEMS)} />
 
       <PitchLayout
-        eyebrow="TBCP 3 & NEGP · 2026 Tribal Broadband Funding"
+        eyebrow="TBCP 3 & NEGP · Closed Nov 17, 2026 · Awards From Spring 2027"
         titleLines={[
           { text: "TURN FUNDING", tone: "white" },
           { text: "INTO A CARRIER-", tone: "dim" },
           { text: "READY SCOPE.", tone: "rust" },
         ]}
-        subhead="NTIA's 2026 TBCP 3 and Native Entities Grant Program funding lane is active. Konative helps Tribal nations and Native entities turn the opportunity into clear connectivity requirements, supplier comparisons, resilient network options, and procurement-ready next steps."
+        subhead="NTIA's 2026 TBCP 3 and Native Entities Grant Program windows closed November 17, 2026, with rolling awards expected from Spring 2027. Konative does not write grants; it helps Tribal nations and Native entities turn an award into clear connectivity requirements, supplier comparisons, resilient network options, and procurement-ready next steps."
         primaryCta={{ label: "Start the Scope Builder →", href: "/tribal/scope" }}
         secondaryCta={{ label: "Browse TBCP Awards →", href: "/tribal/awards" }}
         ctaHeadlineTop="BRING US THE GRANT CONTEXT."
         ctaHeadlineBottom="WE'LL SHAPE THE NETWORK ASK."
-        ctaSub="Use Konative to turn locations, facilities, requirements, deadlines, and funding context into a supplier-ready connectivity scope."
+        ctaSub="Use Konative to turn locations, facilities, requirements, award terms, and timelines into a supplier-ready connectivity scope."
       >
         <PitchSection eyebrow="Why This Page Exists" heading="Funding is not the finish line">
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 32, alignItems: "start" }}>
@@ -184,8 +184,8 @@ export default function TribalGrantsPage() {
               <div style={labelStyle}>2026 funding lane</div>
               <h2 style={{ ...cardTitleStyle, fontSize: 31 }}>TBCP 3 / NEGP</h2>
               <p style={bodyStyle}>
-                The 2026 Tribal broadband funding lane should be treated as two connected motions: applicants
-                preparing scopes before deadline pressure, and awardees preparing for procurement and implementation.
+                With the 2026 application windows closed, the work is two connected motions: applicants getting
+                procurement-ready while awards roll out, and awardees moving into procurement and implementation.
               </p>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 22 }}>
                 <a href="https://broadbandusa.ntia.gov/funding-programs/tribal-broadband-connectivity/round-three-notice-of-funding-opportunity" style={ctaLinkStyle}>
@@ -264,13 +264,13 @@ export default function TribalGrantsPage() {
         <PitchSection eyebrow="Start Here" heading="Three ways to use this page">
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))", gap: 18 }}>
             <div style={cardStyle}>
-              <div style={labelStyle}>For applicants</div>
-              <h3 style={cardTitleStyle}>Pressure-test the scope before deadline pressure</h3>
+              <div style={labelStyle}>Awaiting an award</div>
+              <h3 style={cardTitleStyle}>Get procurement-ready before the award lands</h3>
               <p style={{ ...bodyStyle, marginBottom: 22 }}>
-                Use Konative to clarify service needs, locations, and commercial assumptions before the project becomes a rushed procurement.
+                Use Konative to clarify service needs, locations, and commercial assumptions before the award turns into a rushed procurement.
               </p>
               <Link href="/tribal/scope?context=tbcp3-applicant" style={ctaLinkStyle}>
-                Build applicant scope →
+                Build your connectivity scope →
               </Link>
             </div>
             <div style={cardStyle}>

@@ -1,3 +1,4 @@
+import { bookingUrl } from "@/lib/booking";
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import HeroBackdrop from '@/components/marketing/HeroBackdrop'
@@ -217,7 +218,7 @@ export default function PartnersPage() {
             We add partners by invitation and collective vetting. If you align with the standards above and want to be considered, send a one-paragraph note.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="https://cal.com/jeramey-james/15min" target="_blank" rel="noopener noreferrer" style={{ background: '#C8001F', color: '#fff', padding: '0.875rem 1.75rem', borderRadius: 6, textDecoration: 'none', fontWeight: 700, fontSize: '0.9375rem' }}>
+            <a href={bookingUrl("partners")} target="_blank" rel="noopener noreferrer" style={{ background: '#C8001F', color: '#fff', padding: '0.875rem 1.75rem', borderRadius: 6, textDecoration: 'none', fontWeight: 700, fontSize: '0.9375rem' }}>
               Book a Call →
             </a>
             <Link href="/contact" style={{ background: 'transparent', color: '#f6f7fb', padding: '0.875rem 1.75rem', borderRadius: 6, textDecoration: 'none', fontWeight: 600, fontSize: '0.9375rem', border: '1px solid #334155' }}>

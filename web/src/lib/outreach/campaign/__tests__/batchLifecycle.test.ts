@@ -101,4 +101,45 @@ describe("campaign batch lifecycle + send gate", () => {
     expect(sendSpy).not.toHaveBeenCalled();
     sendSpy.mockRestore();
   });
+
+  it("dispatchCanaryBatchMailgun blocks a suppressed address before Mailgun (K-09)", async () => {
+    process.env.MAILGUN_API_KEY = "k";
+    process.env.MAILGUN_DOMAIN = "mg.konative.com";
+    process.env.TWENTY_API_URL = "https://twenty.test";
+    process.env.TWENTY_API_TOKEN = "t";
+    const calls: string[] = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => {
+        calls.push(String(url));
+        return new Response(
+          JSON.stringify({
+            data: { people: { edges: [{ node: { emails: { primaryEmail: "dnc@example.com" }, doNotContact: true } }] } },
+          }),
+        );
+      }),
+    );
+    try {
+      const batch = {
+        run_id: "r",
+        status: "canary" as const,
+        audience: "tbcp-segment-a",
+        suppression_checked: true,
+        touch,
+        canary_recipient_count: 1,
+        receipts: [],
+      };
+      const dispatch = await dispatchCanaryBatchMailgun({
+        batch,
+        to: "dnc@example.com",
+        gate: { getMode: () => "off" },
+      });
+      expect(dispatch.ok).toBe(false);
+      expect(dispatch).toMatchObject({ reason: "suppressed" });
+      expect(calls.some((u) => u.includes("api.mailgun.net"))).toBe(false);
+    } finally {
+      vi.unstubAllGlobals();
+      for (const k of ["MAILGUN_API_KEY", "MAILGUN_DOMAIN", "TWENTY_API_URL", "TWENTY_API_TOKEN"]) delete process.env[k];
+    }
+  });
 });

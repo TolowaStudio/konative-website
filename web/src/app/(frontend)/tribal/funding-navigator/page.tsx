@@ -1,3 +1,4 @@
+import { bookingUrl } from "@/lib/booking";
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 import Link from "next/link";
@@ -14,14 +15,14 @@ import DeadlineCountdown from "./DeadlineCountdown";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "$790M Tribal Broadband Funding Navigator — TBCP Round 3 & NEGP Deadlines",
+  title: "$790M Tribal Broadband Funding Navigator — TBCP Round 3 & NEGP Closed, Awards From Spring 2027",
   description:
-    "TBCP Round 3 ($540M) and NEGP ($250M) both close Nov 17, 2026 at 11:59 p.m. ET. Free navigator: eligibility, eligible uses, and an application checklist.",
+    "TBCP Round 3 ($540M) and NEGP ($250M) closed Nov 17, 2026. NTIA expects rolling awards from Spring 2027. Program facts, sources, and what funded projects need next.",
   alternates: { canonical: "/tribal/funding-navigator" },
   openGraph: {
-    title: "$790M Tribal Broadband Funding Navigator — TBCP Round 3 & NEGP Deadlines",
+    title: "$790M Tribal Broadband Funding Navigator — TBCP Round 3 & NEGP Closed, Awards From Spring 2027",
     description:
-      "TBCP Round 3 ($540M) and NEGP ($250M) both close Nov 17, 2026 at 11:59 p.m. ET. Free navigator: eligibility, eligible uses, and an application checklist.",
+      "TBCP Round 3 ($540M) and NEGP ($250M) closed Nov 17, 2026. NTIA expects rolling awards from Spring 2027. Program facts, sources, and what funded projects need next.",
     url: `${SITE_URL}/tribal/funding-navigator`,
   },
 };
@@ -36,7 +37,7 @@ const TEXT = "#111111";
 const MUTED = "#6B7280";
 const DIVIDER = "#E5E7EB";
 
-const CAL_LINK = "https://cal.com/jeramey-james/15min";
+const CAL_LINK = bookingUrl("tribal-funding-navigator");
 
 // --- JSON-LD ---
 
@@ -59,9 +60,9 @@ const speakableJsonLd = {
 
 const FAQ_ITEMS = [
   {
-    question: "What are the application deadlines for TBCP Round 3 and NEGP?",
+    question: "Are TBCP Round 3 and NEGP still open?",
     answer:
-      "Both NTIA funding opportunities opened June 17, 2026. Under the current NTIA notices, TBCP Round 3 (2026-NTIA-TBCP, $540 million) and the Native Entities Grant Program (2026-NTIA-NEGP, $250 million) both close November 17, 2026 at 11:59 p.m. ET. Applications for each program are submitted through the NTIA grants portal. Awards are expected on a rolling basis beginning Spring 2027.",
+      "No. Both NTIA funding opportunities opened June 17, 2026, and under the NTIA notices TBCP Round 3 (2026-NTIA-TBCP, $540 million) and the Native Entities Grant Program (2026-NTIA-NEGP, $250 million) both closed November 17, 2026 at 11:59 p.m. ET. Applications were submitted through the NTIA grants portal. NTIA expects to make awards on a rolling basis beginning Spring 2027.",
   },
   {
     question: "What is the difference between TBCP Round 3 and the NEGP?",
@@ -69,19 +70,19 @@ const FAQ_ITEMS = [
       "TBCP Round 3 is the larger program ($540M, run by NTIA BroadbandUSA) and funds both broadband infrastructure deployment and broadband use and adoption projects — including affordability subsidies, devices, digital skills, telehealth, and distance learning. The NEGP ($250M, under the Digital Equity Act) makes smaller grants of $500,000 to $2.5 million for Native entities' digital equity and inclusion activities, with a 10% match that can be waived. If you are building network infrastructure, TBCP Round 3 is the fit; if you are running a focused digital-equity program, NEGP may be the faster path.",
   },
   {
-    question: "Can we apply to both programs?",
+    question: "Could a Tribe apply to both programs?",
     answer:
-      "Both opportunities are open simultaneously and share a November 17, 2026 deadline at 11:59 p.m. ET. Many Tribal Nations have needs that map to each: infrastructure under TBCP Round 3 and digital-equity programming under NEGP. Read both NOFOs carefully for scope and duplication-of-funding rules, and confirm your application strategy with your NTIA program officer. Splitting a coherent story across two sharp applications is usually stronger than stretching one application to cover everything.",
+      "Yes. Both opportunities were open at the same time and shared the November 17, 2026 deadline. Many Tribal Nations had needs that mapped to each: infrastructure under TBCP Round 3 and digital-equity programming under NEGP. If you applied to both, keep the two scopes distinct for duplication-of-funding rules and post-award reporting, and confirm the details with your NTIA program officer.",
   },
   {
-    question: "What if we miss a deadline?",
+    question: "What if we missed the deadline?",
     answer:
-      "Treat each program deadline as hard unless NTIA announces otherwise: TBCP Round 3 and NEGP both close November 17, 2026 at 11:59 p.m. ET. If a window closes without an application, the practical next moves are: pursue FY2026 E-Rate for eligible anchor institutions (the Tribal library Category Two floor is now $66,385 with a 90% maximum discount, and the FCC's T-LEAP program offers free application help), watch for future federal windows, and get procurement-ready now so the next opportunity is not a scramble. Konative can help you scope requirements either way.",
+      "TBCP Round 3 and NEGP both closed November 17, 2026 at 11:59 p.m. ET. If you did not apply, the practical next moves are: pursue FY2026 E-Rate for eligible anchor institutions (the Tribal library Category Two floor is now $66,385 with a 90% maximum discount, and the FCC's T-LEAP program offers free application help), watch for future federal windows, and get procurement-ready now so the next opportunity is not a scramble. Konative can help you scope connectivity requirements either way.",
   },
   {
-    question: "Does Konative charge for this navigator or for application-window help?",
+    question: "Does Konative charge for this navigator or for connectivity help?",
     answer:
-      "No. This page is free with no signup, and a working session during the application window costs nothing. Konative is a vendor-neutral connectivity brokerage paid by suppliers when they win business — not by Tribes, and never from grant funds. We do not write grants and no federal money flows through us.",
+      "No. This page is free with no signup, and a connectivity review costs the Tribe nothing. Konative is a vendor-neutral connectivity brokerage paid by suppliers when they win business — not by Tribes, and never from grant funds. We do not write grants and no federal money flows through us.",
   },
   {
     question: "What happens after awards are announced?",
@@ -91,7 +92,7 @@ const FAQ_ITEMS = [
   {
     question: "How does a connectivity broker fit alongside our grant writer?",
     answer:
-      "They are different jobs on the same application. Your grant writer owns the narrative, compliance, and submission. Konative pressure-tests the technical and commercial side: is the network scoped realistically, are the carrier costs in the budget defensible, and can the promised service levels actually be procured in your service area? We work alongside grant writers and Native-owned advisors such as AMERIND Critical Infrastructure, Tribal Ready, and MuralNet — partners, not competitors.",
+      "They are different jobs. Your grant writer owned the narrative, compliance, and submission. Konative works on what comes after the award: is the network scoped realistically, are the carrier costs defensible against real market pricing, and can the promised service levels actually be procured in your service area? We work alongside grant writers and Native-owned advisors such as AMERIND Critical Infrastructure, Tribal Ready, and MuralNet — partners, not competitors.",
   },
   {
     question: "Is an affordability subsidy really an eligible use of TBCP funds?",
@@ -234,9 +235,9 @@ const COMPARISON_ROWS: Array<{ label: string; tbcp: string; negp: string }> = [
     negp: "10% match, waivable",
   },
   {
-    label: "Deadline",
-    tbcp: "November 17, 2026 · 11:59 p.m. ET, via the NTIA grants portal (2026-NTIA-TBCP)",
-    negp: "November 17, 2026 · 11:59 p.m. ET, via the NTIA grants portal (2026-NTIA-NEGP; amended July 30, 2026)",
+    label: "Application window",
+    tbcp: "Closed November 17, 2026 · 11:59 p.m. ET (2026-NTIA-TBCP)",
+    negp: "Closed November 17, 2026 · 11:59 p.m. ET (2026-NTIA-NEGP; amended July 30, 2026)",
   },
   {
     label: "Awards",
@@ -263,15 +264,15 @@ const DECISION_SCENARIOS = [
   },
   {
     num: "04",
-    title: "Not sure which — or whether — to pursue",
-    body: "Application windows are finite and oversubscription is the norm. Book a free working session: we will map your situation to the right program, sanity-check scope, and point you to the right partners for the pieces we don't do.",
+    title: "Not sure what comes next",
+    body: "The application windows have closed and awards roll out from Spring 2027. Book a free connectivity review: we map what your project needs to buy, sanity-check carrier costs, and point you to the right partners for the pieces we don't do.",
   },
 ];
 
 const CHECKLIST_ITEMS = [
   {
     title: "SAM.gov registration current",
-    body: "Your entity's SAM.gov registration and UEI must be active to apply. Renewals and new registrations can take weeks — start this first, today.",
+    body: "Your entity's SAM.gov registration and UEI must be active to apply. Renewals and new registrations can take weeks — keep it current between rounds.",
   },
   {
     title: "Tribal resolution or authorization",
@@ -330,7 +331,7 @@ const CONTEXT_STATS = [
   {
     stat: "Closed",
     label: "USDA ReConnect",
-    body: "USDA ReConnect currently has no open application window. Right now, the NTIA programs on this page are the live federal path.",
+    body: "USDA ReConnect currently has no open application window, and TBCP Round 3 and NEGP closed November 17, 2026. Watch for future federal windows.",
   },
 ];
 
@@ -400,8 +401,8 @@ export default function FundingNavigatorPage() {
               maxWidth: 900,
             }}
           >
-            <span style={{ display: "block", color: "#fff" }}>$790M is on the table.</span>
-            <span style={{ display: "block", color: RED }}>The clock is running.</span>
+            <span style={{ display: "block", color: "#fff" }}>The $790M windows have closed.</span>
+            <span style={{ display: "block", color: RED }}>Awards come next.</span>
           </h1>
           <p
             id="hero-summary"
@@ -416,14 +417,14 @@ export default function FundingNavigatorPage() {
           >
             On June 17, 2026, NTIA opened two funding opportunities for Tribal Nations — TBCP
             Round 3 ($540 million) and the Native Entities Grant Program ($250 million).
-            Under the current NTIA notices, both close November 17, 2026 at 11:59 p.m. ET
-            via the NTIA grants portal. This navigator
-            explains eligibility, eligible uses, and how to get an application in on time.
+            Both closed November 17, 2026 at 11:59 p.m. ET, and NTIA expects rolling awards
+            beginning Spring 2027. This navigator keeps the program facts in one place and
+            explains what funded projects need next: connectivity that can actually be procured.
           </p>
           <DeadlineCountdown />
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
             <a href={CAL_LINK} style={primaryBtnStyle}>
-              Book a Free Application-Window Working Session →
+              Book a Free Post-Award Connectivity Review →
             </a>
             <Link
               href="/tribal/sovereignty"
@@ -450,7 +451,7 @@ export default function FundingNavigatorPage() {
       {/* Program comparison */}
       <PitchSection eyebrow="The Two Programs" heading="TBCP Round 3 vs. the Native Entities Grant Program">
         <p style={{ fontFamily: BODY, fontSize: 16, lineHeight: 1.75, color: MUTED, maxWidth: 720, marginBottom: 36 }}>
-          Two programs, two deadlines. The facts below are drawn from NTIA program materials —
+          Two programs, one shared deadline, now closed. The facts below are drawn from NTIA program materials —
           the Notices of Funding Opportunity linked in the sources section are the binding
           documents, so confirm every detail there before you build a budget around it.
         </p>
@@ -492,10 +493,10 @@ export default function FundingNavigatorPage() {
       </PitchSection>
 
       {/* Application checklist */}
-      <PitchSection eyebrow="Get Application-Ready" heading="The application checklist">
+      <PitchSection eyebrow="For Future Rounds" heading="What a complete application needed">
         <p style={{ fontFamily: BODY, fontSize: 16, lineHeight: 1.75, color: MUTED, maxWidth: 720, marginBottom: 36 }}>
-          Ten things that separate applications that get funded from applications that get
-          filed. None of them can start the week of the deadline.
+          These windows have closed. Keep this list for the next federal round: ten things that
+          separate funded applications from filed ones, none of which can start the week of a deadline.
         </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 16 }}>
           {CHECKLIST_ITEMS.map((item, i) => (
@@ -582,9 +583,9 @@ export default function FundingNavigatorPage() {
         >
           <p style={{ fontFamily: BODY, fontSize: 17, lineHeight: 1.8, color: TEXT, marginBottom: 18 }}>
             Konative doesn&apos;t write grants — and the money never flows through us. We&apos;re a
-            vendor-neutral connectivity brokerage. We help you scope the network your application
-            promises, pressure-test carrier costs in your budget, and — when you&apos;re funded —
-            make carriers compete for the build and the circuits.
+            vendor-neutral connectivity brokerage. When you&apos;re funded, we help turn the network
+            your application promised into service you can actually buy: we pressure-test carrier
+            costs against the budget, then make carriers compete for the build and the circuits.
           </p>
           <p style={{ fontFamily: BODY, fontSize: 17, lineHeight: 1.8, color: TEXT, margin: 0 }}>
             Grant writers and Native-owned advisors (AMERIND Critical Infrastructure, Tribal
@@ -694,9 +695,9 @@ export default function FundingNavigatorPage() {
               marginBottom: 20,
             }}
           >
-            The window is open.
+            Funded is not connected.
             <br />
-            <span style={{ color: RED }}>Use it.</span>
+            <span style={{ color: RED }}>Plan the network now.</span>
           </h2>
           <p
             style={{
@@ -708,13 +709,13 @@ export default function FundingNavigatorPage() {
               margin: "0 auto 36px",
             }}
           >
-            A free working session during the application window: we map your project to the
-            right program, sanity-check the network scope and carrier costs, and point you to
-            the right partners for everything else.
+            A free connectivity review for awardees and applicants moving into operations: we map
+            what the project needs to buy, sanity-check network scope and carrier costs, and make
+            carriers compete for the build and the circuits.
           </p>
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center", justifyContent: "center" }}>
             <a href={CAL_LINK} style={{ ...primaryBtnStyle, padding: "18px 44px" }}>
-              Book a Working Session →
+              Book a Connectivity Review →
             </a>
             <Link
               href="/contact"

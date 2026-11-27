@@ -1,3 +1,4 @@
+import { bookingUrl } from "@/lib/booking";
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import HeroBackdrop from '@/components/marketing/HeroBackdrop'
@@ -166,7 +167,7 @@ export default function FirstNationsPage() {
             We also acknowledge the asymmetry. Indigenous communities have been on the wrong end of every previous extraction cycle — fur, timber, mining, oil, hydro. The data center cycle is different only if it is structured to be different. Konative&apos;s thesis is that the deals worth doing are the ones where the host Nation owns the asset, controls the data jurisdiction, and shapes the workforce pathway.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <a href="https://cal.com/jeramey-james/15min" target="_blank" rel="noopener noreferrer" style={{ background: '#C8001F', color: '#fff', padding: '0.75rem 1.5rem', borderRadius: 6, textDecoration: 'none', fontWeight: 600, fontSize: '0.875rem' }}>
+            <a href={bookingUrl("intelligence-first-nations")} target="_blank" rel="noopener noreferrer" style={{ background: '#C8001F', color: '#fff', padding: '0.75rem 1.5rem', borderRadius: 6, textDecoration: 'none', fontWeight: 600, fontSize: '0.875rem' }}>
               Discuss a Partnership →
             </a>
             <Link href="/methodology" style={{ background: 'transparent', color: '#f6f7fb', padding: '0.75rem 1.5rem', borderRadius: 6, textDecoration: 'none', fontWeight: 600, fontSize: '0.875rem', border: '1px solid #334155' }}>
@@ -316,7 +317,7 @@ export default function FirstNationsPage() {
             Whether you&apos;re an Indigenous Development Corp evaluating a DC opportunity, a hyperscaler looking to host on Indigenous land with the right structure, or a capital partner seeking sovereign-aligned infra exposure — Konative starts every conversation with the host Nation&apos;s priorities.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="https://cal.com/jeramey-james/15min" target="_blank" rel="noopener noreferrer" style={{ background: '#C8001F', color: '#fff', padding: '0.875rem 1.75rem', borderRadius: 6, textDecoration: 'none', fontWeight: 700, fontSize: '0.9375rem' }}>
+            <a href={bookingUrl("intelligence-first-nations")} target="_blank" rel="noopener noreferrer" style={{ background: '#C8001F', color: '#fff', padding: '0.875rem 1.75rem', borderRadius: 6, textDecoration: 'none', fontWeight: 700, fontSize: '0.9375rem' }}>
               Book a Call →
             </a>
             <Link href="/canada" style={{ background: 'transparent', color: '#f6f7fb', padding: '0.875rem 1.75rem', borderRadius: 6, textDecoration: 'none', fontWeight: 600, fontSize: '0.9375rem', border: '1px solid #334155' }}>

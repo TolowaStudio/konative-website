@@ -9,6 +9,7 @@
 // note rendered alongside the result. No invented precision: output is
 // always a range, never a single number.
 
+import { bookingUrl } from "@/lib/booking";
 import { useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import Link from "next/link";
@@ -385,7 +386,7 @@ export default function LateralEstimator() {
 
       <div style={{ marginTop: 28, display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
         <a
-          href="https://cal.com/jeramey-james/15min"
+          href={bookingUrl("tools-lateral-estimator-lateralestimator")}
           style={{
             fontFamily: BODY,
             fontWeight: 600,

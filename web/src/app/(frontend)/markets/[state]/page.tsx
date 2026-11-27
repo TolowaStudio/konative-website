@@ -1,3 +1,4 @@
+import { bookingUrl } from "@/lib/booking";
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -639,7 +640,7 @@ export default async function MarketPage({ params }: { params: Promise<{ state: 
                 }}>
                   Data Center Connectivity →
                 </Link>
-                <a href="https://cal.com/jeramey-james/15min" style={{
+                <a href={bookingUrl("markets-state")} style={{
                   fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 11,
                   letterSpacing: '0.12em', textTransform: 'uppercase',
                   color: 'rgba(255,255,255,0.6)', textDecoration: 'none',
